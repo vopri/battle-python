@@ -117,5 +117,5 @@ def _avoid_walls(data: dict, possible_moves: List[NextStep]) -> List[NextStep]:
     return [
         move
         for move in possible_moves
-        if walls.will_clash(current_head_pos["x"], current_head_pos["y"])
+        if walls.will_clash((current_head_pos["x"], current_head_pos["y"]), move)
     ]
