@@ -1,7 +1,7 @@
 import random
 from typing import Dict, List
 
-from battle_snake.entities import NextStep
+from battle_snake.entities import NextStep, Walls
 
 """
 This file can be a nice home for your Battlesnake's logic and helper functions.
@@ -59,6 +59,7 @@ def choose_move(data: dict) -> str:
 
     # TODO: Step 1 - Don't hit walls.
     # Use information from `data` and `my_head` to not move beyond the game board.
+    possible_moves = _avoid_walls(data, possible_moves)
     # board = data['board']
     # board_height = ?
     # board_width = ?
@@ -106,3 +107,15 @@ def _avoid_my_neck(my_body: dict, possible_moves: List[NextStep]) -> List[NextSt
         possible_moves.remove(NextStep.UP)
 
     return possible_moves
+
+
+def _avoid_walls(data: dict, possible_moves: List[NextStep]) -> List[NextStep]:
+    height = data["board"]["height"]
+    width = data["board"]["width"]
+    current_head_pos = data["you"]["head"]
+    walls = Walls(height, width)
+    return [
+        move
+        for move in possible_moves
+        if walls.will_clash(current_head_pos["x"], current_head_pos["y"])
+    ]
