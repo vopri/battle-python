@@ -1,11 +1,9 @@
 import logging
 import os
 
-from flask import Flask
-from flask import request
+from flask import Flask, request
 
-import logic
-
+from battle_snake import logic
 
 app = Flask(__name__)
 
@@ -72,5 +70,5 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
 
     print(f"\nRunning Battlesnake server at http://{host}:{port}")
-    app.env = 'development'
+    app.env = "development"
     app.run(host=host, port=port, debug=True)

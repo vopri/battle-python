@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "starter-snake-python"
+name = "battle-snake"
 version = "1.0.0"
 description = "A simple Battlesnake written in Python"
-authors = ["Battlesnake Developers <developers@battlesnake.com>"]
+authors = ["Volker Prior <volker.prior@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
