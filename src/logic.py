@@ -1,5 +1,5 @@
 import random
-from typing import List, Dict
+from typing import Dict, List
 
 """
 This file can be a nice home for your Battlesnake's logic and helper functions.
@@ -7,6 +7,7 @@ This file can be a nice home for your Battlesnake's logic and helper functions.
 We have started this for you, and included some logic to remove your Battlesnake's 'neck'
 from the list of possible moves!
 """
+
 
 def get_info() -> dict:
     """
@@ -17,10 +18,10 @@ def get_info() -> dict:
     """
     return {
         "apiversion": "1",
-        "author": "",  # TODO: Your Battlesnake Username
-        "color": "#888888",  # TODO: Personalize
-        "head": "default",  # TODO: Personalize
-        "tail": "default",  # TODO: Personalize
+        "author": "vopri",
+        "color": "#ff9900",
+        "head": "fang",
+        "tail": "hook",
     }
 
 
@@ -36,9 +37,11 @@ def choose_move(data: dict) -> str:
     for each move of the game.
 
     """
-    my_snake = data["you"]      # A dictionary describing your snake's position on the board
+    my_snake = data["you"]  # A dictionary describing your snake's position on the board
     my_head = my_snake["head"]  # A dictionary of coordinates like {"x": 0, "y": 0}
-    my_body = my_snake["body"]  # A list of coordinate dictionaries like [{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0}]
+    my_body = my_snake[
+        "body"
+    ]  # A list of coordinate dictionaries like [{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0}]
 
     # Uncomment the lines below to see what this data looks like in your output!
     # print(f"~~~ Turn: {data['turn']}  Game Mode: {data['game']['ruleset']['name']} ~~~")
@@ -72,7 +75,9 @@ def choose_move(data: dict) -> str:
     move = random.choice(possible_moves)
     # TODO: Explore new strategies for picking a move that are better than random
 
-    print(f"{data['game']['id']} MOVE {data['turn']}: {move} picked from all valid options in {possible_moves}")
+    print(
+        f"{data['game']['id']} MOVE {data['turn']}: {move} picked from all valid options in {possible_moves}"
+    )
 
     return move
 
