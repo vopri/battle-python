@@ -1,7 +1,7 @@
 import random
 from typing import Dict, List
 
-from entities import NextStep
+from battle_snake.entities import NextStep
 
 """
 This file can be a nice home for your Battlesnake's logic and helper functions.
