@@ -1,6 +1,8 @@
 import random
 from typing import Dict, List
 
+from entities import NextStep
+
 """
 This file can be a nice home for your Battlesnake's logic and helper functions.
 
@@ -50,7 +52,7 @@ def choose_move(data: dict) -> str:
     # print(f"My Battlesnakes head this turn is: {my_head}")
     # print(f"My Battlesnakes body this turn is: {my_body}")
 
-    possible_moves = ["up", "down", "left", "right"]
+    possible_moves = [NextStep.UP, NextStep.DOWN, NextStep.LEFT, NextStep.RIGHT]
 
     # Step 0: Don't allow your Battlesnake to move back on it's own neck.
     possible_moves = _avoid_my_neck(my_body, possible_moves)
@@ -79,10 +81,10 @@ def choose_move(data: dict) -> str:
         f"{data['game']['id']} MOVE {data['turn']}: {move} picked from all valid options in {possible_moves}"
     )
 
-    return move
+    return move.value
 
 
-def _avoid_my_neck(my_body: dict, possible_moves: List[str]) -> List[str]:
+def _avoid_my_neck(my_body: dict, possible_moves: List[NextStep]) -> List[NextStep]:
     """
     my_body: List of dictionaries of x/y coordinates for every segment of a Battlesnake.
             e.g. [{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0}]
@@ -95,12 +97,12 @@ def _avoid_my_neck(my_body: dict, possible_moves: List[str]) -> List[str]:
     my_neck = my_body[1]  # The segment of body right after the head is the 'neck'
 
     if my_neck["x"] < my_head["x"]:  # my neck is left of my head
-        possible_moves.remove("left")
+        possible_moves.remove(NextStep.LEFT)
     elif my_neck["x"] > my_head["x"]:  # my neck is right of my head
-        possible_moves.remove("right")
+        possible_moves.remove(NextStep.RIGHT)
     elif my_neck["y"] < my_head["y"]:  # my neck is below my head
-        possible_moves.remove("down")
+        possible_moves.remove(NextStep.DOWN)
     elif my_neck["y"] > my_head["y"]:  # my neck is above my head
-        possible_moves.remove("up")
+        possible_moves.remove(NextStep.UP)
 
     return possible_moves
