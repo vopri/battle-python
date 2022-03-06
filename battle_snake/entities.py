@@ -15,6 +15,12 @@ class Position:
     y: int
 
 
+class Snake:
+    def __init__(self, **snake_data: dict):
+        self.head = Position(**snake_data["head"])
+        self.body = [Position(**position) for position in snake_data["body"]]
+
+
 class Walls:
     def __init__(self, board_height: int, board_width: int):
         self.board_height = board_height
