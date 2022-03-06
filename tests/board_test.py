@@ -65,7 +65,7 @@ def snake_data() -> dict:
 
 
 def test_board_init(board_data):
-    board = Board(**board_data)
+    board = Board(my_head=Position(0, 0), **board_data)
     assert board.height == 11
     assert board.width == 11
     assert board.food == {
@@ -79,16 +79,10 @@ def test_board_init(board_data):
 
 
 def test_get_my_snake(board_data):
-    board = Board(**board_data)
+    board = Board(my_head=Position(0, 0), **board_data)
     board.my_head = Position(0, 0)
     me = board.get_my_snake()
     assert len(me) == 3
-
-
-def test_update_board(board_data, board_data_two):
-    board = Board(**board_data)
-    board.update(my_head=Position(0, 1), **board_data_two)
-    assert len(board.get_my_snake()) == 4
 
 
 @pytest.fixture

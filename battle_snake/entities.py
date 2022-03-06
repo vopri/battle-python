@@ -36,7 +36,7 @@ class Snake:
 
 
 class Board:
-    def __init__(self, **board_data: dict):
+    def __init__(self, my_head: Position, **board_data: dict):
         self.height: int = board_data["height"]  # type: ignore
         self.width: int = board_data["width"]  # type: ignore
         self.food: set[Position] = {
@@ -46,14 +46,10 @@ class Board:
             Position(**snake_data["head"]): Snake(**snake_data)
             for snake_data in board_data["snakes"]
         }
-        self.my_head: Optional[Position] = None
-
-    def update(self, my_head: Position, **board_data: dict):
-        self.__init__(**board_data)
-        self.my_head = my_head
+        self.my_head: Position = my_head
 
     def get_my_snake(self) -> Snake:
-        return self.all_snakes[self.my_head]  # type: ignore
+        return self.all_snakes[self.my_head]
 
 
 class Walls:
