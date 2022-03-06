@@ -80,9 +80,17 @@ def test_board_init(board_data):
 
 def test_get_my_snake(board_data):
     board = Board(my_head=Position(0, 0), **board_data)
-    board.my_head = Position(0, 0)
     me = board.get_my_snake()
     assert len(me) == 3
+
+
+def test_is_wall(board_data):
+    board = Board(my_head=Position(0, 0), **board_data)
+    assert not board.is_wall(Position(0, 0))
+    assert not board.is_wall(Position(3, 3))
+    assert board.is_wall(Position(-1, 3))
+    assert board.is_wall(Position(2, -3))
+    assert not board.is_wall(Position(11, 3))
 
 
 @pytest.fixture

@@ -51,6 +51,13 @@ class Board:
     def get_my_snake(self) -> Snake:
         return self.all_snakes[self.my_head]
 
+    def is_wall(self, pos: Position) -> bool:
+        if not (self.width >= pos.x >= 0):
+            return True
+        if not (self.height >= pos.y >= 0):
+            return True
+        return False
+
 
 class Walls:
     def __init__(self, board_height: int, board_width: int):
