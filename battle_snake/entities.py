@@ -49,7 +49,8 @@ class Board:
         }
         self.my_head: Position = my_head
 
-    def get_my_snake(self) -> Snake:
+    @property
+    def my_snake(self) -> Snake:
         return self.all_snakes[self.my_head]
 
     def is_wall(self, pos: Position) -> bool:

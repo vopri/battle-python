@@ -81,7 +81,7 @@ def test_board_init(board_data):
 
 def test_get_my_snake(board_data):
     board = Board(my_head=Position(0, 0), **board_data)
-    me = board.get_my_snake()
+    me = board.my_snake
     assert len(me) == 3
 
 
