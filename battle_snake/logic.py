@@ -38,7 +38,7 @@ def choose_move(data: dict) -> str:
     my_snake: Snake = board.my_snake
     next_possible_positions: dict[
         Position, NextStep
-    ] = board.my_snake.next_theoretical_positions()
+    ] = board.my_snake.next_theoretical_head_positions()
     next_possible_positions = _filter_neck(next_possible_positions, my_snake)
     next_possible_positions = _filter_walls(board, next_possible_positions)
 
