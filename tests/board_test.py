@@ -1,5 +1,7 @@
+from pdb import post_mortem
+
 import pytest
-from battle_snake.entities import Position, Snake
+from battle_snake.entities import NextStep, Position, Snake
 
 
 def test_postion_init():
@@ -24,6 +26,21 @@ def test_snake_init(snake_data):
         Position(6, 3),
         Position(6, 2),
     ]
+
+
+def test_next_theoretical_positions(snake):
+    assert snake.head == Position(5, 4)
+    assert snake.next_theoretical_positions() == {
+        Position(6, 4): NextStep.RIGHT,
+        Position(4, 4): NextStep.LEFT,
+        Position(5, 5): NextStep.UP,
+        Position(5, 3): NextStep.DOWN,
+    }
+
+
+@pytest.fixture
+def snake(snake_data) -> Snake:
+    return Snake(**snake_data)
 
 
 @pytest.fixture

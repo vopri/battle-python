@@ -17,8 +17,18 @@ class Position:
 
 class Snake:
     def __init__(self, **snake_data: dict):
-        self.head = Position(**snake_data["head"])
-        self.body = [Position(**position) for position in snake_data["body"]]
+        self.head: Position = Position(**snake_data["head"])
+        self.body: list[Position] = [
+            Position(**position) for position in snake_data["body"]
+        ]
+
+    def next_theoretical_positions(self) -> dict[Position, NextStep]:
+        result = dict()
+        result[Position(self.head.x + 1, self.head.y)] = NextStep.RIGHT
+        result[Position(self.head.x - 1, self.head.y)] = NextStep.LEFT
+        result[Position(self.head.x, self.head.y + 1)] = NextStep.UP
+        result[Position(self.head.x, self.head.y - 1)] = NextStep.DOWN
+        return result
 
 
 class Walls:
