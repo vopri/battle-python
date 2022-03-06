@@ -36,11 +36,11 @@ def choose_move(data: dict) -> str:
     """
     board: Board = _init_board(data)
     my_snake: Snake = board.my_snake
-    next_possible_positions: dict[
+    next_possible_moves: dict[
         Position, NextStep
-    ] = board.my_snake.next_theoretical_head_positions()
-    next_possible_positions = _filter_neck(next_possible_positions, my_snake)
-    next_possible_positions = _filter_walls(board, next_possible_positions)
+    ] = board.my_snake.next_theoretical_head_positions_and_moves()
+    next_possible_moves = _filter_neck(next_possible_moves, my_snake)
+    next_possible_moves = _filter_walls(board, next_possible_moves)
 
     # TODO: Step 2 - Don't hit yourself.
     # Use information from `my_body` to avoid moves that would collide with yourself.
@@ -53,11 +53,11 @@ def choose_move(data: dict) -> str:
     # food = data['board']['food']
 
     # Choose a random direction from the remaining possible_moves to move in, and then return that move
-    move = random.choice(list(next_possible_positions.values()))
+    move = random.choice(list(next_possible_moves.values()))
     # TODO: Explore new strategies for picking a move that are better than random
 
     print(
-        f"{data['game']['id']} MOVE {data['turn']}: {move} picked from all valid options in {next_possible_positions}"
+        f"{data['game']['id']} MOVE {data['turn']}: {move} picked from all valid options in {next_possible_moves}"
     )
 
     return move.value
@@ -69,17 +69,17 @@ def _init_board(data):
     return board
 
 
-def _filter_neck(next_positions, my_snake):
+def _filter_neck(next_possible_moves, my_snake):
     return {
         position: next_step
-        for position, next_step in next_positions.items()
+        for position, next_step in next_possible_moves.items()
         if position != my_snake.neck
     }
 
 
-def _filter_walls(board, next_possible_positions):
+def _filter_walls(board, next_possible_moves):
     return {
         position: next_step
-        for position, next_step in next_possible_positions.items()
+        for position, next_step in next_possible_moves.items()
         if not board.is_wall(position)
     }

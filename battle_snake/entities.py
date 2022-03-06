@@ -27,7 +27,7 @@ class Snake:
     def __len__(self):
         return len(self.body_incl_head)
 
-    def next_theoretical_head_positions(self) -> dict[Position, NextStep]:
+    def next_theoretical_head_positions_and_moves(self) -> dict[Position, NextStep]:
         result = dict()
         result[Position(self.head.x + 1, self.head.y)] = NextStep.RIGHT
         result[Position(self.head.x - 1, self.head.y)] = NextStep.LEFT
