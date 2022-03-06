@@ -1,5 +1,4 @@
 from enum import Enum
-from xmlrpc.client import boolean
 
 
 class NextStep(Enum):
