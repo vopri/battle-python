@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -6,6 +7,12 @@ class NextStep(Enum):
     DOWN = "down"
     LEFT = "left"
     RIGHT = "right"
+
+
+@dataclass(frozen=True)
+class Position:
+    x: int
+    y: int
 
 
 class Walls:
