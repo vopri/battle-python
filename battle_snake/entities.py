@@ -18,10 +18,11 @@ class Position:
 
 class Snake:
     def __init__(self, **snake_data: dict):
-        self.head: Position = Position(**snake_data["head"])
         self.body_incl_head: list[Position] = [
             Position(**position) for position in snake_data["body"]
         ]
+        self.head: Position = self.body_incl_head[0]
+        self.neck: Position = self.body_incl_head[1]
 
     def __len__(self):
         return len(self.body_incl_head)

@@ -26,6 +26,7 @@ def test_snake_init(snake_data):
         Position(6, 3),
         Position(6, 2),
     ]
+    assert snake.neck == Position(5, 3)
 
 
 def test_next_theoretical_positions(snake):
