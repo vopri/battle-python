@@ -1,7 +1,7 @@
 import random
 from typing import Dict, List
 
-from battle_snake.entities import Board, NextStep, Position, Snake, Walls
+from battle_snake.entities import Board, NextStep, Position, Snake
 
 """
 This file can be a nice home for your Battlesnake's logic and helper functions.
