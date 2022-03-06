@@ -1,7 +1,7 @@
 import random
 from typing import Dict, List
 
-from battle_snake.entities import NextStep, Walls
+from battle_snake.entities import Board, NextStep, Position, Snake, Walls
 
 """
 This file can be a nice home for your Battlesnake's logic and helper functions.
@@ -33,36 +33,14 @@ def choose_move(data: dict) -> str:
     For a full example of 'data', see https://docs.battlesnake.com/references/api/sample-move-request
 
     return: A String, the single move to make. One of "up", "down", "left" or "right".
-
-    Use the information in 'data' to decide your next move. The 'data' variable can be interacted
-    with as a Python Dictionary, and contains all of the information about the Battlesnake board
-    for each move of the game.
-
     """
-    my_snake = data["you"]  # A dictionary describing your snake's position on the board
-    my_head = my_snake["head"]  # A dictionary of coordinates like {"x": 0, "y": 0}
-    my_body = my_snake[
-        "body"
-    ]  # A list of coordinate dictionaries like [{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0}]
-
-    # Uncomment the lines below to see what this data looks like in your output!
-    # print(f"~~~ Turn: {data['turn']}  Game Mode: {data['game']['ruleset']['name']} ~~~")
-    # print(f"All board data this turn: {data}")
-    # print(f"My Battlesnake this turn is: {my_snake}")
-    # print(f"My Battlesnakes head this turn is: {my_head}")
-    # print(f"My Battlesnakes body this turn is: {my_body}")
-
-    possible_moves = [NextStep.UP, NextStep.DOWN, NextStep.LEFT, NextStep.RIGHT]
-
-    # Step 0: Don't allow your Battlesnake to move back on it's own neck.
-    possible_moves = _avoid_my_neck(my_body, possible_moves)
-
-    # TODO: Step 1 - Don't hit walls.
-    # Use information from `data` and `my_head` to not move beyond the game board.
-    possible_moves = _avoid_walls(data, possible_moves)
-    # board = data['board']
-    # board_height = ?
-    # board_width = ?
+    board: Board = _init_board(data)
+    my_snake: Snake = board.my_snake
+    next_possible_positions: dict[
+        Position, NextStep
+    ] = board.my_snake.next_theoretical_positions()
+    next_possible_positions = _filter_neck(next_possible_positions, my_snake)
+    next_possible_positions = _filter_walls(board, next_possible_positions)
 
     # TODO: Step 2 - Don't hit yourself.
     # Use information from `my_body` to avoid moves that would collide with yourself.
@@ -75,47 +53,33 @@ def choose_move(data: dict) -> str:
     # food = data['board']['food']
 
     # Choose a random direction from the remaining possible_moves to move in, and then return that move
-    move = random.choice(possible_moves)
+    move = random.choice(list(next_possible_positions.values()))
     # TODO: Explore new strategies for picking a move that are better than random
 
     print(
-        f"{data['game']['id']} MOVE {data['turn']}: {move} picked from all valid options in {possible_moves}"
+        f"{data['game']['id']} MOVE {data['turn']}: {move} picked from all valid options in {next_possible_positions}"
     )
 
     return move.value
 
 
-def _avoid_my_neck(my_body: dict, possible_moves: List[NextStep]) -> List[NextStep]:
-    """
-    my_body: List of dictionaries of x/y coordinates for every segment of a Battlesnake.
-            e.g. [{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0}]
-    possible_moves: List of strings. Moves to pick from.
-            e.g. ["up", "down", "left", "right"]
-
-    return: The list of remaining possible_moves, with the 'neck' direction removed
-    """
-    my_head = my_body[0]  # The first body coordinate is always the head
-    my_neck = my_body[1]  # The segment of body right after the head is the 'neck'
-
-    if my_neck["x"] < my_head["x"]:  # my neck is left of my head
-        possible_moves.remove(NextStep.LEFT)
-    elif my_neck["x"] > my_head["x"]:  # my neck is right of my head
-        possible_moves.remove(NextStep.RIGHT)
-    elif my_neck["y"] < my_head["y"]:  # my neck is below my head
-        possible_moves.remove(NextStep.DOWN)
-    elif my_neck["y"] > my_head["y"]:  # my neck is above my head
-        possible_moves.remove(NextStep.UP)
-
-    return possible_moves
+def _init_board(data):
+    my_head_pos = Position(**data["you"]["head"])
+    board = Board(my_head_pos, **data["board"])
+    return board
 
 
-def _avoid_walls(data: dict, possible_moves: List[NextStep]) -> List[NextStep]:
-    height = data["board"]["height"]
-    width = data["board"]["width"]
-    current_head_pos = data["you"]["head"]
-    walls = Walls(height, width)
-    return [
-        move
-        for move in possible_moves
-        if not walls.will_clash((current_head_pos["x"], current_head_pos["y"]), move)
-    ]
+def _filter_neck(next_positions, my_snake):
+    return {
+        position: next_step
+        for position, next_step in next_positions.items()
+        if position != my_snake.neck
+    }
+
+
+def _filter_walls(board, next_possible_positions):
+    return {
+        position: next_step
+        for position, next_step in next_possible_positions.items()
+        if not board.is_wall(position)
+    }

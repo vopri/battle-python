@@ -13,7 +13,7 @@ def move_request_head_origin():
     return json.loads(move_request_1.read_text())
 
 
-@pytest.mark.repeat(50)
+@pytest.mark.repeat(100)
 def test_path(move_request_head_origin):
     chosen_move = logic.choose_move(move_request_head_origin)
     assert chosen_move != NextStep.DOWN.value
