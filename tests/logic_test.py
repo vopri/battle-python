@@ -29,7 +29,7 @@ def test_filter_walls_bottom_left(board):
         Position(0, 1): NextStep.UP,
         Position(0, -1): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {NextStep.UP, NextStep.RIGHT}
 
 
@@ -40,7 +40,7 @@ def test_filter_walls_bottom_right(board):
         Position(10, 1): NextStep.UP,
         Position(10, -1): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {NextStep.UP, NextStep.LEFT}
 
 
@@ -51,7 +51,7 @@ def test_filter_walls_top_left(board):
         Position(0, 11): NextStep.UP,
         Position(0, 9): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {NextStep.DOWN, NextStep.RIGHT}
 
 
@@ -62,7 +62,7 @@ def test_filter_walls_top_right(board):
         Position(10, 11): NextStep.UP,
         Position(10, 9): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {NextStep.DOWN, NextStep.LEFT}
 
 
@@ -73,7 +73,7 @@ def test_filter_walls_top_middle(board):
         Position(5, 11): NextStep.UP,
         Position(5, 9): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {
         NextStep.DOWN,
         NextStep.LEFT,
@@ -88,7 +88,7 @@ def test_filter_walls_bottom_middle(board):
         Position(5, 1): NextStep.UP,
         Position(5, -1): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {
         NextStep.UP,
         NextStep.LEFT,
@@ -103,7 +103,7 @@ def test_filter_walls_middle_right(board):
         Position(10, 6): NextStep.UP,
         Position(10, 4): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {
         NextStep.UP,
         NextStep.LEFT,
@@ -118,7 +118,7 @@ def test_filter_walls_middle_left(board):
         Position(0, 6): NextStep.UP,
         Position(0, 4): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {
         NextStep.UP,
         NextStep.RIGHT,
@@ -133,7 +133,7 @@ def test_filter_walls_middle(board):
         Position(5, 6): NextStep.UP,
         Position(5, 4): NextStep.DOWN,
     }
-    filtered_moves = logic._filter_walls(board, possible_moves)
+    filtered_moves = logic._avoid_walls(board, possible_moves)
     assert set(filtered_moves.values()) == {
         NextStep.DOWN,
         NextStep.LEFT,
@@ -143,7 +143,7 @@ def test_filter_walls_middle(board):
 
 
 def test_filter_neck_left(snake_right_middle_short: Snake):
-    moves = logic._filter_neck(
+    moves = logic._avoid_my_neck(
         snake_right_middle_short.next_theoretical_head_positions_and_moves(),
         snake_right_middle_short,
     )
@@ -153,7 +153,7 @@ def test_filter_neck_left(snake_right_middle_short: Snake):
 
 
 def test_filter_neck_right(snake_middle_short: Snake):
-    moves = logic._filter_neck(
+    moves = logic._avoid_my_neck(
         snake_middle_short.next_theoretical_head_positions_and_moves(),
         snake_middle_short,
     )
@@ -163,7 +163,7 @@ def test_filter_neck_right(snake_middle_short: Snake):
 
 
 def test_filter_neck_up(snake_origin: Snake):
-    moves = logic._filter_neck(
+    moves = logic._avoid_my_neck(
         snake_origin.next_theoretical_head_positions_and_moves(),
         snake_origin,
     )
@@ -173,7 +173,7 @@ def test_filter_neck_up(snake_origin: Snake):
 
 
 def test_filter_neck_down(snake_top_right_short: Snake):
-    moves = logic._filter_neck(
+    moves = logic._avoid_my_neck(
         snake_top_right_short.next_theoretical_head_positions_and_moves(),
         snake_top_right_short,
     )

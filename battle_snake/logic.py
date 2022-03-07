@@ -40,8 +40,8 @@ def choose_move(data: dict) -> str:
     next_possible_moves: Moves = (
         board.my_snake.next_theoretical_head_positions_and_moves()
     )
-    next_possible_moves = _filter_neck(next_possible_moves, my_snake)
-    next_possible_moves = _filter_walls(board, next_possible_moves)
+    next_possible_moves = _avoid_my_neck(next_possible_moves, my_snake)
+    next_possible_moves = _avoid_walls(board, next_possible_moves)
 
     # TODO: Step 2 - Don't hit yourself.
     # Use information from `my_body` to avoid moves that would collide with yourself.
@@ -70,7 +70,7 @@ def _init_board(data):
     return board
 
 
-def _filter_neck(next_possible_moves: Moves, my_snake: Snake):
+def _avoid_my_neck(next_possible_moves: Moves, my_snake: Snake):
     return {
         position: next_step
         for position, next_step in next_possible_moves.items()
@@ -78,7 +78,7 @@ def _filter_neck(next_possible_moves: Moves, my_snake: Snake):
     }
 
 
-def _filter_walls(board: Board, next_possible_moves: Moves):
+def _avoid_walls(board: Board, next_possible_moves: Moves):
     return {
         position: next_step
         for position, next_step in next_possible_moves.items()
