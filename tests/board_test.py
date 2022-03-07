@@ -27,6 +27,7 @@ def test_snake_init(snake_data):
         Position(6, 2),
     ]
     assert snake.neck == Position(5, 3)
+    assert len(snake) == 4
 
 
 def test_next_theoretical_positions(snake):
@@ -77,12 +78,14 @@ def test_board_init(board_data):
     assert len(board.all_snakes) == 2
     snake_on_5_4 = board.all_snakes.get(Position(5, 4))
     assert len(snake_on_5_4) == 4  # type: ignore
+    assert snake_on_5_4.body_incl_head[-1] == Position(6, 2)  # type: ignore
 
 
 def test_get_my_snake(board_data):
     board = Board(my_head=Position(0, 0), **board_data)
     me = board.my_snake
     assert len(me) == 3
+    assert me.neck == Position(1, 0)
 
 
 def test_is_wall(board_data):
