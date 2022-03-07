@@ -3,7 +3,8 @@ from pathlib import Path
 
 import pytest
 from battle_snake import logic
-from battle_snake.entities import NextStep, Snake
+from battle_snake.entities import Board, NextStep, Position, Snake
+from flask import request
 from pytest import fixture
 
 
@@ -13,11 +14,132 @@ def move_request_head_origin():
     return json.loads(move_request_1.read_text())
 
 
-@pytest.mark.repeat(100)
-def test_path(move_request_head_origin):
-    chosen_move = logic.choose_move(move_request_head_origin)
-    assert chosen_move != NextStep.DOWN.value
-    assert chosen_move != NextStep.LEFT.value
+@fixture
+def board(move_request_head_origin):
+    return Board(
+        Position(**move_request_head_origin["you"]["head"]),
+        **move_request_head_origin["board"]
+    )
+
+
+def test_filter_walls_bottom_left(board):
+    possible_moves = {
+        Position(-1, 0): NextStep.LEFT,
+        Position(1, 0): NextStep.RIGHT,
+        Position(0, 1): NextStep.UP,
+        Position(0, -1): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {NextStep.UP, NextStep.RIGHT}
+
+
+def test_filter_walls_bottom_right(board):
+    possible_moves = {
+        Position(9, 0): NextStep.LEFT,
+        Position(11, 0): NextStep.RIGHT,
+        Position(10, 1): NextStep.UP,
+        Position(10, -1): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {NextStep.UP, NextStep.LEFT}
+
+
+def test_filter_walls_top_left(board):
+    possible_moves = {
+        Position(-1, 10): NextStep.LEFT,
+        Position(1, 10): NextStep.RIGHT,
+        Position(0, 11): NextStep.UP,
+        Position(0, 9): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {NextStep.DOWN, NextStep.RIGHT}
+
+
+def test_filter_walls_top_right(board):
+    possible_moves = {
+        Position(9, 10): NextStep.LEFT,
+        Position(11, 10): NextStep.RIGHT,
+        Position(10, 11): NextStep.UP,
+        Position(10, 9): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {NextStep.DOWN, NextStep.LEFT}
+
+
+def test_filter_walls_top_middle(board):
+    possible_moves = {
+        Position(4, 10): NextStep.LEFT,
+        Position(6, 10): NextStep.RIGHT,
+        Position(5, 11): NextStep.UP,
+        Position(5, 9): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {
+        NextStep.DOWN,
+        NextStep.LEFT,
+        NextStep.RIGHT,
+    }
+
+
+def test_filter_walls_bottom_middle(board):
+    possible_moves = {
+        Position(4, 0): NextStep.LEFT,
+        Position(6, 0): NextStep.RIGHT,
+        Position(5, 1): NextStep.UP,
+        Position(5, -1): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {
+        NextStep.UP,
+        NextStep.LEFT,
+        NextStep.RIGHT,
+    }
+
+
+def test_filter_walls_middle_right(board):
+    possible_moves = {
+        Position(9, 5): NextStep.LEFT,
+        Position(11, 5): NextStep.RIGHT,
+        Position(10, 6): NextStep.UP,
+        Position(10, 4): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {
+        NextStep.UP,
+        NextStep.LEFT,
+        NextStep.DOWN,
+    }
+
+
+def test_filter_walls_middle_left(board):
+    possible_moves = {
+        Position(-1, 5): NextStep.LEFT,
+        Position(1, 5): NextStep.RIGHT,
+        Position(0, 6): NextStep.UP,
+        Position(0, 4): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {
+        NextStep.UP,
+        NextStep.RIGHT,
+        NextStep.DOWN,
+    }
+
+
+def test_filter_walls_middle(board):
+    possible_moves = {
+        Position(4, 5): NextStep.LEFT,
+        Position(6, 5): NextStep.RIGHT,
+        Position(5, 6): NextStep.UP,
+        Position(5, 4): NextStep.DOWN,
+    }
+    filtered_moves = logic._filter_walls(board, possible_moves)
+    assert set(filtered_moves.values()) == {
+        NextStep.DOWN,
+        NextStep.LEFT,
+        NextStep.UP,
+        NextStep.RIGHT,
+    }
 
 
 def test_filter_neck_left(snake_right_middle_short: Snake):

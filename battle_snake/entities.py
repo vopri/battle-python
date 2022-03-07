@@ -54,8 +54,10 @@ class Board:
         return self.all_snakes[self.my_head]
 
     def is_wall(self, pos: Position) -> bool:
-        if not (self.width >= pos.x >= 0):
+        if pos.x < 0 or pos.y < 0:
             return True
-        if not (self.height >= pos.y >= 0):
+        if pos.x >= self.width:
+            return True
+        if pos.y >= self.height:
             return True
         return False

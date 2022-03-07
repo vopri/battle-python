@@ -92,9 +92,16 @@ def test_is_wall(board_data):
     board = Board(my_head=Position(0, 0), **board_data)
     assert not board.is_wall(Position(0, 0))
     assert not board.is_wall(Position(3, 3))
+    assert not board.is_wall(Position(10, 10))
+    assert not board.is_wall(Position(0, 10))
+    assert not board.is_wall(Position(10, 0))
     assert board.is_wall(Position(-1, 3))
     assert board.is_wall(Position(2, -3))
-    assert not board.is_wall(Position(11, 3))
+    assert board.is_wall(Position(11, 3))
+    assert board.is_wall(Position(5, 11))
+    assert board.is_wall(Position(15, 15))
+    assert board.is_wall(Position(-3, 15))
+    assert board.is_wall(Position(-3, -8))
 
 
 @pytest.fixture
