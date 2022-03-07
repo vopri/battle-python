@@ -9,6 +9,7 @@ This file can be a nice home for your Battlesnake's logic and helper functions.
 We have started this for you, and included some logic to remove your Battlesnake's 'neck'
 from the list of possible moves!
 """
+Moves = dict[Position, NextStep]  # type aliase
 
 
 def get_info() -> dict:
@@ -36,9 +37,9 @@ def choose_move(data: dict) -> str:
     """
     board: Board = _init_board(data)
     my_snake: Snake = board.my_snake
-    next_possible_moves: dict[
-        Position, NextStep
-    ] = board.my_snake.next_theoretical_head_positions_and_moves()
+    next_possible_moves: Moves = (
+        board.my_snake.next_theoretical_head_positions_and_moves()
+    )
     next_possible_moves = _filter_neck(next_possible_moves, my_snake)
     next_possible_moves = _filter_walls(board, next_possible_moves)
 
@@ -69,7 +70,7 @@ def _init_board(data):
     return board
 
 
-def _filter_neck(next_possible_moves, my_snake):
+def _filter_neck(next_possible_moves: Moves, my_snake: Snake):
     return {
         position: next_step
         for position, next_step in next_possible_moves.items()
@@ -77,7 +78,7 @@ def _filter_neck(next_possible_moves, my_snake):
     }
 
 
-def _filter_walls(board, next_possible_moves):
+def _filter_walls(board: Board, next_possible_moves: Moves):
     return {
         position: next_step
         for position, next_step in next_possible_moves.items()
