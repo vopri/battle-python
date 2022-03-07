@@ -27,6 +27,7 @@ def test_snake_init(snake_data):
         Position(6, 2),
     ]
     assert snake.neck == Position(5, 3)
+    assert snake.tail == Position(6, 2)
     assert len(snake) == 4
 
 

@@ -182,6 +182,53 @@ def test_filter_neck_down(snake_top_right_short: Snake):
     assert set(moves.values()) == expected
 
 
+def test_future_snake_right_without_food(
+    snake_long: Snake, snake_long_future_right_without_food: Snake
+):
+    future_snake: Snake = snake_long.calculate_future_snake(
+        next_step=NextStep.RIGHT, food=False
+    )
+    assert (
+        future_snake.body_incl_head
+        == snake_long_future_right_without_food.body_incl_head
+    )
+
+
+def test_future_snake_left_without_food(
+    snake_long: Snake, snake_long_future_left_without_food: Snake
+):
+    future_snake: Snake = snake_long.calculate_future_snake(
+        next_step=NextStep.LEFT, food=False
+    )
+    assert (
+        future_snake.body_incl_head
+        == snake_long_future_left_without_food.body_incl_head
+    )
+
+
+def test_future_snake_up_without_food(
+    snake_long: Snake, snake_long_future_up_without_food: Snake
+):
+    future_snake: Snake = snake_long.calculate_future_snake(
+        next_step=NextStep.UP, food=False
+    )
+    assert (
+        future_snake.body_incl_head == snake_long_future_up_without_food.body_incl_head
+    )
+
+
+def test_future_snake_down_without_food(
+    snake_long_2: Snake, snake_long_2_future_down_without_food: Snake
+):
+    future_snake: Snake = snake_long_2.calculate_future_snake(
+        next_step=NextStep.DOWN, food=False
+    )
+    assert (
+        future_snake.body_incl_head
+        == snake_long_2_future_down_without_food.body_incl_head
+    )
+
+
 @fixture
 def snake_origin():
     return Snake(
@@ -300,6 +347,170 @@ def snake_top_right_short():
             "body": [{"x": 10, "y": 10}, {"x": 10, "y": 9}],
             "latency": "111",
             "head": {"x": 10, "y": 10},
+            "length": 2,
+            "shout": "why are we shouting??",
+            "squad": "",
+            "customizations": {"color": "#FF0000", "head": "pixel", "tail": "pixel"},
+        }
+    )
+
+
+@fixture
+def snake_long():
+    return Snake(
+        **{
+            "id": "snake-508e96ac-94ad-11ea-bb37",
+            "name": "My Snake",
+            "health": 54,
+            "body": [
+                {"x": 5, "y": 5},
+                {"x": 5, "y": 4},
+                {"x": 5, "y": 3},
+                {"x": 6, "y": 3},
+                {"x": 7, "y": 3},
+                {"x": 7, "y": 2},
+                {"x": 8, "y": 2},
+                {"x": 8, "y": 1},
+            ],
+            "latency": "111",
+            "head": {"x": 5, "y": 5},
+            "length": 2,
+            "shout": "why are we shouting??",
+            "squad": "",
+            "customizations": {"color": "#FF0000", "head": "pixel", "tail": "pixel"},
+        }
+    )
+
+
+@fixture
+def snake_long_2():
+    return Snake(
+        **{
+            "id": "snake-508e96ac-94ad-11ea-bb37",
+            "name": "My Snake",
+            "health": 54,
+            "body": [
+                {"x": 4, "y": 5},
+                {"x": 5, "y": 5},
+                {"x": 5, "y": 4},
+                {"x": 5, "y": 3},
+                {"x": 6, "y": 3},
+                {"x": 7, "y": 3},
+                {"x": 7, "y": 2},
+                {"x": 8, "y": 2},
+                {"x": 8, "y": 1},
+            ],
+            "latency": "111",
+            "head": {"x": 5, "y": 5},
+            "length": 2,
+            "shout": "why are we shouting??",
+            "squad": "",
+            "customizations": {"color": "#FF0000", "head": "pixel", "tail": "pixel"},
+        }
+    )
+
+
+@fixture
+def snake_long_2_future_down_without_food():
+    return Snake(
+        **{
+            "id": "snake-508e96ac-94ad-11ea-bb37",
+            "name": "My Snake",
+            "health": 54,
+            "body": [
+                {"x": 4, "y": 4},
+                {"x": 4, "y": 5},
+                {"x": 5, "y": 5},
+                {"x": 5, "y": 4},
+                {"x": 5, "y": 3},
+                {"x": 6, "y": 3},
+                {"x": 7, "y": 3},
+                {"x": 7, "y": 2},
+                {"x": 8, "y": 2},
+            ],
+            "latency": "111",
+            "head": {"x": 5, "y": 5},
+            "length": 2,
+            "shout": "why are we shouting??",
+            "squad": "",
+            "customizations": {"color": "#FF0000", "head": "pixel", "tail": "pixel"},
+        }
+    )
+
+
+@fixture
+def snake_long_future_up_without_food():
+    return Snake(
+        **{
+            "id": "snake-508e96ac-94ad-11ea-bb37",
+            "name": "My Snake",
+            "health": 54,
+            "body": [
+                {"x": 5, "y": 6},
+                {"x": 5, "y": 5},
+                {"x": 5, "y": 4},
+                {"x": 5, "y": 3},
+                {"x": 6, "y": 3},
+                {"x": 7, "y": 3},
+                {"x": 7, "y": 2},
+                {"x": 8, "y": 2},
+            ],
+            "latency": "111",
+            "head": {"x": 5, "y": 5},
+            "length": 2,
+            "shout": "why are we shouting??",
+            "squad": "",
+            "customizations": {"color": "#FF0000", "head": "pixel", "tail": "pixel"},
+        }
+    )
+
+
+@fixture
+def snake_long_future_right_without_food():
+    return Snake(
+        **{
+            "id": "snake-508e96ac-94ad-11ea-bb37",
+            "name": "My Snake",
+            "health": 54,
+            "body": [
+                {"x": 6, "y": 5},
+                {"x": 5, "y": 5},
+                {"x": 5, "y": 4},
+                {"x": 5, "y": 3},
+                {"x": 6, "y": 3},
+                {"x": 7, "y": 3},
+                {"x": 7, "y": 2},
+                {"x": 8, "y": 2},
+            ],
+            "latency": "111",
+            "head": {"x": 5, "y": 5},
+            "length": 2,
+            "shout": "why are we shouting??",
+            "squad": "",
+            "customizations": {"color": "#FF0000", "head": "pixel", "tail": "pixel"},
+        }
+    )
+
+
+@fixture
+def snake_long_future_left_without_food():
+    return Snake(
+        **{
+            "id": "snake-508e96ac-94ad-11ea-bb37",
+            "name": "My Snake",
+            "health": 54,
+            "body": [
+                {"x": 4, "y": 5},
+                {"x": 5, "y": 5},
+                {"x": 5, "y": 4},
+                {"x": 5, "y": 3},
+                {"x": 6, "y": 3},
+                {"x": 7, "y": 3},
+                {"x": 7, "y": 2},
+                {"x": 8, "y": 2},
+            ],
+            "latency": "111",
+            "head": {"x": 5, "y": 5},
             "length": 2,
             "shout": "why are we shouting??",
             "squad": "",

@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
@@ -21,8 +22,18 @@ class Snake:
         self.body_incl_head: list[Position] = [
             Position(**position) for position in snake_data["body"]
         ]
-        self.head: Position = self.body_incl_head[0]
-        self.neck: Position = self.body_incl_head[1]
+
+    @property
+    def head(self) -> Position:
+        return self.body_incl_head[0]
+
+    @property
+    def neck(self) -> Position:
+        return self.body_incl_head[1]
+
+    @property
+    def tail(self) -> Position:
+        return self.body_incl_head[-1]
 
     def __len__(self):
         return len(self.body_incl_head)
@@ -34,6 +45,27 @@ class Snake:
         result[Position(self.head.x, self.head.y + 1)] = NextStep.UP
         result[Position(self.head.x, self.head.y - 1)] = NextStep.DOWN
         return result
+
+    def calculate_future_snake(self, next_step: NextStep, food: bool = False):
+        future_snake = copy.deepcopy(self)
+        future_head_position: Position = self._calc_future_head_position(next_step)
+        self._add_future_head_to_future_snake(future_snake, future_head_position)
+        if not food:
+            self._remove_tail(future_snake)
+        return future_snake
+
+    def _add_future_head_to_future_snake(self, future_snake, future_head_position):
+        future_snake.body_incl_head.insert(0, future_head_position)
+
+    def _calc_future_head_position(self, next_step):
+        return [
+            position
+            for position, n_step in self.next_theoretical_head_positions_and_moves().items()
+            if n_step == next_step
+        ][0]
+
+    def _remove_tail(self, future_snake):
+        future_snake.body_incl_head.pop()
 
 
 class Board:
