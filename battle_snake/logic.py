@@ -42,9 +42,8 @@ def choose_move(data: dict) -> str:
     )
     next_possible_moves = _avoid_my_neck(next_possible_moves, my_snake)
     next_possible_moves = _avoid_walls(board, next_possible_moves)
-
-    # TODO: Step 2 - Don't hit yourself.
-    # Use information from `my_body` to avoid moves that would collide with yourself.
+    food = _is_food_available(board, my_snake)
+    next_possible_moves = _avoid_my_future_body(my_snake, next_possible_moves, food)
 
     # TODO: Step 3 - Don't collide with others.
     # Use information from `data` to prevent your Battlesnake from colliding with others.
@@ -84,3 +83,24 @@ def _avoid_walls(board: Board, next_possible_moves: Moves):
         for position, next_step in next_possible_moves.items()
         if not board.is_wall(position)
     }
+
+
+def _avoid_my_future_body(
+    my_snake: Snake,
+    next_possible_moves: Moves,
+    food: bool,
+) -> Moves:
+    save_moves = {}
+    for position, next_step in next_possible_moves.items():
+        possible_future_snake = my_snake.calculate_future_snake(next_step, food)
+        possible_future_body_without_head = possible_future_snake.body_incl_head[1:]
+        i_will_bite_myself = (
+            possible_future_snake.head in possible_future_body_without_head
+        )
+        if not i_will_bite_myself:
+            save_moves[position] = next_step
+    return save_moves
+
+
+def _is_food_available(board, my_snake):
+    return my_snake.head in board.food

@@ -229,6 +229,49 @@ def test_future_snake_down_without_food(
     )
 
 
+def test_avoid_my_body_without_food(snake_in_block: Snake):
+    possible_moves = snake_in_block.next_theoretical_head_positions_and_moves()
+    filtered_moves = logic._avoid_my_future_body(
+        snake_in_block, possible_moves, food=False
+    )
+    expected_moves = {NextStep.DOWN, NextStep.RIGHT}
+    assert set(filtered_moves.values()) == expected_moves
+
+
+def test_avoid_my_body_with_food(snake_in_block: Snake):
+    possible_moves = snake_in_block.next_theoretical_head_positions_and_moves()
+    filtered_moves = logic._avoid_my_future_body(
+        snake_in_block, possible_moves, food=True
+    )
+    expected_moves = {NextStep.DOWN}
+    assert set(filtered_moves.values()) == expected_moves
+
+
+@fixture
+def snake_in_block():
+    return Snake(
+        **{
+            "id": "snake-508e96ac-94ad-11ea-bb37",
+            "name": "My Snake",
+            "health": 54,
+            "body": [
+                {"x": 7, "y": 4},
+                {"x": 6, "y": 4},
+                {"x": 6, "y": 5},
+                {"x": 7, "y": 5},
+                {"x": 8, "y": 5},
+                {"x": 8, "y": 4},
+            ],
+            "latency": "111",
+            "head": {"x": 7, "y": 4},
+            "length": 6,
+            "shout": "why are we shouting??",
+            "squad": "",
+            "customizations": {"color": "#FF0000", "head": "pixel", "tail": "pixel"},
+        }
+    )
+
+
 @fixture
 def snake_origin():
     return Snake(
