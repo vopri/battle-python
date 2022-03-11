@@ -38,8 +38,8 @@ def test_next_theoretical_positions(snake):
     }
 
 
-def test_board_init(board_data):
-    board = Board(my_head=Position(0, 0), **board_data)
+def test_board_init(sample_board_data):
+    board = Board(my_head=Position(0, 0), **sample_board_data)
     assert board.height == 11
     assert board.width == 11
     assert board.food == {
@@ -53,15 +53,15 @@ def test_board_init(board_data):
     assert snake_on_5_4.body_incl_head[-1] == Position(6, 2)  # type: ignore
 
 
-def test_get_my_snake(board_data):
-    board = Board(my_head=Position(0, 0), **board_data)
+def test_get_my_snake(sample_board_data):
+    board = Board(my_head=Position(0, 0), **sample_board_data)
     me = board.my_snake
     assert len(me) == 3
     assert me.neck == Position(1, 0)
 
 
-def test_is_wall(board_data):
-    board = Board(my_head=Position(0, 0), **board_data)
+def test_is_wall(sample_board_data):
+    board = Board(my_head=Position(0, 0), **sample_board_data)
     assert not board.is_wall(Position(0, 0))
     assert not board.is_wall(Position(3, 3))
     assert not board.is_wall(Position(10, 10))
