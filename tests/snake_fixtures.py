@@ -3,12 +3,7 @@ from pytest import fixture
 
 
 @fixture
-def snake(snake_data) -> Snake:
-    return Snake(**snake_data)
-
-
-@fixture
-def snake_data() -> dict:
+def sample_snake_data() -> dict:
     return {
         "body": [
             {"x": 5, "y": 4},
@@ -17,6 +12,11 @@ def snake_data() -> dict:
             {"x": 6, "y": 2},
         ],
     }
+
+
+@fixture
+def sample_snake(sample_snake_data) -> Snake:
+    return Snake(**sample_snake_data)
 
 
 @fixture
