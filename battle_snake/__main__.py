@@ -3,7 +3,7 @@ import os
 
 from flask import Flask, request
 
-from battle_snake import logic
+from battle_snake import interactor
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ def handle_info():
     See https://docs.battlesnake.com/guides/getting-started#step-4-register-your-battlesnake
     """
     print("INFO")
-    return logic.get_info()
+    return interactor.get_info()
 
 
 @app.post("/start")
@@ -25,7 +25,7 @@ def handle_start():
     It's purely for informational purposes, you don't have to make any decisions here.
     request.json contains information about the game that's about to be played.
     """
-    data = request.get_json()
+    data: dict = request.get_json()  # type: ignore
 
     print(f"{data['game']['id']} START")
     return "ok"
@@ -39,8 +39,8 @@ def handle_move():
     """
     data = request.get_json()
 
-    # TODO - look at the logic.py file to see how we decide what move to return!
-    move = logic.choose_move(data)
+    # TODO - look at the interactor.py file to see how we decide what move to return!
+    move = interactor.choose_move(data)  # type: ignore
 
     return {"move": move}
 
@@ -53,7 +53,7 @@ def handle_end():
     """
     data = request.get_json()
 
-    print(f"{data['game']['id']} END")
+    print(f"{data['game']['id']} END")  # type: ignore
     return "ok"
 
 

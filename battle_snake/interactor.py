@@ -4,9 +4,9 @@ from typing import Dict, List
 from battle_snake.entities import Board, NextStep, Position, Snake
 
 """
-This file can be a nice home for your Battlesnake's logic and helper functions.
+This file can be a nice home for your Battlesnake's interactor and helper functions.
 
-We have started this for you, and included some logic to remove your Battlesnake's 'neck'
+We have started this for you, and included some interactor to remove your Battlesnake's 'neck'
 from the list of possible moves!
 """
 Moves = dict[Position, NextStep]  # type aliase

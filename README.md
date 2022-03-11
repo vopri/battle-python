@@ -22,7 +22,7 @@ The [Quick Start Coding Guide](https://docs.battlesnake.com/guides/getting-start
 
 ## Customizing Your Battlesnake
 
-Locate the `get_info` function inside [logic.py](logic.py#L11). You should see a line that looks like this:
+Locate the `get_info` function inside [interactor.py](interactor.py#L11). You should see a line that looks like this:
 
 ```python
 return {
@@ -42,7 +42,7 @@ Whenever you update these values, go to the page for your Battlesnake and select
 
 On every turn of each game your Battlesnake receives information about the game board and must decide its next move.
 
-Locate the `choose_move` function inside [logic.py](logic.py#L27). Possible moves are "up", "down", "left", or "right" and initially your Battlesnake will choose a move randomly. Your goal as a developer is to read information sent to you about the game (available in the `data` variable) and decide where your Battlesnake should move next. All your Battlesnake logic lives in [logic.py](logic.py), and this is the code you will want to edit.
+Locate the `choose_move` function inside [interactor.py](interactor.py#L27). Possible moves are "up", "down", "left", or "right" and initially your Battlesnake will choose a move randomly. Your goal as a developer is to read information sent to you about the game (available in the `data` variable) and decide where your Battlesnake should move next. All your Battlesnake interactor lives in [interactor.py](interactor.py), and this is the code you will want to edit.
 
 See the [Battlesnake Game Rules](https://docs.battlesnake.com/references/rules) for more information on playing the game, moving around the board, and improving your algorithm.
 
