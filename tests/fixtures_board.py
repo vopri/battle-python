@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from battle_snake.entities import Board, Position
+from battle_snake.entities import Board, Position, Snake
 from pytest import fixture
 
 

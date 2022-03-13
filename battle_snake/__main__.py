@@ -3,7 +3,7 @@ import os
 
 from flask import Flask, request
 
-from battle_snake import interactor
+from battle_snake.interactor import MoveDecision, get_info
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ def handle_info():
     See https://docs.battlesnake.com/guides/getting-started#step-4-register-your-battlesnake
     """
     print("INFO")
-    return interactor.get_info()
+    return get_info()
 
 
 @app.post("/start")
@@ -38,11 +38,9 @@ def handle_move():
     Valid moves are "up", "down", "left", or "right".
     """
     data = request.get_json()
+    move_decision = MoveDecision(data)  # type: ignore
 
-    # TODO - look at the interactor.py file to see how we decide what move to return!
-    move = interactor.choose_move(data)  # type: ignore
-
-    return {"move": move}
+    return {"move": move_decision.decide().value}
 
 
 @app.post("/end")

@@ -1,20 +1,26 @@
-from battle_snake import interactor
 from battle_snake.entities import NextStep, Snake
+from battle_snake.interactor import MoveDecision
 
 
-def test_avoid_my_body_without_food(snake_in_block: Snake):
-    possible_moves = snake_in_block.next_theoretical_head_positions_and_moves()
-    filtered_moves = interactor._avoid_my_future_body(
-        snake_in_block, possible_moves, my_snake_gets_food=False
-    )
+def test_avoid_my_body_without_food(
+    sample_move_decision_with_snake_in_block_without_food: MoveDecision,
+):
+    sample_move_decision_with_snake_in_block_without_food._avoid_my_future_body()
     expected_moves = {NextStep.DOWN, NextStep.RIGHT}
-    assert set(filtered_moves.values()) == expected_moves
-
-
-def test_avoid_my_body_with_food(snake_in_block: Snake):
-    possible_moves = snake_in_block.next_theoretical_head_positions_and_moves()
-    filtered_moves = interactor._avoid_my_future_body(
-        snake_in_block, possible_moves, my_snake_gets_food=True
+    assert (
+        set(
+            sample_move_decision_with_snake_in_block_without_food.possible_moves.values()
+        )
+        == expected_moves
     )
+
+
+def test_avoid_my_body_with_food(
+    sample_move_decision_with_snake_in_block_with_food: MoveDecision,
+):
+    sample_move_decision_with_snake_in_block_with_food._avoid_my_future_body()
     expected_moves = {NextStep.DOWN}
-    assert set(filtered_moves.values()) == expected_moves
+    assert (
+        set(sample_move_decision_with_snake_in_block_with_food.possible_moves.values())
+        == expected_moves
+    )

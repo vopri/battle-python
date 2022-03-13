@@ -1,2 +1,3 @@
-from board_fixtures import *
-from snake_fixtures import *
+from fixtures_board import *
+from fixtures_move_decisions import *
+from fixtures_snakes import *
