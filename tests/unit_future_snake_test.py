@@ -1,4 +1,30 @@
-from battle_snake.entities import NextStep, Snake
+import pytest
+from battle_snake.entities import NextStep, Position, Snake
+
+
+@pytest.mark.parametrize(
+    "snake_name, snake_as_str",
+    [
+        (
+            "snake_origin",
+            "|===========|\n|···········|\n|···········|\n|···········|\n|···········|\n|···········|\n|···········|\n|···········|\n|···········|\n|x··········|\n|x··········|\n|o··········|\n|===========|",
+        ),
+        (
+            "sample_snake",
+            "|===========|\n|···········|\n|···········|\n|···········|\n|···········|\n|···········|\n|···········|\n|·····o·····|\n|·····xx····|\n|······x····|\n|···········|\n|···········|\n|===========|",
+        ),
+    ],
+)
+def test_print_snake(
+    snake_name: str, snake_as_str: str, request: pytest.FixtureRequest
+):
+    snake: Snake = request.getfixturevalue(snake_name)
+    print(snake)
+    assert str(snake) == snake_as_str
+
+
+def test_snake_body_withoud_head(snake_origin):
+    assert snake_origin.body_without_head == [Position(0, 1), Position(0, 2)]
 
 
 def test_future_snake_right_without_food(

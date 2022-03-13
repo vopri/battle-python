@@ -1,7 +1,10 @@
 import copy
 from dataclasses import dataclass
 from enum import Enum
+from itertools import groupby
+from operator import attrgetter
 from typing import Optional
+from unittest.util import sorted_list_difference
 
 
 class NextStep(Enum):
@@ -28,6 +31,10 @@ class Snake:
         return self.body_incl_head[0]
 
     @property
+    def body_without_head(self) -> list[Position]:
+        return self.body_incl_head[1:]
+
+    @property
     def neck(self) -> Position:
         return self.body_incl_head[1]
 
@@ -37,6 +44,32 @@ class Snake:
 
     def __len__(self):
         return len(self.body_incl_head)
+
+    def __str__(self):
+        """Visualize snake in 11 x 11 field"""
+        field = self._init_field()
+        convert_row = lambda row: "".join([cell for cell in row])
+        for pos in self.body_incl_head:
+            self._enter_snake_into_field(field, pos)
+        self._paint_field_walls(field)
+        return "\n".join(convert_row(row) for row in field)
+
+    def _init_field(self):
+        field: list[list[str]] = [["·" for i in range(11)] for j in range(11)]
+        return field
+
+    def _enter_snake_into_field(self, field, pos):
+        char = "x"
+        if pos == self.head:
+            char = "o"
+        field[10 - pos.y][pos.x] = char
+
+    def _paint_field_walls(self, field):
+        field.insert(0, ["=" for i in range(11)])
+        field.append(["=" for i in range(11)])
+        for row in field:
+            row.insert(0, "|")
+            row.append("|")
 
     def next_theoretical_head_positions_and_moves(self) -> dict[Position, NextStep]:
         result = dict()
