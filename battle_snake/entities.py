@@ -48,10 +48,10 @@ class Snake:
     def __str__(self):
         """Visualize snake in 11 x 11 field"""
         field = self._init_field()
-        convert_row = lambda row: "".join([cell for cell in row])
         for pos in self.body_incl_head:
             self._enter_snake_into_field(field, pos)
         self._paint_field_walls(field)
+        convert_row = lambda row: "".join([cell for cell in row])
         return "\n".join(convert_row(row) for row in field)
 
     def _init_field(self):
