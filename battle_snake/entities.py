@@ -128,6 +128,26 @@ class Snake:
     def _remove_tail(self, future_snake):
         future_snake.body_incl_head.pop()
 
+    def is_dangerous(self, other_snake: "Snake") -> bool:
+        """Check if my snake's head collides with other snake badly.
+
+        If my snake collides with the other's snake body I will die (-> dangerous).
+        If my snake collides with the other's snake head it depends:
+        - the longer snake survives
+        - if both snakes have same lenght, both snakes will die.
+        """
+        if self.head in other_snake.body_without_head:
+            return True
+        if self.head == other_snake.head:
+            if len(self) == len(other_snake):
+                return True
+            if len(self) > len(other_snake):
+                return False
+            else:
+                return True
+        else:
+            return False
+
 
 class Board:
     """Represents the board including board size, all snakes, food and position of my own snake."""
