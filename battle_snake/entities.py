@@ -135,6 +135,8 @@ class Snake:
         If my snake collides with the other's snake head it depends:
         - the longer snake survives
         - if both snakes have same lenght, both snakes will die.
+
+        Hint: Can be combined with calcualte_future_snake.
         """
         if self.head in other_snake.body_without_head:
             return True
