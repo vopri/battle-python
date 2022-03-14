@@ -23,12 +23,15 @@ def get_info() -> dict:
 
 
 class MoveDecision:
+    """Decision make for the next move of my snake. Entry point is method 'decide'"""
+
     def __init__(self, data: dict):
         self.board: Board = self._init_board(data)
         self.possible_moves: Moves = self.me.next_theoretical_head_positions_and_moves()
 
     @property
     def me(self) -> Snake:
+        """Shortcut to my snake"""
         return self.board.my_snake
 
     def _init_board(self, data: dict) -> Board:
@@ -36,10 +39,20 @@ class MoveDecision:
         return Board(my_head_pos, **data["board"])
 
     def decide(self) -> NextStep:
+        """Entry point to find the next move of my snake
+
+        Returns:
+            NextStep: Concrete next step of my snake
+        """
         self._exclude_impossible_moves()
         return random.choice(list(self.possible_moves.values()))
 
     def _exclude_impossible_moves(self):
+        """Remove all possible next steps that would lead to death at once.
+
+        This internal method doesn't include any strategies or tactis.
+        The only purpose is to survive the next step.
+        """
         self._avoid_walls()
         self._avoid_my_neck()
         self._avoid_my_future_body()
