@@ -130,17 +130,47 @@ def test_is_dangerous(
         ("snake_origin", NextStep.UP, True, True),  # neck with food
         ("snake_origin", NextStep.RIGHT, False, False),  # free space without food
         #
-        # TODO: unclear rule for special case: very short snake with head and tail only: will it bite into his neck (without food)? Have to test with real engine
-        # (
-        #     "snake_middle_short",
-        #     NextStep.RIGHT,
-        #     False,
-        #     True,
-        # ),
+        (
+            "snake_middle_short",
+            NextStep.RIGHT,
+            False,
+            True,
+        ),
         ("snake_middle_short", NextStep.RIGHT, True, True),  # neck with food
         ("snake_middle_short", NextStep.LEFT, False, False),  # free space without food
         ("snake_middle_short", NextStep.LEFT, True, False),  # free space with food
         #
+        (
+            "snake_right_middle_short",
+            NextStep.LEFT,
+            True,
+            True,
+        ),  # neck space with food
+        (
+            "snake_right_middle_short",
+            NextStep.LEFT,
+            False,
+            True,
+        ),  # neck space without food
+        ("snake_right_middle_short", NextStep.UP, True, False),  # free space with food
+        (
+            "snake_right_middle_short",
+            NextStep.DOWN,
+            True,
+            False,
+        ),  # free space with food
+        (
+            "snake_right_middle_short",
+            NextStep.RIGHT,
+            True,
+            False,
+        ),  # free space with food (even is wall, but this is not checked here)
+        (
+            "snake_right_middle_short",
+            NextStep.UP,
+            False,
+            False,
+        ),  # free space with food
     ],
 )
 def test_snake_will_bite_itself(
