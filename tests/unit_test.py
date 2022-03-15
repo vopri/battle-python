@@ -136,7 +136,7 @@ def test_is_dangerous(
         #     NextStep.RIGHT,
         #     False,
         #     True,
-        # ),  # ERROR  # neck without food
+        # ),
         ("snake_middle_short", NextStep.RIGHT, True, True),  # neck with food
         ("snake_middle_short", NextStep.LEFT, False, False),  # free space without food
         ("snake_middle_short", NextStep.LEFT, True, False),  # free space with food

@@ -101,6 +101,10 @@ class Snake:
         of the body stays. Without food (and therefore without any growth) the snake's
         body will change its position entirely.
 
+        Special case for very small cases at the beginning of the game:
+        Until the snake is smaller than 3 (inc. head) it will grow, even if there's no
+        food available.
+
         Args:
             next_step (NextStep): Direction for the next step.
             is_food_available (bool, optional): Is there currenlty food beneath the snakes head? Defaults to False.
@@ -108,6 +112,9 @@ class Snake:
         Returns:
             Snake: Brand new snake how it would look like in the future after the next step.
         """
+        is_baby_snake = len(self) < 3
+        if is_baby_snake:
+            is_food_available = True
         future_snake: Snake = copy.deepcopy(self)
         future_head_position: Position = self._calc_future_head_position(next_step)
         self._add_future_head_to_future_snake(future_snake, future_head_position)
