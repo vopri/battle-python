@@ -26,21 +26,31 @@ from battle_snake.interactor import MoveDecision
             False,
             {NextStep.RIGHT, NextStep.UP, NextStep.LEFT},
         ),
+        (
+            "snake_in_block",
+            False,
+            {NextStep.RIGHT, NextStep.DOWN},
+        ),
+        (
+            "snake_in_block",
+            True,
+            {NextStep.DOWN},
+        ),
     ],
 )
-def test_avoid_my_neck(
+def test_avoid_my_bite_myself(
     sample_move_decision: MoveDecision,
     snake_fix_str: str,
     food: bool,
     expected_steps: set[NextStep],
     request: pytest.FixtureRequest,
 ):
-    _arrange_test_avoid_my_neck(sample_move_decision, snake_fix_str, food, request)
-    sample_move_decision._avoid_my_neck()
+    _arrange_test_avoid_bite_myself(sample_move_decision, snake_fix_str, food, request)
+    sample_move_decision._avoid_myself()
     assert set(sample_move_decision.possible_moves.values()) == expected_steps
 
 
-def _arrange_test_avoid_my_neck(sample_move_decision, snake_fix_str, food, request):
+def _arrange_test_avoid_bite_myself(sample_move_decision, snake_fix_str, food, request):
     snake: Snake = request.getfixturevalue(snake_fix_str)
     sample_move_decision.board.all_snakes = {snake.head: snake}
     sample_move_decision.board.my_head = snake.head
