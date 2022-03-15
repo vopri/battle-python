@@ -91,7 +91,7 @@ class Snake:
     def calculate_future_snake(
         self,
         next_step: NextStep,
-        food: bool = False,
+        is_food_available: bool = False,
     ) -> "Snake":
         """Return a new snake based on the next step into one defined direction.
 
@@ -103,7 +103,7 @@ class Snake:
 
         Args:
             next_step (NextStep): Direction for the next step.
-            food (bool, optional): Is there currenlty food beneath the snakes head? Defaults to False.
+            is_food_available (bool, optional): Is there currenlty food beneath the snakes head? Defaults to False.
 
         Returns:
             Snake: Brand new snake how it would look like in the future after the next step.
@@ -111,7 +111,7 @@ class Snake:
         future_snake: Snake = copy.deepcopy(self)
         future_head_position: Position = self._calc_future_head_position(next_step)
         self._add_future_head_to_future_snake(future_snake, future_head_position)
-        if not food:
+        if not is_food_available:
             self._remove_tail(future_snake)
         return future_snake
 
@@ -138,8 +138,6 @@ class Snake:
 
         Hint: Can be combined with calcualte_future_snake.
         """
-        if self.head in other_snake.body_without_head:
-            return True
         if self.head == other_snake.head:
             if len(self) == len(other_snake):
                 return True
@@ -147,6 +145,21 @@ class Snake:
                 return False
             else:
                 return True
+        if self.head in other_snake.body_without_head:
+            return True
+        else:
+            return False
+
+    def will_bite_itself(self, next_step: NextStep, is_food_available: bool) -> bool:
+        """Will this snake byte itself after the next step (depending from available food now)?
+
+        Args:
+            next_step (NextStep)
+            is_food_available (bool): referes to current moment and not to the future. Food is eaten before next move.
+        """
+        future_me = self.calculate_future_snake(next_step, is_food_available)
+        if future_me.head in future_me.body_without_head:
+            return True
         else:
             return False
 

@@ -106,3 +106,55 @@ def test_is_dangerous(
     my_snake = request.getfixturevalue(my_snake)
     other_snake = request.getfixturevalue(other_snake)
     assert my_snake.is_dangerous(other_snake) == is_dangerous
+
+
+@pytest.mark.parametrize(
+    "snake_str, next_step, is_food_available, expected_outcome",
+    [
+        ("snake_in_block", NextStep.LEFT, False, True),  # neck without food
+        ("snake_in_block", NextStep.LEFT, True, True),  # neck with food
+        ("snake_in_block", NextStep.UP, False, True),  # body without food
+        ("snake_in_block", NextStep.UP, True, True),  # body with food
+        ("snake_in_block", NextStep.RIGHT, False, False),  # tail without food
+        ("snake_in_block", NextStep.RIGHT, True, True),  # tail with food
+        ("snake_in_block", NextStep.DOWN, False, False),  # free space without food
+        ("snake_in_block", NextStep.DOWN, True, False),  # free space with food
+        #
+        ("sample_snake", NextStep.UP, False, False),  # free space without food
+        ("sample_snake", NextStep.LEFT, False, False),  # free space without food
+        ("sample_snake", NextStep.RIGHT, False, False),  # free space without food
+        ("sample_snake", NextStep.UP, True, False),  # free space with food
+        ("sample_snake", NextStep.DOWN, True, True),  # neck with food
+        #
+        ("snake_origin", NextStep.UP, False, True),  # neck without food
+        ("snake_origin", NextStep.UP, True, True),  # neck with food
+        ("snake_origin", NextStep.RIGHT, False, False),  # free space without food
+        #
+        # TODO: unclear rule for special case: very short snake with head and tail only: will it bite into his neck (without food)? Have to test with real engine
+        # (
+        #     "snake_middle_short",
+        #     NextStep.RIGHT,
+        #     False,
+        #     True,
+        # ),  # ERROR  # neck without food
+        ("snake_middle_short", NextStep.RIGHT, True, True),  # neck with food
+        ("snake_middle_short", NextStep.LEFT, False, False),  # free space without food
+        ("snake_middle_short", NextStep.LEFT, True, False),  # free space with food
+        #
+    ],
+)
+def test_snake_will_bite_itself(
+    snake_str,
+    next_step: NextStep,
+    is_food_available: bool,
+    expected_outcome: bool,
+    request: pytest.FixtureRequest,
+):
+    snake = request.getfixturevalue(snake_str)
+    assert (
+        snake.will_bite_itself(
+            next_step,
+            is_food_available,
+        )
+        == expected_outcome
+    )
