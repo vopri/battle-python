@@ -234,31 +234,43 @@ class Board:
         board_of_possible_future.all_snakes = {}
         return board_of_possible_future
 
-    def _remove_eaten_food(self, board_of_possible_future):
+    def _remove_eaten_food(self, board_of_possible_future: "Board"):
         for position, snake in self.all_snakes.items():
-            if snake.head in self.food:
+            if self._is_food_available(snake):
                 board_of_possible_future.food.remove(position)
 
     def _add_other_snakes_of_future_that_dont_bite_itself(
         self,
-        board_of_possible_future,
+        board_of_possible_future: "Board",
     ):
+        """Add all possible snakes to the board (read on details!).
+
+        - All, but not my own snake. I want to add my own snake later on,
+        after I can see the board of all possibilities.
+        - There are up to 4 snake-copies in the future board for every
+        original snake, 1 for every direction (as long as it doesn't bite itself)
+        """
         for snake in self.all_snakes.values():
+            # My own snake shall not (yet) be part of the
+            # future board of possibilities
             if snake == self.my_snake:
                 continue
-            for next_possible_step in (
+            all_possible_steps = (
                 NextStep.UP,
                 NextStep.DOWN,
                 NextStep.RIGHT,
                 NextStep.LEFT,
-            ):
-                is_food_available = snake.head in self.food
-                if snake.will_bite_itself(next_possible_step, is_food_available):
+            )
+            for next_step in all_possible_steps:
+                if snake.will_bite_itself(next_step, self._is_food_available(snake)):
                     continue
-                future_snake = snake.calculate_future_snake(next_possible_step)
+                future_snake = snake.calculate_future_snake(next_step)
                 board_of_possible_future.all_snakes[future_snake.head] = future_snake
 
-    def _remove_snakes_running_into_walls(self, board_of_possible_future):
+    def _is_food_available(self, snake: Snake):
+        return snake.head in self.food
+
+    def _remove_snakes_running_into_walls(self, board_of_possible_future: "Board"):
         board_of_possible_future.all_snakes = {
             head: snake
             for head, snake in board_of_possible_future.all_snakes.items()
@@ -269,26 +281,40 @@ class Board:
         self,
         board_of_possible_future: "Board",
     ):
+        """All snakes that are *defenitely* killed by another snake are removed.
+
+        What means 'definitely'? Based on current position and food the body
+        of every snake in the future step is deterministic. But the snake's heads
+        are not and depend from individual decisions of the snakes.
+        Therefore the method will *not* remove snakes that might be killed due to
+        head collisions, but only snake that are killed because they bite
+        into another body (excl. head).
+        """
         future_snakes = list(board_of_possible_future.all_snakes.values())
         while future_snakes:
             snake_for_checking_if_save = future_snakes.pop()
             for possibly_threatening_snake in future_snakes:
-                # FIXME: Ich sollte pessimistischer sein! Head an Head drin lassen
-                # Can't use snake.is_dangerous here, because it's not
-                # all clear, with the head of the snakes will be in the future board.
-                # But the bodies are deterministic and can be used to remove killed snakes.
-                # This way we will get the board with all possible snake
-                is_snake_definitely_killed = (
-                    True
-                    if (
-                        snake_for_checking_if_save.head
-                        in possibly_threatening_snake.body_without_head
-                    )
-                    else False
+                # Can't use snake.is_dangerous here, because that would include
+                # kills based on head collision.
+                is_snake_definitely_killed = self._is_snake_definitely_killed(
+                    snake_for_checking_if_save, possibly_threatening_snake
                 )
-                #
                 if is_snake_definitely_killed:
                     del board_of_possible_future.all_snakes[
                         snake_for_checking_if_save.head
                     ]
-                    break  # continue with next snake-for-checking-if-save
+                    break
+
+    def _is_snake_definitely_killed(
+        self,
+        snake_for_checking_if_save: Snake,
+        possibly_threatening_snake: Snake,
+    ):
+        """Ignore head collisions!"""
+        if (
+            snake_for_checking_if_save.head
+            in possibly_threatening_snake.body_without_head
+        ):
+            return True
+        else:
+            return False
