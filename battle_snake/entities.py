@@ -298,10 +298,9 @@ class Board:
             for possibly_threatening_snake in future_snakes:
                 # Can't use snake.is_dangerous here, because that would include
                 # kills based on head collision.
-                is_snake_definitely_killed = self._is_snake_definitely_killed(
+                if self._is_snake_definitely_killed(
                     snake_for_checking_if_save, possibly_threatening_snake
-                )
-                if is_snake_definitely_killed:
+                ):
                     del board_of_possible_future.all_snakes[
                         snake_for_checking_if_save.head
                     ]
