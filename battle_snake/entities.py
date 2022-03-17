@@ -265,13 +265,30 @@ class Board:
             if not self.is_wall(head)
         }
 
-    def _remove_snakes_killed_by_others(self, board_of_possible_future):
+    def _remove_snakes_killed_by_others(
+        self,
+        board_of_possible_future: "Board",
+    ):
         future_snakes = list(board_of_possible_future.all_snakes.values())
         while future_snakes:
             snake_for_checking_if_save = future_snakes.pop()
             for possibly_threatening_snake in future_snakes:
-                if snake_for_checking_if_save.is_dangerous(possibly_threatening_snake):
+                # FIXME: Ich sollte pessimistischer sein! Head an Head drin lassen
+                # Can't use snake.is_dangerous here, because it's not
+                # all clear, with the head of the snakes will be in the future board.
+                # But the bodies are deterministic and can be used to remove killed snakes.
+                # This way we will get the board with all possible snake
+                is_snake_definitely_killed = (
+                    True
+                    if (
+                        snake_for_checking_if_save.head
+                        in possibly_threatening_snake.body_without_head
+                    )
+                    else False
+                )
+                #
+                if is_snake_definitely_killed:
                     del board_of_possible_future.all_snakes[
                         snake_for_checking_if_save.head
                     ]
-                    break
+                    break  # continue with next snake-for-checking-if-save
