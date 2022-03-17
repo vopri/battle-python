@@ -70,7 +70,7 @@ class Snake:
             row.append("|")
 
     def next_theoretical_head_positions_and_moves(self) -> dict[Position, NextStep]:
-        """Give all possible 4 theoretically possible coordinates of snake's head for the next move.
+        """Give all 4 theoretically possible coordinates of snake's head for the next move.
 
         The returned positions are just theoretically possible and do not take care
         of hitting walls, my own body or other snakes. Therefore the position can
@@ -107,7 +107,8 @@ class Snake:
 
         Args:
             next_step (NextStep): Direction for the next step.
-            is_food_available (bool, optional): Is there currenlty food beneath the snakes head? Defaults to False.
+            is_food_available (bool, optional): Is there currenlty food beneath the
+                snakes head? Defaults to False.
 
         Returns:
             Snake: Brand new snake how it would look like in the future after the next step.
@@ -162,7 +163,8 @@ class Snake:
 
         Args:
             next_step (NextStep)
-            is_food_available (bool): referes to current moment and not to the future. Food is eaten before next move.
+            is_food_available (bool): referes to current moment and not to the future.
+                Food is eaten before next move.
         """
         future_me = self.calculate_future_snake(next_step, is_food_available)
         if future_me.head in future_me.body_without_head:
