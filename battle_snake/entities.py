@@ -10,7 +10,7 @@ class NextStep(Enum):
     RIGHT = "right"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class Position:
     x: int
     y: int
@@ -51,6 +51,9 @@ class Snake:
         self._paint_field_walls(field)
         convert_row = lambda row: "".join([cell for cell in row])
         return "\n".join(convert_row(row) for row in field)
+
+    def __repr__(self) -> str:
+        return f"{self.body_incl_head})"
 
     def _init_field(self):
         field: list[list[str]] = [["·" for i in range(11)] for j in range(11)]
@@ -209,53 +212,46 @@ class Board:
             return True
         return False
 
-    def calculate_future_board(self) -> "Board":
-        """Calculate how the board could look like in the next turn.
 
-        Deterministic is the body of all snakes.
-        Unclear is the position of their heads.
+class FutureBoard(Board):
+    """Calculate how the board could look like in the next turn.
 
-        My own snake will not be included in the returned board.
+    Deterministic is the body of all snakes.
+    Unclear is the position of their heads.
 
-        This method will include all possible snakes,
-        "impossible snakes" will be removed.
+    My own snake will not be included in all-possible-snakes.
 
-        All possible head positions are included (pessimistic approach).
-        All "eaten" food from the current turn will be removed.
+    This method will include all possible snakes,
+    "impossible snakes" will be removed.
 
-        """
-        board_of_possible_future = self._get_board_copy_without_snakes()
-        self._remove_eaten_food(board_of_possible_future)
-        self._add_other_snakes_of_future_that_dont_bite_itself(board_of_possible_future)
-        self._remove_snakes_running_into_walls(board_of_possible_future)
-        self._remove_snakes_killed_by_others(board_of_possible_future)
-        return board_of_possible_future
+    All possible head positions are included (pessimistic approach).
+    All "eaten" food from the current turn will be removed.
 
-    def _get_board_copy_without_snakes(self) -> "Board":
-        board_of_possible_future = copy.deepcopy(self)
-        board_of_possible_future.all_snakes = {}
-        return board_of_possible_future
+    """
 
-    def _remove_eaten_food(self, board_of_possible_future: "Board"):
-        for position, snake in self.all_snakes.items():
-            if self._is_food_available(snake):
-                board_of_possible_future.food.remove(position)
+    def __init__(self, board: Board):
+        self._orig_board = board
+        self.height: int = board.height
+        self.width: int = board.width
+        self.food: set[Position] = {food for food in board.food}
+        self.all_possible_snakes: list[Snake] = []
+        self._add_other_snakes_of_future_that_dont_bite_itself()
+        self._remove_snakes_running_into_walls()
+        self._remove_snakes_killed_by_others()
+        self._remove_eaten_food()
 
-    def _add_other_snakes_of_future_that_dont_bite_itself(
-        self,
-        board_of_possible_future: "Board",
-    ):
-        """Add all possible snakes to the board (read on details!).
+    def _add_other_snakes_of_future_that_dont_bite_itself(self):
+        """Add all possible snakes (except mine) to the board.
 
         - All, but not my own snake. I want to add my own snake later on,
         after I can see the board of all possibilities.
-        - There are up to 4 snake-copies in the future board for every
+        - There are up to 3 snake-copies in the future board for every
         original snake, 1 for every direction (as long as it doesn't bite itself)
         """
-        for snake in self.all_snakes.values():
+        for snake in self._orig_board.all_snakes.values():
             # My own snake shall not (yet) be part of the
             # future board of possibilities
-            if snake == self.my_snake:
+            if snake == self._orig_board.my_snake:
                 continue
             all_possible_steps = (
                 NextStep.UP,
@@ -264,58 +260,43 @@ class Board:
                 NextStep.LEFT,
             )
             for next_step in all_possible_steps:
-                if snake.will_bite_itself(next_step, self._is_food_available(snake)):
+                is_food_available = self._is_food_available(snake)
+                if snake.will_bite_itself(next_step, is_food_available):
                     continue
-                future_snake = snake.calculate_future_snake(next_step)
-                board_of_possible_future.all_snakes[future_snake.head] = future_snake
+                future_snake = snake.calculate_future_snake(
+                    next_step, is_food_available
+                )
+                self.all_possible_snakes.append(future_snake)
 
     def _is_food_available(self, snake: Snake):
         return snake.head in self.food
 
-    def _remove_snakes_running_into_walls(self, board_of_possible_future: "Board"):
-        board_of_possible_future.all_snakes = {
-            head: snake
-            for head, snake in board_of_possible_future.all_snakes.items()
-            if not self.is_wall(head)
-        }
+    def _remove_snakes_running_into_walls(self):
+        self.all_possible_snakes = [
+            snake for snake in self.all_possible_snakes if not self.is_wall(snake.head)
+        ]
 
-    def _remove_snakes_killed_by_others(
-        self,
-        board_of_possible_future: "Board",
-    ):
+    def _remove_snakes_killed_by_others(self):
         """All snakes that are *defenitely* killed by another snake are removed.
 
         What means 'definitely'? Based on current position and food the body
         of every snake in the future step is deterministic. But the snake's heads
-        are not and depend from individual decisions of the snakes.
+        are not deterministic. They depend from individual decisions of the snakes.
         Therefore the method will *not* remove snakes that might be killed due to
         head collisions, but only snake that are killed because they bite
         into another body (excl. head).
         """
-        future_snakes = list(board_of_possible_future.all_snakes.values())
-        while future_snakes:
-            snake_for_checking_if_save = future_snakes.pop()
-            for possibly_threatening_snake in future_snakes:
-                # Can't use snake.is_dangerous here, because that would include
-                # kills based on head collision.
-                if self._is_snake_definitely_killed(
-                    snake_for_checking_if_save, possibly_threatening_snake
-                ):
-                    del board_of_possible_future.all_snakes[
-                        snake_for_checking_if_save.head
-                    ]
-                    break
 
-    def _is_snake_definitely_killed(
-        self,
-        snake_for_checking_if_save: Snake,
-        possibly_threatening_snake: Snake,
-    ):
-        """Ignore head collisions!"""
-        if (
-            snake_for_checking_if_save.head
-            in possibly_threatening_snake.body_without_head
-        ):
-            return True
-        else:
-            return False
+        all_body_fields: set[Position] = {
+            pos for snake in self.all_possible_snakes for pos in snake.body_without_head
+        }
+        self.all_possible_snakes = [
+            snake
+            for snake in self.all_possible_snakes
+            if not snake.head in all_body_fields
+        ]
+
+    def _remove_eaten_food(self):
+        for position, snake in self._orig_board.all_snakes.items():
+            if self._is_food_available(snake):
+                self.food.remove(position)

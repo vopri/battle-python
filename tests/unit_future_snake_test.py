@@ -19,7 +19,6 @@ def test_print_snake(
     snake_name: str, snake_as_str: str, request: pytest.FixtureRequest
 ):
     snake: Snake = request.getfixturevalue(snake_name)
-    print(snake)
     assert str(snake) == snake_as_str
 
 
