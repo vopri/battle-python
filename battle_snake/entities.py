@@ -316,6 +316,15 @@ class FutureBoard(Board):
         return position in self._all_body_fields()
 
     def calc_snake_head_risk_value(self, pos: Position) -> float:
+        """Calculate a risk between 0 and 1 that there's a dangerous snake head.
+
+        Dangerous means that the snake is at least of my lenght.
+        Args:
+            pos (Position): Position to check for
+
+        Returns:
+            float: Risk value as sum of probability of all snakes with their head on this position.
+        """
         neck_ids_of_danger_snakes_on_pos = self._get_danger_snake_neck_id_on_pos(pos)
         risk_value = sum(
             [
