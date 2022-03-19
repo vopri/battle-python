@@ -146,8 +146,6 @@ class Snake:
         If my snake collides with the other's snake head it depends:
         - the longer snake survives
         - if both snakes have same lenght, both snakes will die.
-
-        Hint: Can be combined with calcualte_future_snake.
         """
         if self.head == other_snake.head:
             if len(self) == len(other_snake):
@@ -287,14 +285,19 @@ class FutureBoard(Board):
         into another body (excl. head).
         """
 
-        all_body_fields: set[Position] = {
-            pos for snake in self.all_possible_snakes for pos in snake.body_without_head
-        }
+        all_body_fields = self._all_body_fields()
         self.all_possible_snakes = [
             snake
             for snake in self.all_possible_snakes
             if not snake.head in all_body_fields
         ]
+
+    def _all_body_fields(self) -> set[Position]:
+        return {
+            pos for snake in self.all_possible_snakes for pos in snake.body_without_head
+        }
+
+        return all_body_fields
 
     def _remove_eaten_food(self):
         for position, snake in self._orig_board.all_snakes.items():
@@ -305,3 +308,6 @@ class FutureBoard(Board):
     def my_snake(self) -> Snake:
         """My snake from original board"""
         return self._orig_board.all_snakes[self._orig_board.my_head]
+
+    def is_other_snake_body_on_this(self, position: Position) -> bool:
+        return position in self._all_body_fields()
