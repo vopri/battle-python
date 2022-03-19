@@ -300,3 +300,8 @@ class FutureBoard(Board):
         for position, snake in self._orig_board.all_snakes.items():
             if self._is_food_available(snake):
                 self.food.remove(position)
+
+    @property
+    def my_snake(self) -> Snake:
+        """My snake from original board"""
+        return self._orig_board.all_snakes[self._orig_board.my_head]
