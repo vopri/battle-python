@@ -233,6 +233,7 @@ class FutureBoard(Board):
         self.width: int = board.width
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[Snake] = []
+        self._cache_all_body_fields = None
         self._add_other_snakes_of_future_that_dont_bite_itself()
         self._remove_snakes_running_into_walls()
         self._remove_snakes_killed_by_others()
@@ -293,11 +294,13 @@ class FutureBoard(Board):
         ]
 
     def _all_body_fields(self) -> set[Position]:
-        return {
-            pos for snake in self.all_possible_snakes for pos in snake.body_without_head
-        }
-
-        return all_body_fields
+        if self._cache_all_body_fields is None:
+            self._cache_all_body_fields = {
+                pos
+                for snake in self.all_possible_snakes
+                for pos in snake.body_without_head
+            }
+        return self._cache_all_body_fields
 
     def _remove_eaten_food(self):
         for position, snake in self._orig_board.all_snakes.items():
@@ -311,3 +314,38 @@ class FutureBoard(Board):
 
     def is_other_snake_body_on_this(self, position: Position) -> bool:
         return position in self._all_body_fields()
+
+    def calc_snake_head_risk_value(self, pos: Position) -> float:
+        neck_ids_of_danger_snakes_on_pos = self._get_danger_snake_neck_id_on_pos(pos)
+        risk_value = sum(
+            [
+                (1 / self._count_snakes_by_neck_position(neck_pos))
+                for neck_pos in neck_ids_of_danger_snakes_on_pos
+            ]
+        )
+        return risk_value
+
+    def _get_danger_snake_neck_id_on_pos(self, position: Position) -> list[Position]:
+        """Return a list with neck positions of all snakes here, that can be dangerous for me.
+
+        Dangerous means, they are longer or equals long as me.
+        Args:
+            position (Position): Position to check for dangouers snakes.
+
+        Returns:
+            list[Position]: List of neck positions, because the neck is deterministic and the same
+            for all possible variants of 1 snake in the future board of possiblities.
+        """
+        dangerous_size = len(self.my_snake)
+        return [
+            snake.neck
+            for snake in self.all_possible_snakes
+            if snake.head == position and len(snake) >= dangerous_size
+        ]
+
+    def _count_snakes_by_neck_position(self, pos: Position) -> int:
+        snake_variants = [
+            snake for snake in self.all_possible_snakes if snake.neck == pos
+        ]
+        return len(snake_variants)
+        return 0

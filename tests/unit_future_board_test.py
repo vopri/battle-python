@@ -60,3 +60,11 @@ def test_future_board_is_other_snake_body(
     assert (
         future_board.is_other_snake_body_on_this(position) == is_other_snake_body_there
     )
+
+
+def test_calc_snake_head_risk_value(test_board: Board):
+    future_board = FutureBoard(test_board)
+    risk_value = future_board.calc_snake_head_risk_value(Position(4, 4))
+    assert risk_value >= 0
+    assert risk_value <= 1
+    assert risk_value == (1 / 3) + (1 / 3)
