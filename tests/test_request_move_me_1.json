@@ -1,0 +1,217 @@
+{
+    "game": {
+        "id": "game-00fe20da-94ad-11ea-bb37",
+        "ruleset": {
+            "name": "standard",
+            "version": "v.1.2.3"
+        },
+        "timeout": 500
+    },
+    "turn": 14,
+    "board": {
+        "height": 11,
+        "width": 11,
+        "food": [
+            {
+                "x": 5,
+                "y": 5
+            },
+            {
+                "x": 9,
+                "y": 0
+            },
+            {
+                "x": 2,
+                "y": 6
+            },
+            {
+                "x": 5,
+                "y": 4
+            }
+        ],
+        "hazards": [
+            {
+                "x": 3,
+                "y": 2
+            }
+        ],
+        "snakes": [
+            {
+                "id": "snake-508e96ac-94ad-11ea-bb37",
+                "name": "My Snake",
+                "health": 54,
+                "body": [
+                    {
+                        "x": 3,
+                        "y": 6
+                    },
+                    {
+                        "x": 3,
+                        "y": 7
+                    }
+                ],
+                "latency": "111",
+                "head": {
+                    "x": 3,
+                    "y": 6
+                },
+                "length": 2,
+                "shout": "why are we shouting??",
+                "squad": "",
+                "customizations": {
+                    "color": "#FF0000",
+                    "head": "pixel",
+                    "tail": "pixel"
+                }
+            },
+            {
+                "id": "snake-b67f4906-94ae-11ea-bb37",
+                "name": "Another Snake",
+                "health": 16,
+                "body": [
+                    {
+                        "x": 5,
+                        "y": 4
+                    },
+                    {
+                        "x": 5,
+                        "y": 3
+                    },
+                    {
+                        "x": 6,
+                        "y": 3
+                    },
+                    {
+                        "x": 6,
+                        "y": 2
+                    }
+                ],
+                "latency": "222",
+                "head": {
+                    "x": 5,
+                    "y": 4
+                },
+                "length": 4,
+                "shout": "I'm not really sure...",
+                "squad": "",
+                "customizations": {
+                    "color": "#26CF04",
+                    "head": "silly",
+                    "tail": "curled"
+                }
+            },
+            {
+                "body": [
+                    {
+                        "x": 5,
+                        "y": 10
+                    },
+                    {
+                        "x": 6,
+                        "y": 10
+                    }
+                ],
+                "head": {
+                    "x": 5,
+                    "y": 10
+                }
+            },
+            {
+                "body": [
+                    {
+                        "x": 5,
+                        "y": 2
+                    },
+                    {
+                        "x": 5,
+                        "y": 1
+                    }
+                ],
+                "head": {
+                    "x": 5,
+                    "y": 2
+                }
+            },
+            {
+                "body": [
+                    {
+                        "x": 2,
+                        "y": 6
+                    },
+                    {
+                        "x": 2,
+                        "y": 7
+                    }
+                ],
+                "head": {
+                    "x": 2,
+                    "y": 6
+                }
+            },
+            {
+                "body": [
+                    {
+                        "x": 4,
+                        "y": 5
+                    },
+                    {
+                        "x": 3,
+                        "y": 5
+                    },
+                    {
+                        "x": 2,
+                        "y": 5
+                    }
+                ],
+                "head": {
+                    "x": 4,
+                    "y": 5
+                }
+            },
+            {
+                "body": [
+                    {
+                        "x": 10,
+                        "y": 10
+                    },
+                    {
+                        "x": 10,
+                        "y": 9
+                    }
+                ],
+                "head": {
+                    "x": 10,
+                    "y": 10
+                }
+            }
+        ]
+    },
+    "you": {
+        "id": "snake-508e96ac-94ad-11ea-bb37",
+        "name": "My Snake",
+        "health": 54,
+        "body": [
+            {
+                "x": 3,
+                "y": 6
+            },
+            {
+                "x": 3,
+                "y": 7
+            }
+        ],
+        "latency": "111",
+        "head": {
+            "x": 3,
+            "y": 6
+        },
+        "length": 2,
+        "shout": "why are we shouting??",
+        "squad": "",
+        "customizations": {
+            "color": "#FF0000",
+            "head": "pixel",
+            "tail": "pixel"
+        }
+    }
+}

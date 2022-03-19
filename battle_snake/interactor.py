@@ -1,7 +1,7 @@
 import random
 from typing import Dict, List
 
-from battle_snake.entities import Board, NextStep, Position, Snake
+from battle_snake.entities import Board, FutureBoard, NextStep, Position, Snake
 
 Moves = dict[Position, NextStep]  # type alias
 
@@ -26,6 +26,7 @@ class MoveDecision:
     def __init__(self, data: dict):
         self.board: Board = self._init_board(data)
         self.possible_moves: Moves = self.me.next_theoretical_head_positions_and_moves()
+        self.future_board: FutureBoard = FutureBoard(self.board)
 
     @property
     def me(self) -> Snake:
@@ -53,6 +54,7 @@ class MoveDecision:
         """
         self._avoid_walls()
         self._avoid_myself()
+        self._avoid_other_snake_bodies()
 
     def _avoid_walls(self):
         self.possible_moves = {
@@ -70,3 +72,10 @@ class MoveDecision:
 
     def _is_food_available(self):
         return self.me.head in self.board.food
+
+    def _avoid_other_snake_bodies(self):
+        self.possible_moves = {
+            position: next_step
+            for position, next_step in self.possible_moves.items()
+            if not self.future_board.is_other_snake_body_on_this(position)
+        }

@@ -1,5 +1,5 @@
 import pytest
-from battle_snake.entities import NextStep, Snake
+from battle_snake.entities import Board, NextStep, Snake
 from battle_snake.interactor import MoveDecision
 
 
@@ -72,3 +72,9 @@ def _arrange_test_exclude_impossible_steps(
     sample_move_decision.possible_moves = (
         sample_move_decision.me.next_theoretical_head_positions_and_moves()
     )
+
+
+def test_exclude_impossible_steps_other_snakes(test_request_move_me_1):
+    md = MoveDecision(test_request_move_me_1)
+    md._exclude_impossible_moves()
+    assert set(md.possible_moves.values()) == {NextStep.RIGHT}
