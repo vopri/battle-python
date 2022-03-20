@@ -44,6 +44,7 @@ class MoveDecision:
             NextStep: Concrete next step of my snake
         """
         self._exclude_impossible_moves()
+        self._exclude_dangerous_moves()
         return random.choice(list(self.possible_moves.values()))
 
     def _exclude_impossible_moves(self):
@@ -78,4 +79,11 @@ class MoveDecision:
             position: next_step
             for position, next_step in self.possible_moves.items()
             if not self.future_board.is_other_snake_body_on_this(position)
+        }
+
+    def _exclude_dangerous_moves(self, risk_tolerance=0):
+        self.possible_moves = {
+            position: next_step
+            for position, next_step in self.possible_moves.items()
+            if self.future_board.calc_snake_head_risk_value(position) <= 0
         }

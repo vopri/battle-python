@@ -78,3 +78,9 @@ def test_exclude_impossible_steps_other_snakes(test_request_move_me_1):
     md = MoveDecision(test_request_move_me_1)
     md._exclude_impossible_moves()
     assert set(md.possible_moves.values()) == {NextStep.RIGHT}
+
+
+def test_exclude_dangerous_steps_other_snakes(test_request_move_me_2):
+    md = MoveDecision(test_request_move_me_2)
+    md._exclude_dangerous_moves()
+    assert set(md.possible_moves.values()) == {NextStep.RIGHT, NextStep.UP}
