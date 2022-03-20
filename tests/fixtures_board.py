@@ -42,6 +42,12 @@ def test_request_move_me_2():
     return json.loads(sample_request.read_text())
 
 
+@fixture()
+def test_request_move_me_3():
+    sample_request = Path.cwd() / "tests" / "test_request_move_me_3.json"
+    return json.loads(sample_request.read_text())
+
+
 @fixture
 def test_board(test_request):
     return Board(

@@ -45,6 +45,10 @@ class MoveDecision:
         """
         self._exclude_impossible_moves()
         self._exclude_dangerous_moves()
+        if self._theres_no_way_to_survive():
+            # don't waste time and kill yourself like a snake with honour
+            return NextStep.UP
+        self._select_chances()
         return random.choice(list(self.possible_moves.values()))
 
     def _exclude_impossible_moves(self):
@@ -87,3 +91,18 @@ class MoveDecision:
             for position, next_step in self.possible_moves.items()
             if self.future_board.calc_snake_head_risk_value(position) <= 0
         }
+
+    def _theres_no_way_to_survive(self) -> bool:
+        return len(self.possible_moves) == 0
+
+    def _select_chances(self):
+        self._lead_me_to_nearby_food()
+
+    def _lead_me_to_nearby_food(self):
+        moves_leading_to_food = {
+            position: next_step
+            for position, next_step in self.possible_moves.items()
+            if position in self.future_board.food
+        }
+        if moves_leading_to_food:
+            self.possible_moves = moves_leading_to_food
