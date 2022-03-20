@@ -44,12 +44,20 @@ class MoveDecision:
             NextStep: Concrete next step of my snake
         """
         self._exclude_impossible_moves()
+        if self._there_is_only_one_move_possible():
+            return self._last_possible_next_step()
         self._exclude_dangerous_moves()
         if self._theres_no_way_to_survive():
             # don't waste time and kill yourself like a snake with honour
             return NextStep.UP
-        self._select_chances()
+        self._select_best_possible_moves()
         return random.choice(list(self.possible_moves.values()))
+
+    def _last_possible_next_step(self):
+        return list(self.possible_moves.values())[-1]
+
+    def _there_is_only_one_move_possible(self):
+        return len(self.possible_moves) == 1
 
     def _exclude_impossible_moves(self):
         """Remove all possible next steps that would lead to death at once.
@@ -95,7 +103,7 @@ class MoveDecision:
     def _theres_no_way_to_survive(self) -> bool:
         return len(self.possible_moves) == 0
 
-    def _select_chances(self):
+    def _select_best_possible_moves(self):
         self._lead_me_to_nearby_food()
 
     def _lead_me_to_nearby_food(self):
