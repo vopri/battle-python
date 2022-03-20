@@ -357,4 +357,3 @@ class FutureBoard(Board):
             snake for snake in self.all_possible_snakes if snake.neck == pos
         ]
         return len(snake_variants)
-        return 0
