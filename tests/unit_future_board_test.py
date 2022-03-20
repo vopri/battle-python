@@ -62,9 +62,19 @@ def test_future_board_is_other_snake_body(
     )
 
 
-def test_calc_snake_head_risk_value(test_board: Board):
+@pytest.mark.parametrize(
+    "position,risk_value_as_str",
+    [
+        (Position(4, 4), "(1 / 3) + (1 / 3)"),
+        (Position(6, 4), "1 / 3"),
+        (Position(8, 6), "0"),
+        (Position(9, 10), "1"),
+        (Position(5, 9), "1/2"),
+    ],
+)
+def test_calc_snake_head_risk_value(test_board: Board, position, risk_value_as_str):
     future_board = FutureBoard(test_board)
-    risk_value = future_board.calc_snake_head_risk_value(Position(4, 4))
+    risk_value = future_board.calc_snake_head_risk_value(position)
     assert risk_value >= 0
     assert risk_value <= 1
-    assert risk_value == (1 / 3) + (1 / 3)
+    assert risk_value == eval(risk_value_as_str)
