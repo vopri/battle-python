@@ -119,25 +119,8 @@ class Snake:
         is_baby_snake = len(self) < 3
         if is_baby_snake:
             is_food_available = True
-        future_snake: Snake = copy.deepcopy(self)
-        future_head_position: Position = self._calc_future_head_position(next_step)
-        self._add_future_head_to_future_snake(future_snake, future_head_position)
-        if not is_food_available:
-            self._remove_tail(future_snake)
-        return future_snake
 
-    def _calc_future_head_position(self, next_step):
-        return [
-            position
-            for position, n_step in self.next_theoretical_head_positions_and_moves().items()
-            if n_step == next_step
-        ][0]
-
-    def _add_future_head_to_future_snake(self, future_snake, future_head_position):
-        future_snake.body_incl_head.insert(0, future_head_position)
-
-    def _remove_tail(self, future_snake):
-        future_snake.body_incl_head.pop()
+        return FutureSnake(self, next_step, is_food_available)
 
     def is_dangerous(self, other_snake: "Snake") -> bool:
         """Check if my snake's head collides with other snake badly.
@@ -175,18 +158,34 @@ class Snake:
 
 
 class FutureSnake(Snake):
-    def __init__(
-        self,
-        mother: Snake,
-        next_step: NextStep,
-        is_food_available: bool,
-        is_my_snake: bool = False,
-    ):
+    def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
         self.mother = mother
-        self.body_incl_head = mother.body_incl_head
+        self.body_incl_head = mother.body_incl_head[:]
         self.next_step = next_step
         self.is_food_available = is_food_available
-        self.is_my_snake = is_my_snake
+
+        future_head_position: Position = self._calc_future_head_position(next_step)
+        self._add_future_head_to_future_snake(future_head_position)
+        if not is_food_available:
+            self._remove_tail()
+
+    def _calc_future_head_position(self, next_step) -> Position:
+        if next_step == NextStep.UP:
+            return Position(self.head.x, self.head.y + 1)
+        if next_step == NextStep.DOWN:
+            return Position(self.head.x, self.head.y - 1)
+        if next_step == NextStep.RIGHT:
+            return Position(self.head.x + 1, self.head.y)
+        if next_step == NextStep.LEFT:
+            return Position(self.head.x - 1, self.head.y)
+        else:
+            raise ValueError(f"Next step not defined: {next_step}")
+
+    def _add_future_head_to_future_snake(self, future_head_position):
+        self.body_incl_head.insert(0, future_head_position)
+
+    def _remove_tail(self):
+        self.body_incl_head.pop()
 
 
 class Board:

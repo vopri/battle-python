@@ -5,13 +5,12 @@ from battle_snake.entities import FutureSnake, NextStep, Position, Snake
 def test_future_snake_init(sample_snake: Snake):
     next_step = NextStep.UP
     is_food_available = True
-    future_snake = FutureSnake(
-        sample_snake, next_step, is_food_available, is_my_snake=True
-    )
+    future_snake = FutureSnake(sample_snake, next_step, is_food_available)
     assert future_snake.next_step == next_step
     assert future_snake.is_food_available == is_food_available
     assert future_snake.mother == sample_snake
-    assert future_snake.is_my_snake
+    assert future_snake.head == Position(5, 5)
+    assert sample_snake.head == Position(5, 4)
 
 
 def test_future_snake_right_without_food(
