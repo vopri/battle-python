@@ -174,6 +174,21 @@ class Snake:
             return False
 
 
+class FutureSnake(Snake):
+    def __init__(
+        self,
+        mother: Snake,
+        next_step: NextStep,
+        is_food_available: bool,
+        is_my_snake: bool = False,
+    ):
+        self.mother = mother
+        self.body_incl_head = mother.body_incl_head
+        self.next_step = next_step
+        self.is_food_available = is_food_available
+        self.is_my_snake = is_my_snake
+
+
 class Board:
     """Represents the board including board size, all snakes, food and position of my own snake."""
 
