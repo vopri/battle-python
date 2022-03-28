@@ -228,16 +228,14 @@ class Board:
         return False
 
 
-class FutureBoard(Board):
+class FutureBoard:
     """Calculate how the board could look like in the next turn.
 
     Deterministic is the body of all snakes.
     Unclear is the position of their heads.
 
-    My own snake will not be included in all-possible-snakes.
-
-    This method will include all possible snakes,
-    "impossible snakes" will be removed.
+    This method will include all possible snakes, including mine.
+    "Impossible snakes" will be removed.
 
     All possible head positions are included (pessimistic approach).
     All "eaten" food from the current turn will be removed.
@@ -251,24 +249,19 @@ class FutureBoard(Board):
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[Snake] = []
         self._cache_all_body_fields = None
-        self._add_other_snakes_of_future_that_dont_bite_itself()
+        self._add_all_snakes_of_future_that_dont_bite_itself()
         self._remove_snakes_running_into_walls()
         self._remove_snakes_killed_by_others()
         self._remove_eaten_food()
 
-    def _add_other_snakes_of_future_that_dont_bite_itself(self):
-        """Add all possible snakes (except mine) to the board.
+    def _add_all_snakes_of_future_that_dont_bite_itself(self):
+        """Add all possible snakes (including mine) to the board.
 
-        - All, but not my own snake. I want to add my own snake later on,
-        after I can see the board of all possibilities.
+        - All snakes that do not bite itself.
         - There are up to 3 snake-copies in the future board for every
         original snake, 1 for every direction (as long as it doesn't bite itself)
         """
         for snake in self._orig_board.all_snakes.values():
-            # My own snake shall not (yet) be part of the
-            # future board of possibilities
-            if snake == self._orig_board.my_snake:
-                continue
             all_possible_steps = (
                 NextStep.UP,
                 NextStep.DOWN,
@@ -325,12 +318,27 @@ class FutureBoard(Board):
                 self.food.remove(position)
 
     @property
-    def my_snake(self) -> Snake:
+    def my_original_snake(self) -> Snake:
         """My snake from original board"""
         return self._orig_board.all_snakes[self._orig_board.my_head]
 
     def is_other_snake_body_on_this(self, position: Position) -> bool:
-        return position in self._all_body_fields()
+        if self._is_no_snake_body_on_this(position):
+            return False
+        if self._is_one_of_my_own_future_bodies_on_this(position):
+            return False
+        return True
+
+    def _is_no_snake_body_on_this(self, position):
+        return not position in self._all_body_fields()
+
+    def _is_one_of_my_own_future_bodies_on_this(self, position):
+        return position in [
+            position
+            for snake in self.all_possible_snakes
+            for position in snake.body_without_head
+            if snake.is_me
+        ]
 
     def calc_snake_head_risk_value(self, pos: Position) -> float:
         """Calculate a risk between 0 and 1 that there's a dangerous snake head.
@@ -362,11 +370,13 @@ class FutureBoard(Board):
             list[Position]: List of neck positions, because the neck is deterministic and the same
             for all possible variants of 1 snake in the future board of possiblities.
         """
-        dangerous_size = len(self.my_snake)
+        dangerous_size = len(self.my_original_snake)
         return [
             snake.neck
             for snake in self.all_possible_snakes
-            if snake.head == position and len(snake) >= dangerous_size
+            if snake.head == position
+            and len(snake) >= dangerous_size
+            and not snake.is_me
         ]
 
     def _count_snakes_by_neck_position(self, pos: Position) -> int:
@@ -374,3 +384,20 @@ class FutureBoard(Board):
             snake for snake in self.all_possible_snakes if snake.neck == pos
         ]
         return len(snake_variants)
+
+    def is_wall(self, pos: Position) -> bool:
+        """Check for dangerous wall on given position.
+
+        Args:
+            pos (Position): Coordinates on the board.
+
+        Returns:
+            bool: Is there a wall?
+        """
+        if pos.x < 0 or pos.y < 0:
+            return True
+        if pos.x >= self.width:
+            return True
+        if pos.y >= self.height:
+            return True
+        return False

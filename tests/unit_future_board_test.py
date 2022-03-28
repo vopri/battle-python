@@ -19,8 +19,9 @@ def test_future_board_init(test_board: Board):
 
 def test_future_board_all_possible_snakes(test_board: Board):
     future_board = FutureBoard(test_board)
-    assert len(future_board.all_possible_snakes) == 13
+    assert len(future_board.all_possible_snakes) == 14
     expected_heads = {
+        Position(x=0, y=1),
         Position(x=1, y=6),
         Position(x=2, y=5),
         Position(x=3, y=6),
@@ -36,9 +37,6 @@ def test_future_board_all_possible_snakes(test_board: Board):
         Position(x=9, y=10),
     }
     assert {snake.head for snake in future_board.all_possible_snakes} == expected_heads
-
-    # for snake in sorted(future_board.all_possible_snakes, key=lambda snake: snake.head):  # type: ignore
-    #     print(snake.head)
 
 
 @pytest.mark.parametrize(
@@ -70,6 +68,7 @@ def test_future_board_is_other_snake_body(
         (Position(8, 6), "0"),
         (Position(9, 10), "1"),
         (Position(5, 9), "1/2"),
+        (Position(0, 1), "0"),  # my own head is no risk at all
     ],
 )
 def test_calc_snake_head_risk_value(test_board: Board, position, risk_value_as_str):
