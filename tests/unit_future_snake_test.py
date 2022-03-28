@@ -1,5 +1,5 @@
 import pytest
-from battle_snake.entities import FutureSnake, NextStep, Position, Snake
+from battle_snake.entities import Board, FutureSnake, NextStep, Position, Snake
 
 
 def test_future_snake_init(sample_snake: Snake):
@@ -11,6 +11,16 @@ def test_future_snake_init(sample_snake: Snake):
     assert future_snake.mother == sample_snake
     assert future_snake.head == Position(5, 5)
     assert sample_snake.head == Position(5, 4)
+
+
+def test_sample_board_future_snake_is_me_marker(sample_board: Board):
+    my_future_snake: FutureSnake = sample_board.my_snake.calculate_future_snake(
+        NextStep.UP, True
+    )
+    assert my_future_snake.is_me
+    other_snake: Snake = sample_board.all_snakes.get(Position(5, 4))  # type: ignore
+    other_future_snake = other_snake.calculate_future_snake(NextStep.DOWN)
+    assert other_future_snake.is_me == False
 
 
 def test_future_snake_right_without_food(

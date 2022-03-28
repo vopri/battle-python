@@ -96,7 +96,7 @@ class Snake:
         self,
         next_step: NextStep,
         is_food_available: bool = False,
-    ) -> "Snake":
+    ) -> "FutureSnake":
         """Return a new snake based on the next step into one defined direction.
 
         The resulting snake is a deepcopy without any references to the original snake.
@@ -164,6 +164,7 @@ class FutureSnake(Snake):
         self.body_incl_head = mother.body_incl_head[:]
         self.next_step = next_step
         self.is_food_available = is_food_available
+        self.is_me = mother.is_me
 
         future_head_position: Position = self._calc_future_head_position(next_step)
         self._add_future_head_to_future_snake(future_head_position)
