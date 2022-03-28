@@ -23,6 +23,7 @@ class Snake:
         self.body_incl_head: list[Position] = [
             Position(**position) for position in snake_data["body"]
         ]
+        self.is_me: bool = False
 
     @property
     def head(self) -> Position:
@@ -202,6 +203,7 @@ class Board:
             for snake_data in board_data["snakes"]
         }
         self.my_head: Position = my_head
+        self.my_snake.is_me = True
 
     @property
     def my_snake(self) -> Snake:
