@@ -78,7 +78,9 @@ class MoveDecision:
         self.possible_moves = {
             position: next_step
             for position, next_step in self.possible_moves.items()
-            if not self.me.will_bite_itself(next_step, self._is_food_available())
+            if not self.me.calculate_future_snake(
+                next_step, self._is_food_available()
+            ).is_bite_itself()
         }
 
     def _is_food_available(self):

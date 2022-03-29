@@ -101,3 +101,80 @@ def test_future_snake_bites_itself(snake_in_block: Snake):
     assert not future_snake_down.is_bite_itself()
     future_snake_up = snake_in_block.calculate_future_snake(NextStep.UP)
     assert future_snake_up.is_bite_itself()
+
+
+@pytest.mark.parametrize(
+    "snake_str, next_step, is_food_available, expected_outcome",
+    [
+        ("snake_in_block", NextStep.LEFT, False, True),  # neck without food
+        ("snake_in_block", NextStep.LEFT, True, True),  # neck with food
+        ("snake_in_block", NextStep.UP, False, True),  # body without food
+        ("snake_in_block", NextStep.UP, True, True),  # body with food
+        ("snake_in_block", NextStep.RIGHT, False, False),  # tail without food
+        ("snake_in_block", NextStep.RIGHT, True, True),  # tail with food
+        ("snake_in_block", NextStep.DOWN, False, False),  # free space without food
+        ("snake_in_block", NextStep.DOWN, True, False),  # free space with food
+        #
+        ("sample_snake", NextStep.UP, False, False),  # free space without food
+        ("sample_snake", NextStep.LEFT, False, False),  # free space without food
+        ("sample_snake", NextStep.RIGHT, False, False),  # free space without food
+        ("sample_snake", NextStep.UP, True, False),  # free space with food
+        ("sample_snake", NextStep.DOWN, True, True),  # neck with food
+        #
+        ("snake_origin", NextStep.UP, False, True),  # neck without food
+        ("snake_origin", NextStep.UP, True, True),  # neck with food
+        ("snake_origin", NextStep.RIGHT, False, False),  # free space without food
+        #
+        (
+            "snake_middle_short",
+            NextStep.RIGHT,
+            False,
+            True,
+        ),
+        ("snake_middle_short", NextStep.RIGHT, True, True),  # neck with food
+        ("snake_middle_short", NextStep.LEFT, False, False),  # free space without food
+        ("snake_middle_short", NextStep.LEFT, True, False),  # free space with food
+        #
+        (
+            "snake_right_middle_short",
+            NextStep.LEFT,
+            True,
+            True,
+        ),  # neck space with food
+        (
+            "snake_right_middle_short",
+            NextStep.LEFT,
+            False,
+            True,
+        ),  # neck space without food
+        ("snake_right_middle_short", NextStep.UP, True, False),  # free space with food
+        (
+            "snake_right_middle_short",
+            NextStep.DOWN,
+            True,
+            False,
+        ),  # free space with food
+        (
+            "snake_right_middle_short",
+            NextStep.RIGHT,
+            True,
+            False,
+        ),  # free space with food (even is wall, but this is not checked here)
+        (
+            "snake_right_middle_short",
+            NextStep.UP,
+            False,
+            False,
+        ),  # free space with food
+    ],
+)
+def test_future_snake_will_bite_itself(
+    snake_str,
+    next_step: NextStep,
+    is_food_available: bool,
+    expected_outcome: bool,
+    request: pytest.FixtureRequest,
+):
+    snake: Snake = request.getfixturevalue(snake_str)
+    future_snake = snake.calculate_future_snake(next_step, is_food_available)
+    assert future_snake.is_bite_itself() == expected_outcome

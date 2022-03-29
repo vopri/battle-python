@@ -80,17 +80,6 @@ class Snake:
 
         return FutureSnake(self, next_step, is_food_available)
 
-    def will_bite_itself(self, next_step: NextStep, is_food_available: bool) -> bool:
-        """Will this snake byte itself after the next step (depending from available food now)?
-
-        Args:
-            next_step (NextStep)
-            is_food_available (bool): referes to current moment and not to the future.
-                Food is eaten before next move.
-        """
-        future_me = self.calculate_future_snake(next_step, is_food_available)
-        return future_me.is_bite_itself()
-
 
 class FutureSnake(Snake):
     """Return a new snake based on the next step and available food.
@@ -269,11 +258,11 @@ class FutureBoard:
             )
             for next_step in all_possible_steps:
                 is_food_available = self._is_food_available(snake)
-                if snake.will_bite_itself(next_step, is_food_available):
-                    continue
                 future_snake = snake.calculate_future_snake(
                     next_step, is_food_available
                 )
+                if future_snake.is_bite_itself():
+                    continue
                 self.all_possible_snakes.append(future_snake)
 
     def _is_food_available(self, snake: Snake):
