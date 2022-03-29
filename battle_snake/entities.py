@@ -76,46 +76,9 @@ class Snake:
         next_step: NextStep,
         is_food_available: bool = False,
     ) -> "FutureSnake":
-        """Return a new snake based on the next step and available food.
-
-        The resulting snake is a new 'possible' snake that remembers its 'mother'.
-        Food leads to the growth of the snake: The head will move forward but the rest
-        of the body stays.
-
-        Special case for very small cases at the beginning of the game:
-        Until the snake is smaller than 3 (inc. head) it will grow, even if there's no
-        food available.
-
-        Args:
-            next_step (NextStep): Direction for the next step.
-            is_food_available (bool, optional): Is there currenlty food beneath the
-                snake's head? Defaults to False.
-
-        Returns:
-            FutureSnake: Brand new 'possible' snake how it would look like in the future after the next step.
-        """
+        """Return a new theoretical posibble snake based on the next step and available food."""
 
         return FutureSnake(self, next_step, is_food_available)
-
-    def is_dangerous(self, other_snake: "Snake") -> bool:
-        """Check if my snake's head collides with other snake badly.
-
-        If my snake collides with the other's snake body I will die (-> dangerous).
-        If my snake collides with the other's snake head it depends:
-        - the longer snake survives
-        - if both snakes have same lenght, both snakes will die.
-        """
-        if self.head == other_snake.head:
-            if len(self) == len(other_snake):
-                return True
-            if len(self) > len(other_snake):
-                return False
-            else:
-                return True
-        if self.head in other_snake.body_without_head:
-            return True
-        else:
-            return False
 
     def will_bite_itself(self, next_step: NextStep, is_food_available: bool) -> bool:
         """Will this snake byte itself after the next step (depending from available food now)?
@@ -173,6 +136,24 @@ class SnakeVisualizer:
 
 
 class FutureSnake(Snake):
+    """Return a new snake based on the next step and available food.
+
+    The resulting snake is a new 'possible' snake that remembers its 'mother'.
+    Food leads to the growth of the snake: The head will move forward but the rest
+    of the body stays.
+
+    Special case for very small cases at the beginning of the game:
+    Until the snake is smaller than 3 (inc. head) it will grow, even if there's no
+    food available.
+
+    Args:
+        next_step (NextStep): Direction for the next step.
+        is_food_available (bool, optional): Is there currenlty food beneath the
+            snake's head? Defaults to False.
+
+    Returns:
+        FutureSnake: Brand new 'possible' snake how it would look like in the future after the next step."""
+
     def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
         self.mother = mother
         self.body_and_head = mother.body_and_head[:]

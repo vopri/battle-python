@@ -84,33 +84,6 @@ def test_is_wall(sample_board):
 
 
 @pytest.mark.parametrize(
-    "my_snake, other_snake, is_dangerous",
-    [
-        ("snake_bottom_middle_short", "snake_top_right_short", False),  # far away
-        ("snake_long", "snake_middle_short", False),  # head to head (long one wins)
-        ("snake_middle_short", "snake_long", True),  # head to head (changed order)
-        ("snake_middle_short", "snake_long_2", True),  # head to body
-        (
-            "snake_top_right_short",
-            "snake_top_right_short_collision_same_size",
-            True,
-        ),  # head to head same size
-        (
-            "snake_top_right_short_collision_same_size",
-            "snake_top_right_short",
-            True,
-        ),  # head to head same size (changed order)
-    ],
-)
-def test_is_dangerous(
-    my_snake, other_snake, is_dangerous, request: pytest.FixtureRequest
-):
-    my_snake = request.getfixturevalue(my_snake)
-    other_snake = request.getfixturevalue(other_snake)
-    assert my_snake.is_dangerous(other_snake) == is_dangerous
-
-
-@pytest.mark.parametrize(
     "snake_str, next_step, is_food_available, expected_outcome",
     [
         ("snake_in_block", NextStep.LEFT, False, True),  # neck without food
