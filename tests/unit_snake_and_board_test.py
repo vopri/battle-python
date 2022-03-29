@@ -29,7 +29,7 @@ def test_snake_init(sample_snake_data):
     assert len(snake) == 4
 
 
-def test_snake_next_theoretical_positions(sample_snake):
+def test_next_theoretical_positions(sample_snake):
     assert sample_snake.head == Position(5, 4)
     assert sample_snake.next_theoretical_head_positions_and_moves() == {
         Position(6, 4): NextStep.RIGHT,
