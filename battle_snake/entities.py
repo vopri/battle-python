@@ -82,15 +82,21 @@ class Snake:
 
 
 class FutureSnake(Snake):
-    """Return a new snake based on the next step and available food.
+    """Create a theoretical new snake based on the next step and available food.
 
-    The resulting snake is a new 'possible' snake that remembers its 'mother'.
+    The resulting snake is just theoretical, because it will be created even if
+    it does bite itself or if it would fall out of the gaming board.
     Food leads to the growth of the snake: The head will move forward but the rest
     of the body stays.
 
-    Special case for very small cases at the beginning of the game:
+    Special case for very small snakes at the beginning of the game:
     Until the snake is smaller than 3 (inc. head) it will grow, even if there's no
     food available.
+
+    The future snake remembers its 'mother' as well as the mother's next_step
+    that created this snake in the first place.
+    A FutureSnake can calculate another FutureSnake. Every FutureSnake can
+    go back to the very first next_step of the earliest ancestor.
 
     Args:
         next_step (NextStep): Direction for the next step.
@@ -98,7 +104,7 @@ class FutureSnake(Snake):
             snake's head? Defaults to False.
 
     Returns:
-        FutureSnake: Brand new 'possible' snake how it would look like in the future after the next step."""
+        FutureSnake: Brand new 'theoretical' snake how it would look like in the future after the next step."""
 
     def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
         self.mother = mother
