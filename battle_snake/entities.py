@@ -89,10 +89,7 @@ class Snake:
                 Food is eaten before next move.
         """
         future_me = self.calculate_future_snake(next_step, is_food_available)
-        if future_me.head in future_me.body_without_head:
-            return True
-        else:
-            return False
+        return future_me.is_bite_itself()
 
 
 class FutureSnake(Snake):
@@ -148,6 +145,9 @@ class FutureSnake(Snake):
 
     def _remove_tail(self):
         self.body_and_head.pop()
+
+    def is_bite_itself(self) -> bool:
+        return self.head in self.body_without_head
 
 
 class SnakeVisualizer:

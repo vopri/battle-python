@@ -94,3 +94,10 @@ def test_future_snake_mini_without_food_growing():
             **{"body": [{"x": 7, "y": 1}, {"x": 7, "y": 2}, {"x": 7, "y": 3}]}
         ).body_and_head
     )
+
+
+def test_future_snake_bites_itself(snake_in_block: Snake):
+    future_snake_down = snake_in_block.calculate_future_snake(NextStep.DOWN)
+    assert not future_snake_down.is_bite_itself()
+    future_snake_up = snake_in_block.calculate_future_snake(NextStep.UP)
+    assert future_snake_up.is_bite_itself()
