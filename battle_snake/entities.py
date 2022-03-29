@@ -95,46 +95,6 @@ class Snake:
             return False
 
 
-class SnakeVisualizer:
-    """Visualize snake in 11 x 11 field"""
-
-    def __init__(self, snake: Snake):
-        self._snake = snake
-        self._visual_board: list[list[str]] = self._init_11x11_board()
-        self._visualize()
-        self.snake_in_11x11_board: str
-
-    def _visualize(self):
-        for pos in self._snake.body_and_head:
-            self._enter_snake_into_field(pos)
-        self._paint_field_walls()
-        board_with_snake = self._convert_board_array_to_str()
-        return board_with_snake
-
-    def _init_11x11_board(self):
-        field: list[list[str]] = [["·" for i in range(11)] for j in range(11)]
-        return field
-
-    def _enter_snake_into_field(self, pos):
-        char_for_body_limb = "x"
-        if pos == self._snake.head:
-            char_for_body_limb = "o"
-        self._visual_board[10 - pos.y][pos.x] = char_for_body_limb
-
-    def _paint_field_walls(self):
-        self._visual_board.insert(0, ["=" for i in range(11)])
-        self._visual_board.append(["=" for i in range(11)])
-        for row in self._visual_board:
-            row.insert(0, "|")
-            row.append("|")
-
-    def _convert_board_array_to_str(self):
-        convert_row = lambda row: "".join([cell for cell in row])
-        self.snake_in_11x11_board = "\n".join(
-            convert_row(row) for row in self._visual_board
-        )
-
-
 class FutureSnake(Snake):
     """Return a new snake based on the next step and available food.
 
@@ -188,6 +148,45 @@ class FutureSnake(Snake):
 
     def _remove_tail(self):
         self.body_and_head.pop()
+
+
+class SnakeVisualizer:
+    """Visualize snake in 11 x 11 field"""
+
+    def __init__(self, snake: Snake):
+        self._snake = snake
+        self._visual_board: list[list[str]] = self._init_11x11_board()
+        self._visualize()
+        self.snake_in_11x11_board: str
+
+    def _visualize(self):
+        for pos in self._snake.body_and_head:
+            self._enter_snake_into_visual_board(pos)
+        self._paint_field_walls()
+        self._convert_board_array_to_str()
+
+    def _init_11x11_board(self):
+        field: list[list[str]] = [["·" for i in range(11)] for j in range(11)]
+        return field
+
+    def _enter_snake_into_visual_board(self, pos):
+        char_for_body_limb = "x"
+        if pos == self._snake.head:
+            char_for_body_limb = "o"
+        self._visual_board[10 - pos.y][pos.x] = char_for_body_limb
+
+    def _paint_field_walls(self):
+        self._visual_board.insert(0, ["=" for i in range(11)])
+        self._visual_board.append(["=" for i in range(11)])
+        for row in self._visual_board:
+            row.insert(0, "|")
+            row.append("|")
+
+    def _convert_board_array_to_str(self):
+        convert_row = lambda row: "".join([cell for cell in row])
+        self.snake_in_11x11_board = "\n".join(
+            convert_row(row) for row in self._visual_board
+        )
 
 
 class Board:
