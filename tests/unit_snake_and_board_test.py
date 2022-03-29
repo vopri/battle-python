@@ -31,7 +31,7 @@ def test_snake_init(sample_snake_data):
 
 def test_next_theoretical_positions(sample_snake):
     assert sample_snake.head == Position(5, 4)
-    assert sample_snake.next_theoretical_moves() == {
+    assert sample_snake.get_next_theoretical_moves() == {
         Position(6, 4): NextStep.RIGHT,
         Position(4, 4): NextStep.LEFT,
         Position(5, 5): NextStep.UP,

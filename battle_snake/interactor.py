@@ -1,9 +1,7 @@
 import random
 from typing import Dict, List
 
-from battle_snake.entities import Board, FutureBoard, NextStep, Position, Snake
-
-Moves = dict[Position, NextStep]  # type alias
+from battle_snake.entities import Board, FutureBoard, Moves, NextStep, Position, Snake
 
 
 def get_info() -> dict:
@@ -25,7 +23,7 @@ class MoveDecision:
 
     def __init__(self, data: dict):
         self.board: Board = self._init_board(data)
-        self.possible_moves: Moves = self.me.next_theoretical_moves()
+        self.possible_moves: Moves = self.me.get_next_theoretical_moves()
         self.future_board: FutureBoard = FutureBoard(self.board)
 
     @property

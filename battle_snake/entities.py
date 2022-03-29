@@ -15,6 +15,9 @@ class Position:
     y: int
 
 
+Moves = dict[Position, NextStep]  # type alias
+
+
 class Snake:
     """Representation of one single snake.
 
@@ -49,7 +52,7 @@ class Snake:
     def __str__(self):
         return SnakeVisualizer(self).snake_in_11x11_board
 
-    def next_theoretical_moves(self) -> dict[Position, NextStep]:
+    def get_next_theoretical_moves(self) -> Moves:
         """Give all 4 theoretically possible coordinates of snake's head for the next move.
 
         The returned positions are just theoretically possible and do not take care
