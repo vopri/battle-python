@@ -76,13 +76,11 @@ class Snake:
         next_step: NextStep,
         is_food_available: bool = False,
     ) -> "FutureSnake":
-        """Return a new snake based on the next step into one defined direction.
+        """Return a new snake based on the next step and available food.
 
-        The resulting snake is a deepcopy without any references to the original snake.
-        It is taken into consideration if there's food beneath the snakes head.
+        The resulting snake is a new 'possible' snake that remembers its 'mother'.
         Food leads to the growth of the snake: The head will move forward but the rest
-        of the body stays. Without food (and therefore without any growth) the snake's
-        body will change its position entirely.
+        of the body stays.
 
         Special case for very small cases at the beginning of the game:
         Until the snake is smaller than 3 (inc. head) it will grow, even if there's no
@@ -91,14 +89,11 @@ class Snake:
         Args:
             next_step (NextStep): Direction for the next step.
             is_food_available (bool, optional): Is there currenlty food beneath the
-                snakes head? Defaults to False.
+                snake's head? Defaults to False.
 
         Returns:
-            Snake: Brand new snake how it would look like in the future after the next step.
+            FutureSnake: Brand new 'possible' snake how it would look like in the future after the next step.
         """
-        is_baby_snake = len(self) < 3
-        if is_baby_snake:
-            is_food_available = True
 
         return FutureSnake(self, next_step, is_food_available)
 
@@ -182,13 +177,18 @@ class FutureSnake(Snake):
         self.mother = mother
         self.body_and_head = mother.body_and_head[:]
         self.next_step = next_step
-        self.is_food_available = is_food_available
         self.is_me = mother.is_me
+        self.is_food_available = is_food_available
 
+        if self._is_still_baby_snake():
+            self.is_food_available = True
         future_head_position: Position = self._calc_future_head_position(next_step)
         self._add_future_head_to_future_snake(future_head_position)
-        if not is_food_available:
+        if not self.is_food_available:
             self._remove_tail()
+
+    def _is_still_baby_snake(self):
+        return len(self.mother) < 3
 
     def _calc_future_head_position(self, next_step) -> Position:
         if next_step == NextStep.UP:
