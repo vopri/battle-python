@@ -135,7 +135,7 @@ class FutureSnake(Snake):
     def _remove_tail(self):
         self.body_and_head.pop()
 
-    def is_bite_itself(self) -> bool:
+    def does_bite_itself(self) -> bool:
         return self.head in self.body_without_head
 
 
@@ -261,7 +261,7 @@ class FutureBoard:
                 future_snake = snake.calculate_future_snake(
                     next_step, is_food_available
                 )
-                if future_snake.is_bite_itself():
+                if future_snake.does_bite_itself():
                     continue
                 self.all_possible_snakes.append(future_snake)
 

@@ -1,7 +1,8 @@
 import random
 from typing import Dict, List
 
-from battle_snake.entities import Board, FutureBoard, Moves, NextStep, Position, Snake
+from battle_snake.entities import (Board, FutureBoard, Moves, NextStep,
+                                   Position, Snake)
 
 
 def get_info() -> dict:
@@ -80,7 +81,7 @@ class MoveDecision:
             for position, next_step in self.possible_moves.items()
             if not self.me.calculate_future_snake(
                 next_step, self._is_food_available()
-            ).is_bite_itself()
+            ).does_bite_itself()
         }
 
     def _is_food_available(self):

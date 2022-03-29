@@ -98,9 +98,9 @@ def test_future_snake_mini_without_food_growing():
 
 def test_future_snake_bites_itself(snake_in_block: Snake):
     future_snake_down = snake_in_block.calculate_future_snake(NextStep.DOWN)
-    assert not future_snake_down.is_bite_itself()
+    assert not future_snake_down.does_bite_itself()
     future_snake_up = snake_in_block.calculate_future_snake(NextStep.UP)
-    assert future_snake_up.is_bite_itself()
+    assert future_snake_up.does_bite_itself()
 
 
 @pytest.mark.parametrize(
@@ -177,4 +177,4 @@ def test_future_snake_will_bite_itself(
 ):
     snake: Snake = request.getfixturevalue(snake_str)
     future_snake = snake.calculate_future_snake(next_step, is_food_available)
-    assert future_snake.is_bite_itself() == expected_outcome
+    assert future_snake.does_bite_itself() == expected_outcome
