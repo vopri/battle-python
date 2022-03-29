@@ -70,7 +70,7 @@ def _arrange_test_exclude_impossible_steps(
     sample_move_decision.board.all_snakes = {snake.head: snake}
     sample_move_decision.board.my_head = snake.head
     sample_move_decision.possible_moves = (
-        sample_move_decision.me.next_theoretical_head_positions_and_moves()
+        sample_move_decision.me.next_theoretical_moves()
     )
 
 

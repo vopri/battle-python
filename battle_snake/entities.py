@@ -16,7 +16,10 @@ class Position:
 
 
 class Snake:
-    """Representation of one single snake."""
+    """Representation of one single snake.
+
+    If the snake is myself it's marked with is_me = True
+    """
 
     def __init__(self, **snake_data: dict):
         self.body_and_head: list[Position] = [
@@ -46,7 +49,7 @@ class Snake:
     def __str__(self):
         return SnakeVisualizer(self).snake_in_11x11_board
 
-    def next_theoretical_head_positions_and_moves(self) -> dict[Position, NextStep]:
+    def next_theoretical_moves(self) -> dict[Position, NextStep]:
         """Give all 4 theoretically possible coordinates of snake's head for the next move.
 
         The returned positions are just theoretically possible and do not take care

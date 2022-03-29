@@ -25,7 +25,7 @@ class MoveDecision:
 
     def __init__(self, data: dict):
         self.board: Board = self._init_board(data)
-        self.possible_moves: Moves = self.me.next_theoretical_head_positions_and_moves()
+        self.possible_moves: Moves = self.me.next_theoretical_moves()
         self.future_board: FutureBoard = FutureBoard(self.board)
 
     @property
