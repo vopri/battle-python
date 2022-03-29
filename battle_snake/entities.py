@@ -112,31 +112,33 @@ class FutureSnake(Snake):
         self.next_step = next_step
         self.is_me = mother.is_me
         self.is_food_available = is_food_available
+        self._calculate_future_body()
 
+    def _calculate_future_body(self):
+        self._add_future_head_to_future_snake()
         if self._is_still_baby_snake():
             self.is_food_available = True
-        future_head_position: Position = self._calc_future_head_position(next_step)
-        self._add_future_head_to_future_snake(future_head_position)
         if not self.is_food_available:
             self._remove_tail()
 
-    def _is_still_baby_snake(self):
-        return len(self.mother) < 3
+    def _add_future_head_to_future_snake(self):
+        future_head_position: Position = self._calc_future_head_position()
+        self.body_and_head.insert(0, future_head_position)
 
-    def _calc_future_head_position(self, next_step) -> Position:
-        if next_step == NextStep.UP:
+    def _calc_future_head_position(self) -> Position:
+        if self.next_step == NextStep.UP:
             return Position(self.head.x, self.head.y + 1)
-        if next_step == NextStep.DOWN:
+        if self.next_step == NextStep.DOWN:
             return Position(self.head.x, self.head.y - 1)
-        if next_step == NextStep.RIGHT:
+        if self.next_step == NextStep.RIGHT:
             return Position(self.head.x + 1, self.head.y)
-        if next_step == NextStep.LEFT:
+        if self.next_step == NextStep.LEFT:
             return Position(self.head.x - 1, self.head.y)
         else:
-            raise ValueError(f"Next step not defined: {next_step}")
+            raise ValueError(f"Next step not defined: {self.next_step}")
 
-    def _add_future_head_to_future_snake(self, future_head_position):
-        self.body_and_head.insert(0, future_head_position)
+    def _is_still_baby_snake(self):
+        return len(self.mother) < 3
 
     def _remove_tail(self):
         self.body_and_head.pop()
