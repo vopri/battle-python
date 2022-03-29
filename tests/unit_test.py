@@ -18,7 +18,7 @@ def test_postion_equal():
 def test_snake_init(sample_snake_data):
     snake = Snake(**sample_snake_data)
     assert snake.head == Position(5, 4)
-    assert snake.body_incl_head == [
+    assert snake.body_and_head == [
         Position(5, 4),
         Position(5, 3),
         Position(6, 3),
@@ -55,7 +55,7 @@ def test_board_init(sample_board_data):
     assert len(board.all_snakes) == 2
     snake: Snake = board.all_snakes.get(Position(5, 4))  # type: ignore
     assert len(snake) == 4  # type: ignore
-    assert snake.body_incl_head[-1] == Position(6, 2)  # type: ignore
+    assert snake.body_and_head[-1] == Position(6, 2)  # type: ignore
     assert snake.tail == Position(6, 2)  # type: ignore
     assert board.my_snake.is_me
     assert snake.is_me == False

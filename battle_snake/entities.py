@@ -20,29 +20,29 @@ class Snake:
     """Representation of one single snake."""
 
     def __init__(self, **snake_data: dict):
-        self.body_incl_head: list[Position] = [
+        self.body_and_head: list[Position] = [
             Position(**position) for position in snake_data["body"]
         ]
         self.is_me: bool = False
 
     @property
     def head(self) -> Position:
-        return self.body_incl_head[0]
+        return self.body_and_head[0]
 
     @property
     def body_without_head(self) -> list[Position]:
-        return self.body_incl_head[1:]
+        return self.body_and_head[1:]
 
     @property
     def neck(self) -> Position:
-        return self.body_incl_head[1]
+        return self.body_and_head[1]
 
     @property
     def tail(self) -> Position:
-        return self.body_incl_head[-1]
+        return self.body_and_head[-1]
 
     def __len__(self):
-        return len(self.body_incl_head)
+        return len(self.body_and_head)
 
     def __str__(self):
         return SnakeVisualizer(self).snake_in_11x11_board
@@ -142,7 +142,7 @@ class SnakeVisualizer:
         self.snake_in_11x11_board: str
 
     def _visualize(self):
-        for pos in self._snake.body_incl_head:
+        for pos in self._snake.body_and_head:
             self._enter_snake_into_field(pos)
         self._paint_field_walls()
         board_with_snake = self._convert_board_array_to_str()
@@ -175,7 +175,7 @@ class SnakeVisualizer:
 class FutureSnake(Snake):
     def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
         self.mother = mother
-        self.body_incl_head = mother.body_incl_head[:]
+        self.body_and_head = mother.body_and_head[:]
         self.next_step = next_step
         self.is_food_available = is_food_available
         self.is_me = mother.is_me
@@ -198,10 +198,10 @@ class FutureSnake(Snake):
             raise ValueError(f"Next step not defined: {next_step}")
 
     def _add_future_head_to_future_snake(self, future_head_position):
-        self.body_incl_head.insert(0, future_head_position)
+        self.body_and_head.insert(0, future_head_position)
 
     def _remove_tail(self):
-        self.body_incl_head.pop()
+        self.body_and_head.pop()
 
 
 class Board:
