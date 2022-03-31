@@ -190,17 +190,26 @@ class Board:
     """Represents the board including board size, all snakes, food and position of my own snake."""
 
     def __init__(self, my_head: Position, **board_data: dict):
-        self.height: int = board_data["height"]  # type: ignore
-        self.width: int = board_data["width"]  # type: ignore
-        self.food: set[Position] = {
-            Position(**position_data) for position_data in board_data["food"]
-        }
-        self.all_snakes: dict[Position, Snake] = {
-            Position(**snake_data["head"]): Snake(**snake_data)
-            for snake_data in board_data["snakes"]
-        }
+        self._board_data: dict = board_data
+        self._bounderies: GameBoardBounderies = self._find_board_bounderies()
+        self.food: set[Position] = self._find_food()
+        self.all_snakes: dict[Position, Snake] = self._find_snakes()
         self.my_head: Position = my_head
         self._let_my_snake_know_who_it_is()
+
+    def _find_board_bounderies(self):
+        return GameBoardBounderies(
+            self._board_data["height"], self._board_data["width"]
+        )
+
+    def _find_food(self):
+        return {Position(**position_data) for position_data in self._board_data["food"]}
+
+    def _find_snakes(self):
+        return {
+            Position(**snake_data["head"]): Snake(**snake_data)
+            for snake_data in self._board_data["snakes"]
+        }
 
     def _let_my_snake_know_who_it_is(self):
         self.my_snake.is_me = True
@@ -211,14 +220,7 @@ class Board:
 
     def is_wall(self, pos: Position) -> bool:
         """Check for wall on given position."""
-
-        if pos.x < 0 or pos.y < 0:
-            return True
-        if pos.x >= self.width:
-            return True
-        if pos.y >= self.height:
-            return True
-        return False
+        return self._bounderies.is_wall(pos)
 
 
 class FutureBoard:
@@ -233,12 +235,15 @@ class FutureBoard:
     All possible head positions are included (pessimistic approach).
     All "eaten" food from the current turn will be removed.
 
+    The FutureBoard doesn't derive from Board because of Liskov Substitution Principle:
+    not fitting: all_snakes vs. all_possible_snakes etc.
+    To avoid DRY GameBoardBounderies is extracted.
+
     """
 
     def __init__(self, board: Board):
         self._orig_board = board
-        self.height: int = board.height
-        self.width: int = board.width
+        self._bounderies: GameBoardBounderies = board._bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[Snake] = []
         self._cache_all_body_fields = None
@@ -310,11 +315,6 @@ class FutureBoard:
             if self._is_food_available(snake):
                 self.food.remove(position)
 
-    @property
-    def my_original_snake(self) -> Snake:
-        """My snake from original board"""
-        return self._orig_board.all_snakes[self._orig_board.my_head]
-
     def is_other_snake_body_on_this(self, position: Position) -> bool:
         if self._is_no_snake_body_on_this(position):
             return False
@@ -363,7 +363,8 @@ class FutureBoard:
             list[Position]: List of neck positions, because the neck is deterministic and the same
             for all possible variants of 1 snake in the future board of possiblities.
         """
-        dangerous_size = len(self.my_original_snake)
+        my_original_snake = self._orig_board.my_snake
+        dangerous_size = len(my_original_snake)
         return [
             snake.neck
             for snake in self.all_possible_snakes
@@ -387,6 +388,23 @@ class FutureBoard:
         Returns:
             bool: Is there a wall?
         """
+        return self._bounderies.is_wall(pos)
+
+
+class GameBoardBounderies:
+    def __init__(self, height: int, width: int):
+        self.height = height
+        self.width = width
+
+    def is_wall(self, pos: Position) -> bool:
+        """Check for dangerous wall on given position.
+
+        Args:
+            pos (Position): Coordinates on the board.
+
+        Returns:
+            bool: Is there a wall?
+        """
         if pos.x < 0 or pos.y < 0:
             return True
         if pos.x >= self.width:
@@ -394,3 +412,6 @@ class FutureBoard:
         if pos.y >= self.height:
             return True
         return False
+
+    def __eq__(self, other: "GameBoardBounderies") -> bool:
+        return self.height == other.height and self.width == other.width

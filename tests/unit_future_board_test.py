@@ -4,8 +4,7 @@ from battle_snake.entities import Board, FutureBoard, Position
 
 def test_future_board_init(test_board: Board):
     future_board = FutureBoard(test_board)
-    assert test_board.height == future_board.height
-    assert test_board.width == future_board.width
+    assert test_board._bounderies == future_board._bounderies
     assert future_board.food == {
         # Position(2, 6), # eaten
         # Position(5, 4), # eaten

@@ -1,5 +1,5 @@
 import pytest
-from battle_snake.entities import Board, NextStep, Position, Snake
+from battle_snake.entities import Board, GameBoardBounderies, NextStep, Position, Snake
 
 
 def test_postion_init():
@@ -45,8 +45,7 @@ def test_board_init(sample_board_data):
         my_head=my_head,
         **sample_board_data,
     )
-    assert board.height == 11
-    assert board.width == 11
+    assert board._bounderies == GameBoardBounderies(11, 11)
     assert board.food == {
         Position(5, 5),
         Position(9, 0),
