@@ -53,7 +53,7 @@ def test_avoid_my_bite_myself(
 def _arrange_test_avoid_bite_myself(sample_move_decision, snake_fix_str, food, request):
     snake: Snake = request.getfixturevalue(snake_fix_str)
     sample_move_decision.board.all_snakes = {snake.head: snake}
-    sample_move_decision.board.my_head = snake.head
+    sample_move_decision.board._my_head = snake.head
     sample_move_decision.possible_moves = (
         sample_move_decision.me.get_next_theoretical_moves()
     )

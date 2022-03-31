@@ -194,7 +194,7 @@ class Board:
         self._bounderies: GameBoardBounderies = self._find_board_bounderies()
         self.food: set[Position] = self._find_food()
         self.all_snakes: dict[Position, Snake] = self._find_snakes()
-        self.my_head: Position = my_head
+        self._my_head: Position = my_head
         self._let_my_snake_know_who_it_is()
 
     def _find_board_bounderies(self):
@@ -216,7 +216,7 @@ class Board:
 
     @property
     def my_snake(self) -> Snake:
-        return self.all_snakes[self.my_head]
+        return self.all_snakes[self._my_head]
 
     def is_wall(self, pos: Position) -> bool:
         """Check for wall on given position."""
