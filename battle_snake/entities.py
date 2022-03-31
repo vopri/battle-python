@@ -246,10 +246,9 @@ class FutureBoard:
         self._bounderies: GameBoardBounderies = board._bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[Snake] = []
-        self._cache_all_body_fields = None
         self._add_all_snakes_of_future_that_dont_bite_itself()
         self._remove_snakes_running_into_walls()
-        self._remove_snakes_killed_by_others()
+        self._remove_snakes_disqualified_due_to_biting()
         self._remove_eaten_food()
 
     def _add_all_snakes_of_future_that_dont_bite_itself(self):
@@ -259,23 +258,36 @@ class FutureBoard:
         - There are up to 3 snake-copies in the future board for every
         original snake, 1 for every direction (as long as it doesn't bite itself)
         """
-        for snake in self._orig_board.all_snakes.values():
-            all_possible_steps = (
-                NextStep.UP,
-                NextStep.DOWN,
-                NextStep.RIGHT,
-                NextStep.LEFT,
+        snakes_of_mother_board = self._orig_board.all_snakes.values()
+        for original_snake in snakes_of_mother_board:
+            self._add_all_possibilities_of_snake_to_future_board_if_applicable(
+                original_snake
             )
-            for next_step in all_possible_steps:
-                is_food_available = self._is_food_available(snake)
-                future_snake = snake.calculate_future_snake(
-                    next_step, is_food_available
-                )
-                if future_snake.does_bite_itself():
-                    continue
-                self.all_possible_snakes.append(future_snake)
 
-    def _is_food_available(self, snake: Snake):
+    def _add_all_possibilities_of_snake_to_future_board_if_applicable(
+        self, original_snake
+    ):
+        for next_possible_step in self._get_all_possible_steps():
+            future_snake = self._make_future_snake(original_snake, next_possible_step)
+            if future_snake.does_bite_itself():
+                continue
+            self.all_possible_snakes.append(future_snake)
+
+    def _get_all_possible_steps(self):
+        return (
+            NextStep.UP,
+            NextStep.DOWN,
+            NextStep.RIGHT,
+            NextStep.LEFT,
+        )
+
+    def _make_future_snake(self, snake, next_possible_step):
+        future_snake = snake.calculate_future_snake(
+            next_possible_step, self._is_food_available_for(snake)
+        )
+        return future_snake
+
+    def _is_food_available_for(self, snake: Snake):
         return snake.head in self.food
 
     def _remove_snakes_running_into_walls(self):
@@ -283,38 +295,40 @@ class FutureBoard:
             snake for snake in self.all_possible_snakes if not self.is_wall(snake.head)
         ]
 
-    def _remove_snakes_killed_by_others(self):
-        """All snakes that are *defenitely* killed by another snake are removed.
+    def _remove_snakes_disqualified_due_to_biting(self):
+        """All snakes that are *defenitely* diqualified, because biting another snake are removed.
 
         What means 'definitely'? Based on current position and food the body
         of every snake in the future step is deterministic. But the snake's heads
         are not deterministic. They depend from individual decisions of the snakes.
-        Therefore the method will *not* remove snakes that might be killed due to
-        head collisions, but only snake that are killed because they bite
+        Therefore the method will *not* remove snakes that might be disqualified due to
+        head collisions, but only snake that are disqualified because they bite
         into another body (excl. head).
         """
 
-        all_body_fields = self._all_body_fields()
         self.all_possible_snakes = [
             snake
             for snake in self.all_possible_snakes
-            if not snake.head in all_body_fields
+            if not self._is_disqualified_due_to_biting(snake)
         ]
 
-    def _all_body_fields(self) -> set[Position]:
-        if self._cache_all_body_fields is None:
-            self._cache_all_body_fields = {
-                pos
-                for snake in self.all_possible_snakes
-                for pos in snake.body_without_head
-            }
-        return self._cache_all_body_fields
+    def _is_disqualified_due_to_biting(self, snake) -> bool:
+        return snake.head in self._get_all_body_fields()
+
+    def _get_all_body_fields(self) -> set[Position]:
+        return {
+            pos for snake in self.all_possible_snakes for pos in snake.body_without_head
+        }
 
     def _remove_eaten_food(self):
-        for position, snake in self._orig_board.all_snakes.items():
-            if self._is_food_available(snake):
-                self.food.remove(position)
+        for snake in self._orig_board.all_snakes.values():
+            self._remove_food_eaten_by(snake)
 
+    def _remove_food_eaten_by(self, snake: Snake):
+        if self._is_food_available_for(snake):
+            self.food.remove(snake.head)
+
+    # TODO: Remove after changing the interactor later on
     def is_other_snake_body_on_this(self, position: Position) -> bool:
         if self._is_no_snake_body_on_this(position):
             return False
@@ -322,9 +336,11 @@ class FutureBoard:
             return False
         return True
 
+    # TODO: Remove after changing the interactor later on
     def _is_no_snake_body_on_this(self, position):
-        return not position in self._all_body_fields()
+        return not position in self._get_all_body_fields()
 
+    # TODO: Remove after changing the interactor later on
     def _is_one_of_my_own_future_bodies_on_this(self, position):
         return position in [
             position
@@ -343,16 +359,22 @@ class FutureBoard:
         Returns:
             float: Risk value as sum of probability of all snakes with their head on this position.
         """
-        neck_ids_of_danger_snakes_on_pos = self._get_danger_snake_neck_id_on_pos(pos)
-        risk_value = sum(
-            [
-                (1 / self._count_snakes_by_neck_position(neck_pos))
-                for neck_pos in neck_ids_of_danger_snakes_on_pos
-            ]
-        )
+        probabilities_of_snakes_on_pos = [
+            (1 / self._count_snakes_by_neck_position(neck_pos))
+            for neck_pos in self._get_danger_snake_neck_id_with_head_on_pos(pos)
+        ]
+        risk_value = sum(probabilities_of_snakes_on_pos)
         return risk_value
 
-    def _get_danger_snake_neck_id_on_pos(self, position: Position) -> list[Position]:
+    def _count_snakes_by_neck_position(self, pos: Position) -> int:
+        snake_variants = [
+            snake for snake in self.all_possible_snakes if snake.neck == pos
+        ]
+        return len(snake_variants)
+
+    def _get_danger_snake_neck_id_with_head_on_pos(
+        self, head_pos: Position
+    ) -> list[Position]:
         """Return a list with neck positions of all snakes here, that can be dangerous for me.
 
         Dangerous means, they are longer or equals long as me.
@@ -360,24 +382,19 @@ class FutureBoard:
             position (Position): Position to check for dangouers snakes.
 
         Returns:
-            list[Position]: List of neck positions, because the neck is deterministic and the same
+            list[Position]: List of neck positions, because the neck is on the same position
             for all possible variants of 1 snake in the future board of possiblities.
+            The neck of 1 snake in all possible variants can only be on one position.
+            And on one position there can only be one neck.
         """
-        my_original_snake = self._orig_board.my_snake
-        dangerous_size = len(my_original_snake)
+        dangerous_size = len(self._orig_board.my_snake)
         return [
             snake.neck
             for snake in self.all_possible_snakes
-            if snake.head == position
+            if snake.head == head_pos
             and len(snake) >= dangerous_size
             and not snake.is_me
         ]
-
-    def _count_snakes_by_neck_position(self, pos: Position) -> int:
-        snake_variants = [
-            snake for snake in self.all_possible_snakes if snake.neck == pos
-        ]
-        return len(snake_variants)
 
     def is_wall(self, pos: Position) -> bool:
         """Check for dangerous wall on given position.
