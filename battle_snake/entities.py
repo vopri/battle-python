@@ -246,12 +246,12 @@ class FutureBoard:
         self._bounderies: GameBoardBounderies = board._bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[Snake] = []
-        self._add_all_snakes_of_future_that_dont_bite_itself()
+        self._add_all_possible_snakes_of_future()
         self._remove_snakes_running_into_walls()
         self._remove_snakes_disqualified_due_to_biting()
         self._remove_eaten_food()
 
-    def _add_all_snakes_of_future_that_dont_bite_itself(self):
+    def _add_all_possible_snakes_of_future(self):
         """Add all possible snakes (including mine) to the board.
 
         - All snakes that do not bite itself.
@@ -260,17 +260,11 @@ class FutureBoard:
         """
         snakes_of_mother_board = self._orig_board.all_snakes.values()
         for original_snake in snakes_of_mother_board:
-            self._add_all_possibilities_of_snake_to_future_board_if_applicable(
-                original_snake
-            )
+            self._add_all_possible_variants_of_one_snake_to_future_board(original_snake)
 
-    def _add_all_possibilities_of_snake_to_future_board_if_applicable(
-        self, original_snake
-    ):
+    def _add_all_possible_variants_of_one_snake_to_future_board(self, original_snake):
         for next_possible_step in self._get_all_possible_steps():
             future_snake = self._make_future_snake(original_snake, next_possible_step)
-            if future_snake.does_bite_itself():
-                continue
             self.all_possible_snakes.append(future_snake)
 
     def _get_all_possible_steps(self):
@@ -296,7 +290,7 @@ class FutureBoard:
         ]
 
     def _remove_snakes_disqualified_due_to_biting(self):
-        """All snakes that are *defenitely* diqualified, because biting another snake are removed.
+        """All snakes that are *defenitely* diqualified, because biting another snake or itself are removed.
 
         What means 'definitely'? Based on current position and food the body
         of every snake in the future step is deterministic. But the snake's heads
