@@ -109,7 +109,7 @@ class FutureSnake(Snake):
     def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
         self.mother = mother
         self.body_and_head = mother.body_and_head[:]
-        self.next_step = next_step
+        self.step_made_to_get_here = next_step
         self.is_me = mother.is_me
         self.is_food_available = is_food_available
         self._calculate_future_body()
@@ -126,16 +126,16 @@ class FutureSnake(Snake):
         self.body_and_head.insert(0, future_head_position)
 
     def _calc_future_head_position(self) -> Position:
-        if self.next_step == NextStep.UP:
+        if self.step_made_to_get_here == NextStep.UP:
             return Position(self.head.x, self.head.y + 1)
-        if self.next_step == NextStep.DOWN:
+        if self.step_made_to_get_here == NextStep.DOWN:
             return Position(self.head.x, self.head.y - 1)
-        if self.next_step == NextStep.RIGHT:
+        if self.step_made_to_get_here == NextStep.RIGHT:
             return Position(self.head.x + 1, self.head.y)
-        if self.next_step == NextStep.LEFT:
+        if self.step_made_to_get_here == NextStep.LEFT:
             return Position(self.head.x - 1, self.head.y)
         else:
-            raise ValueError(f"Next step not defined: {self.next_step}")
+            raise ValueError(f"Next step not defined: {self.step_made_to_get_here}")
 
     def _is_still_baby_snake(self):
         return len(self.mother) < 3
@@ -162,11 +162,11 @@ class SnakeVisualizer:
         self._paint_field_walls()
         self._convert_board_array_to_str()
 
-    def _init_11x11_board(self):
+    def _init_11x11_board(self) -> list[list[str]]:
         field: list[list[str]] = [["·" for i in range(11)] for j in range(11)]
         return field
 
-    def _enter_snake_into_visual_board(self, pos):
+    def _enter_snake_into_visual_board(self, pos: Position):
         char_for_body_limb = "x"
         if pos == self._snake.head:
             char_for_body_limb = "o"
