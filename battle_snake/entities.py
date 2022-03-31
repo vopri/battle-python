@@ -200,6 +200,9 @@ class Board:
             for snake_data in board_data["snakes"]
         }
         self.my_head: Position = my_head
+        self._let_my_snake_know_who_it_is()
+
+    def _let_my_snake_know_who_it_is(self):
         self.my_snake.is_me = True
 
     @property
@@ -207,14 +210,8 @@ class Board:
         return self.all_snakes[self.my_head]
 
     def is_wall(self, pos: Position) -> bool:
-        """Check for dangerous wall on given position.
+        """Check for wall on given position."""
 
-        Args:
-            pos (Position): Coordinates on the board.
-
-        Returns:
-            bool: Is there a wall?
-        """
         if pos.x < 0 or pos.y < 0:
             return True
         if pos.x >= self.width:
