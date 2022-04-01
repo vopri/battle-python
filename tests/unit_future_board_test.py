@@ -1,5 +1,5 @@
 import pytest
-from battle_snake.entities import Board, FutureBoard, Position
+from battle_snake.entities import Board, FutureBoard, NextStep, Position
 
 
 def test_future_board_init(test_board: Board):
@@ -79,17 +79,45 @@ def test_calc_snake_head_risk_value(test_board: Board, position, risk_value_as_s
 
 
 @pytest.mark.parametrize(
-    "board_name, amount_of_my_survived_snakes",
+    "board_name, risk_tolerance, amount_of_my_survived_snakes",
     [
-        ("test_board", 1),
-        ("sample_board_move_me_1", 1),
-        ("sample_board_move_me_2", 3),
+        ("test_board", 1, 1),
+        ("test_board", 0.5, 1),
+        ("sample_board_move_me_1", 1, 1),
+        ("sample_board_move_me_1", 0, 0),
+        ("sample_board_move_me_1", 0.5, 1),
+        ("sample_board_move_me_1", 0.3, 0),
+        ("sample_board_move_me_2", 1, 3),
+        ("sample_board_move_me_2", 0, 1),
+        ("sample_board_move_me_2", 0.30, 1),
+        ("sample_board_move_me_2", 0.40, 2),
+        ("sample_board_move_me_2", 0.7, 3),
     ],
 )
 def test_get_my_survived_snakes(
-    board_name: str, amount_of_my_survived_snakes: int, request: pytest.FixtureRequest
+    board_name: str,
+    risk_tolerance: float,
+    amount_of_my_survived_snakes: int,
+    request: pytest.FixtureRequest,
 ):
     board = request.getfixturevalue(board_name)
-    future_board = FutureBoard(board)
+    future_board = FutureBoard(board, risk_tolerance=risk_tolerance)
     snakes = future_board.get_my_survived_snakes()
     assert len(snakes) == amount_of_my_survived_snakes
+
+
+# @pytest.mark.parametrize(
+#     "board_name, first_steps",
+#     [
+#         ("test_board", {NextStep.UP}),
+#         ("sample_board_move_me_1", {NextStep.UP}),
+#         ("sample_board_move_me_2", {NextStep.LEFT, NextStep.RIGHT, NextStep.DOWN}),
+#     ],
+# )
+# def test_get_first_steps_of_my_survived_snakes(
+#     board_name: str, first_steps: set[NextStep], request: pytest.FixtureRequest
+# ):
+#     board = request.getfixturevalue(board_name)
+#     future_board = FutureBoard(board)
+#     next_steps = future_board.get_first_steps_of_my_survived_snakes()
+#     assert next_steps == first_steps

@@ -232,6 +232,13 @@ class FutureBoard:
     This method will include all possible snakes, including mine.
     "Impossible snakes" will be removed.
 
+    Impossible means:
+    - running into walls
+    - disqualified by eating itself or others
+    - dependending from risk_tolerance:
+        - if 0: not risk tolerant at all -> avoid all possible head collisions with snakes in same size or bigger
+        - if 1: very risk tolerant -> don't care if you would collided with another snake's head
+
     All possible head positions are included (pessimistic approach).
     All "eaten" food from the current turn will be removed.
 
@@ -241,14 +248,16 @@ class FutureBoard:
 
     """
 
-    def __init__(self, board: Board):
+    def __init__(self, board: Board, risk_tolerance: float = 0):
         self._orig_board = board
         self._bounderies: GameBoardBounderies = board._bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[Snake] = []
+        self.risk_tolerance: float = risk_tolerance
         self._add_all_possible_snakes_of_future()
         self._remove_snakes_running_into_walls()
         self._remove_snakes_disqualified_due_to_biting()
+        self._remove_my_snakes_with_possible_head_collision()
         self._remove_eaten_food()
 
     def _add_all_possible_snakes_of_future(self):
@@ -313,6 +322,19 @@ class FutureBoard:
         return {
             pos for snake in self.all_possible_snakes for pos in snake.body_without_head
         }
+
+    def _remove_my_snakes_with_possible_head_collision(self):
+        i_dont_care_about_head_collisions = self.risk_tolerance == 1
+        if i_dont_care_about_head_collisions:
+            return
+        my_risky_snake_variants = {
+            snake
+            for snake in self.all_possible_snakes
+            if snake.is_me
+            and self.risk_tolerance < self.calc_snake_head_risk_value(snake.head)
+        }
+        for my_risky_snake in my_risky_snake_variants:
+            self.all_possible_snakes.remove(my_risky_snake)
 
     def _remove_eaten_food(self):
         for snake in self._orig_board.all_snakes.values():
@@ -403,6 +425,10 @@ class FutureBoard:
 
     def get_my_survived_snakes(self) -> set[Snake]:
         return {snake for snake in self.all_possible_snakes if snake.is_me}
+
+    # def get_first_steps_of_my_survived_snakes(self) -> set[NextStep]:
+    #     snakes = self.get_my_survived_snakes()
+    #     return {NextStep.LEFT}
 
 
 class GameBoardBounderies:
