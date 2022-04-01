@@ -147,6 +147,8 @@ class FutureSnake(Snake):
         return self.head in self.body_without_head
 
     def get_my_first_step(self) -> NextStep:
+        """Get the first step from the first FutureSnake in this line of relatives"""
+
         first_future_snake = self._find_first_future_snake_of_my_ancestors()
         return first_future_snake.step_made_to_get_here
 
