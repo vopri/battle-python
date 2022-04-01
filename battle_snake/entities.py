@@ -401,6 +401,9 @@ class FutureBoard:
         """
         return self._bounderies.is_wall(pos)
 
+    def get_my_survived_snakes(self) -> set[Snake]:
+        return {snake for snake in self.all_possible_snakes if snake.is_me}
+
 
 class GameBoardBounderies:
     def __init__(self, height: int, width: int):

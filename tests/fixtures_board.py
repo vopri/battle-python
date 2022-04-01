@@ -36,16 +36,40 @@ def test_request_move_me_1():
     return json.loads(sample_request.read_text())
 
 
+@fixture
+def sample_board_move_me_1(test_request_move_me_1) -> Board:
+    return Board(
+        Position(**test_request_move_me_1["you"]["head"]),
+        **test_request_move_me_1["board"],
+    )
+
+
 @fixture()
 def test_request_move_me_2():
     sample_request = Path.cwd() / "tests" / "test_request_move_me_2.json"
     return json.loads(sample_request.read_text())
 
 
+@fixture
+def sample_board_move_me_2(test_request_move_me_2) -> Board:
+    return Board(
+        Position(**test_request_move_me_2["you"]["head"]),
+        **test_request_move_me_2["board"],
+    )
+
+
 @fixture()
 def test_request_move_me_3():
     sample_request = Path.cwd() / "tests" / "test_request_move_me_3.json"
     return json.loads(sample_request.read_text())
+
+
+@fixture
+def sample_board_move_me_3(test_request_move_me_3) -> Board:
+    return Board(
+        Position(**test_request_move_me_3["you"]["head"]),
+        **test_request_move_me_3["board"],
+    )
 
 
 @fixture

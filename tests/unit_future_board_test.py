@@ -76,3 +76,20 @@ def test_calc_snake_head_risk_value(test_board: Board, position, risk_value_as_s
     assert risk_value >= 0
     assert risk_value <= 1
     assert risk_value == eval(risk_value_as_str)
+
+
+@pytest.mark.parametrize(
+    "board_name, amount_of_my_survived_snakes",
+    [
+        ("test_board", 1),
+        ("sample_board_move_me_1", 1),
+        ("sample_board_move_me_2", 3),
+    ],
+)
+def test_get_my_survived_snakes(
+    board_name: str, amount_of_my_survived_snakes: int, request: pytest.FixtureRequest
+):
+    board = request.getfixturevalue(board_name)
+    future_board = FutureBoard(board)
+    snakes = future_board.get_my_survived_snakes()
+    assert len(snakes) == amount_of_my_survived_snakes
