@@ -265,7 +265,7 @@ class FutureBoard:
         self._orig_board = board
         self._bounderies: GameBoardBounderies = board._bounderies
         self.food: set[Position] = {food for food in board.food}
-        self.all_possible_snakes: list[Snake] = []
+        self.all_possible_snakes: list[FutureSnake] = []
         self.risk_tolerance: float = risk_tolerance
         self._add_all_possible_snakes_of_future()
         self._remove_snakes_running_into_walls()
@@ -436,12 +436,11 @@ class FutureBoard:
         """
         return self._bounderies.is_wall(pos)
 
-    def get_my_survived_snakes(self) -> set[Snake]:
+    def get_my_survived_snakes(self) -> set[FutureSnake]:
         return {snake for snake in self.all_possible_snakes if snake.is_me}
 
-    # def get_first_steps_of_my_survived_snakes(self) -> set[NextStep]:
-    #     snakes = self.get_my_survived_snakes()
-    #     return {NextStep.LEFT}
+    def get_first_steps_of_my_survived_snakes(self) -> set[NextStep]:
+        return {snake.get_my_first_step() for snake in self.get_my_survived_snakes()}
 
 
 class GameBoardBounderies:
