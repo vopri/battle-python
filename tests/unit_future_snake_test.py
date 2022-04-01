@@ -178,3 +178,20 @@ def test_future_snake_will_bite_itself(
     snake: Snake = request.getfixturevalue(snake_str)
     future_snake = snake.calculate_future_snake(next_step, is_food_available)
     assert future_snake.does_bite_itself() == expected_outcome
+
+
+@pytest.mark.parametrize(
+    "snake_name, next_step",
+    [
+        ("sample_snake", NextStep.UP),
+        ("sample_snake", NextStep.DOWN),
+        ("sample_snake", NextStep.LEFT),
+        ("sample_snake", NextStep.RIGHT),
+    ],
+)
+def test_get_my_first_next_step(
+    snake_name: str, next_step: NextStep, request: pytest.FixtureRequest
+):
+    snake = request.getfixturevalue(snake_name)
+    future_snake = snake.calculate_future_snake(next_step)
+    assert future_snake.get_my_first_step() == next_step

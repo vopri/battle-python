@@ -146,6 +146,17 @@ class FutureSnake(Snake):
     def does_bite_itself(self) -> bool:
         return self.head in self.body_without_head
 
+    def get_my_first_step(self) -> NextStep:
+        first_future_snake = self._find_first_future_snake_of_my_ancestors()
+        return first_future_snake.step_made_to_get_here
+
+    def _find_first_future_snake_of_my_ancestors(self):
+        snake: FutureSnake = self
+        while True:
+            if type(snake.mother) == Snake:
+                break
+        return snake
+
 
 class SnakeVisualizer:
     """Visualize snake in 11 x 11 field"""
