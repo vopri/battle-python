@@ -3,6 +3,7 @@ from battle_snake.entities import NextStep, Snake
 from battle_snake.interactor import MoveDecision
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "snake_fix_str, food, expected_steps",
     [

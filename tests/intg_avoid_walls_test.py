@@ -3,6 +3,7 @@ from battle_snake.entities import NextStep, Position
 from battle_snake.interactor import MoveDecision
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "next_possible_steps,filtered_steps",
     [
