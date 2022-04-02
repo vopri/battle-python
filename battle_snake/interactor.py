@@ -1,8 +1,4 @@
-import random
-from typing import Dict, List
-
-from battle_snake.entities import (Board, FutureBoard, Moves, NextStep,
-                                   Position, Snake)
+from battle_snake.entities import Board, FutureBoard, FutureSnake, NextStep, Position
 
 
 def get_info() -> dict:
@@ -20,98 +16,38 @@ def get_info() -> dict:
 
 
 class MoveDecision:
-    """Decision make for the next move of my snake. Entry point is method 'decide'"""
+    """Decision maker for the next move of my snake."""
 
     def __init__(self, data: dict):
         self.board: Board = self._init_board(data)
-        self.possible_moves: Moves = self.me.get_next_theoretical_moves()
-        self.future_board: FutureBoard = FutureBoard(self.board)
-
-    @property
-    def me(self) -> Snake:
-        """Shortcut to my snake"""
-        return self.board.my_snake
+        self.risk_tolerance: float = 0
 
     def _init_board(self, data: dict) -> Board:
         my_head_pos = Position(**data["you"]["head"])
         return Board(my_head_pos, **data["board"])
 
     def decide(self) -> NextStep:
-        """Entry point to find the next move of my snake
+        """Find decision for next step for my snake"""
 
-        Returns:
-            NextStep: Concrete next step of my snake
-        """
-        self._exclude_impossible_moves()
-        if self._there_is_only_one_move_possible():
-            return self._last_possible_next_step()
-        self._exclude_dangerous_moves()
-        if self._theres_no_way_to_survive():
-            # don't waste time and kill yourself like a snake with honour
+        future_board: FutureBoard = FutureBoard(self.board)
+        while self._are_there_no_survivors(future_board) and self.risk_tolerance < 1:
+            self._increase_risk_tolerance()
+            future_board = FutureBoard(self.board, risk_tolerance=self.risk_tolerance)
+        if self._are_there_no_survivors(future_board):
+            # die like a snake!
             return NextStep.UP
-        self._select_best_possible_moves()
-        return random.choice(list(self.possible_moves.values()))
+        best_choice_snake: FutureSnake = self._get_best_choice(future_board)
+        return best_choice_snake.get_my_first_step()
 
-    def _last_possible_next_step(self):
-        return list(self.possible_moves.values())[-1]
+    def _increase_risk_tolerance(self):
+        self.risk_tolerance += 10
 
-    def _there_is_only_one_move_possible(self):
-        return len(self.possible_moves) == 1
+    def _are_there_no_survivors(self, future_board) -> bool:
+        return len(future_board.get_my_survived_snakes()) < 1
 
-    def _exclude_impossible_moves(self):
-        """Remove all possible next steps that would lead to death at once.
-
-        This internal method doesn't include any strategies or tactis.
-        The only purpose is to survive the next step.
-        """
-        self._avoid_walls()
-        self._avoid_myself()
-        self._avoid_other_snake_bodies()
-
-    def _avoid_walls(self):
-        self.possible_moves = {
-            position: next_step
-            for position, next_step in self.possible_moves.items()
-            if not self.board.is_wall(position)
-        }
-
-    def _avoid_myself(self):
-        self.possible_moves = {
-            position: next_step
-            for position, next_step in self.possible_moves.items()
-            if not self.me.calculate_future_snake(
-                next_step, self._is_food_available()
-            ).does_bite_itself()
-        }
-
-    def _is_food_available(self):
-        return self.me.head in self.board.food
-
-    def _avoid_other_snake_bodies(self):
-        self.possible_moves = {
-            position: next_step
-            for position, next_step in self.possible_moves.items()
-            if not self.future_board.is_other_snake_body_on_this(position)
-        }
-
-    def _exclude_dangerous_moves(self, risk_tolerance=0):
-        self.possible_moves = {
-            position: next_step
-            for position, next_step in self.possible_moves.items()
-            if self.future_board.calc_snake_head_risk_value(position) <= 0
-        }
-
-    def _theres_no_way_to_survive(self) -> bool:
-        return len(self.possible_moves) == 0
-
-    def _select_best_possible_moves(self):
-        self._lead_me_to_nearby_food()
-
-    def _lead_me_to_nearby_food(self):
-        moves_leading_to_food = {
-            position: next_step
-            for position, next_step in self.possible_moves.items()
-            if position in self.future_board.food
-        }
-        if moves_leading_to_food:
-            self.possible_moves = moves_leading_to_food
+    def _get_best_choice(self, future_board) -> FutureSnake:
+        for snake in future_board.get_my_survived_snakes():
+            if future_board.is_food_available_for(snake):
+                return snake
+        else:
+            return future_board.get_my_survived_snakes().pop()

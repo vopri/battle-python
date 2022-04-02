@@ -299,11 +299,11 @@ class FutureBoard:
 
     def _make_future_snake(self, snake, next_possible_step):
         future_snake = snake.calculate_future_snake(
-            next_possible_step, self._is_food_available_for(snake)
+            next_possible_step, self.is_food_available_for(snake)
         )
         return future_snake
 
-    def _is_food_available_for(self, snake: Snake):
+    def is_food_available_for(self, snake: Snake):
         return snake.head in self.food
 
     def _remove_snakes_running_into_walls(self):
@@ -354,7 +354,7 @@ class FutureBoard:
             self._remove_food_eaten_by(snake)
 
     def _remove_food_eaten_by(self, snake: Snake):
-        if self._is_food_available_for(snake):
+        if self.is_food_available_for(snake):
             self.food.remove(snake.head)
 
     # TODO: Remove after changing the interactor later on
