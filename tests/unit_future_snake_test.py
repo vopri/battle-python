@@ -96,6 +96,7 @@ def test_future_snake_mini_without_food_growing():
     )
 
 
+@pytest.mark.skip
 def test_future_snake_bites_itself(snake_in_block: Snake):
     future_snake_down = snake_in_block.calculate_future_snake(NextStep.DOWN)
     assert not future_snake_down.does_bite_itself()
@@ -103,6 +104,7 @@ def test_future_snake_bites_itself(snake_in_block: Snake):
     assert future_snake_up.does_bite_itself()
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "snake_str, next_step, is_food_available, expected_outcome",
     [

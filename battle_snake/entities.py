@@ -121,9 +121,6 @@ class FutureSnake(Snake):
     def _remove_tail(self):
         self.body_and_head.pop()
 
-    def does_bite_itself(self) -> bool:
-        return self.head in self.body_without_head
-
     def get_my_first_step(self) -> NextStep:
         """Get the first step from the first FutureSnake in this line of relatives"""
 
