@@ -357,27 +357,6 @@ class FutureBoard:
         if self.is_food_available_for(snake):
             self.food.remove(snake.head)
 
-    # TODO: Remove after changing the interactor later on
-    def is_other_snake_body_on_this(self, position: Position) -> bool:
-        if self._is_no_snake_body_on_this(position):
-            return False
-        if self._is_one_of_my_own_future_bodies_on_this(position):
-            return False
-        return True
-
-    # TODO: Remove after changing the interactor later on
-    def _is_no_snake_body_on_this(self, position):
-        return not position in self._get_all_body_fields()
-
-    # TODO: Remove after changing the interactor later on
-    def _is_one_of_my_own_future_bodies_on_this(self, position):
-        return position in [
-            position
-            for snake in self.all_possible_snakes
-            for position in snake.body_without_head
-            if snake.is_me
-        ]
-
     def calc_snake_head_risk_value(self, pos: Position) -> float:
         """Calculate a risk between 0 and 1 that there's a dangerous snake head.
 

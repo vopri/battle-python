@@ -39,27 +39,6 @@ def test_future_board_all_possible_snakes(test_board: Board):
 
 
 @pytest.mark.parametrize(
-    "position,is_other_snake_body_there",
-    [
-        (Position(1, 3), False),  # nothing
-        (Position(6, 3), True),
-        (Position(5, 5), False),  # two heads
-        (Position(5, 4), True),
-        (Position(4, 5), True),
-        (Position(1, 0), False),  # myself in current board
-        (Position(5, 10), True),
-    ],
-)
-def test_future_board_is_other_snake_body(
-    test_board: Board, position, is_other_snake_body_there
-):
-    future_board = FutureBoard(test_board)
-    assert (
-        future_board.is_other_snake_body_on_this(position) == is_other_snake_body_there
-    )
-
-
-@pytest.mark.parametrize(
     "position,risk_value_as_str",
     [
         (Position(4, 4), "(1 / 3) + (1 / 3)"),
