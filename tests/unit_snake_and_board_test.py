@@ -29,16 +29,6 @@ def test_snake_init(sample_snake_data):
     assert len(snake) == 4
 
 
-def test_next_theoretical_positions(sample_snake):
-    assert sample_snake.head == Position(5, 4)
-    assert sample_snake.get_next_theoretical_moves() == {
-        Position(6, 4): NextStep.RIGHT,
-        Position(4, 4): NextStep.LEFT,
-        Position(5, 5): NextStep.UP,
-        Position(5, 3): NextStep.DOWN,
-    }
-
-
 def test_board_init(sample_board_data):
     my_head = Position(0, 0)
     board = Board(

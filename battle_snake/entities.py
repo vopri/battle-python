@@ -52,25 +52,6 @@ class Snake:
     def __str__(self):
         return SnakeVisualizer(self).snake_in_11x11_board
 
-    def get_next_theoretical_moves(self) -> Moves:
-        """Give all 4 theoretically possible coordinates of snake's head for the next move.
-
-        The returned positions are just theoretically possible and do not take care
-        of hitting walls, my own body or other snakes. Therefore the position can
-        even have negative coordinates.
-
-        Returns:
-            dict[Position, NextStep]: Dictionary with 4 entries where:
-            key represents the coordinates on the field
-            value represents the direction for the next move that leads to that position
-        """
-        result = dict()
-        result[Position(self.head.x + 1, self.head.y)] = NextStep.RIGHT
-        result[Position(self.head.x - 1, self.head.y)] = NextStep.LEFT
-        result[Position(self.head.x, self.head.y + 1)] = NextStep.UP
-        result[Position(self.head.x, self.head.y - 1)] = NextStep.DOWN
-        return result
-
     def calculate_future_snake(
         self,
         next_step: NextStep,
