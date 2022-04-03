@@ -57,6 +57,7 @@ def test_get_my_snake(sample_board):
     assert me.tail == Position(2, 0)
 
 
+@pytest.mark.skip
 def test_is_wall(sample_board):
     assert not sample_board.is_wall(Position(0, 0))
     assert not sample_board.is_wall(Position(3, 3))

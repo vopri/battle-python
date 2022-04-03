@@ -206,10 +206,6 @@ class Board:
     def my_snake(self) -> Snake:
         return self.all_snakes[self._my_head]
 
-    def is_wall(self, pos: Position) -> bool:
-        """Check for wall on given position."""
-        return self._bounderies.is_wall(pos)
-
 
 class FutureBoard:
     """Calculate how the board could look like in the next turn.
