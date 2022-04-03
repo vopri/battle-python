@@ -85,6 +85,7 @@ def test_get_my_survived_snakes(
     assert len(snakes) == amount_of_my_survived_snakes
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "board_name, risk_tolerance, first_steps",
     [

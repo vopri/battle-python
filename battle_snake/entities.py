@@ -389,9 +389,6 @@ class FutureBoard:
     def get_my_survived_snakes(self) -> set[FutureSnake]:
         return {snake for snake in self.all_possible_snakes if snake.is_me}
 
-    def get_first_steps_of_my_survived_snakes(self) -> set[NextStep]:
-        return {snake.get_my_first_step() for snake in self.get_my_survived_snakes()}
-
 
 class GameBoardBounderies:
     def __init__(self, height: int, width: int):
