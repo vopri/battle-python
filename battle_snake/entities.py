@@ -15,9 +15,6 @@ class Position:
     y: int
 
 
-Moves = dict[Position, NextStep]  # type alias
-
-
 class Snake:
     """Representation of one single snake.
 
