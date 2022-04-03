@@ -334,11 +334,22 @@ class FutureBoard:
         Returns:
             float: Risk value as sum of probability of all snakes with their head on this position.
         """
-        probabilities_of_snakes_on_pos = [
-            (1 / self._count_snakes_by_neck_position(neck_pos))
+        amount_of_variants_per_dangerous_snakes = [
+            (self._count_snakes_by_neck_position(neck_pos))
             for neck_pos in self._get_danger_snake_neck_id_with_head_on_pos(pos)
         ]
-        risk_value = sum(probabilities_of_snakes_on_pos)
+        no_risk_at_all = len(amount_of_variants_per_dangerous_snakes) == 0
+        if no_risk_at_all:
+            return 0
+        amount_of_possible_collisions = len(amount_of_variants_per_dangerous_snakes)
+        amount_of_possible_movements_of_dangouers_snakes_in_total = sum(
+            amount_of_variants_per_dangerous_snakes
+        )
+
+        risk_value = (
+            amount_of_possible_collisions
+            / amount_of_possible_movements_of_dangouers_snakes_in_total
+        )
         return risk_value
 
     def _count_snakes_by_neck_position(self, pos: Position) -> int:

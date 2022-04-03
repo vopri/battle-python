@@ -41,8 +41,8 @@ def test_future_board_all_possible_snakes(test_board: Board):
 @pytest.mark.parametrize(
     "position,risk_value_as_str",
     [
-        (Position(4, 4), "(1 / 3) + (1 / 3)"),
-        (Position(6, 4), "1 / 3"),
+        (Position(4, 4), "1/3"),  # 2 of 6
+        (Position(6, 4), "1/3"),
         (Position(8, 6), "0"),
         (Position(9, 10), "1"),
         (Position(5, 9), "1/2"),
@@ -69,7 +69,7 @@ def test_calc_snake_head_risk_value(test_board: Board, position, risk_value_as_s
         ("sample_board_move_me_2", 1, 3),
         ("sample_board_move_me_2", 0, 1),
         ("sample_board_move_me_2", 0.30, 1),
-        ("sample_board_move_me_2", 0.40, 2),
+        ("sample_board_move_me_2", 0.40, 3),
         ("sample_board_move_me_2", 0.7, 3),
     ],
 )
