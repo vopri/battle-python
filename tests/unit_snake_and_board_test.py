@@ -25,7 +25,6 @@ def test_snake_init(sample_snake_data):
         Position(6, 2),
     ]
     assert snake.neck == Position(5, 3)
-    assert snake.tail == Position(6, 2)
     assert len(snake) == 4
 
 
@@ -45,7 +44,6 @@ def test_board_init(sample_board_data):
     snake: Snake = board.all_snakes.get(Position(5, 4))  # type: ignore
     assert len(snake) == 4  # type: ignore
     assert snake.body_and_head[-1] == Position(6, 2)  # type: ignore
-    assert snake.tail == Position(6, 2)  # type: ignore
     assert board.my_snake.is_me
     assert snake.is_me == False
 
@@ -54,7 +52,6 @@ def test_get_my_snake(sample_board):
     me = sample_board.my_snake
     assert len(me) == 3
     assert me.neck == Position(1, 0)
-    assert me.tail == Position(2, 0)
 
 
 @pytest.mark.skip

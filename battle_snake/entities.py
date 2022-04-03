@@ -39,10 +39,6 @@ class Snake:
     def neck(self) -> Position:
         return self.body_and_head[1]
 
-    @property
-    def tail(self) -> Position:
-        return self.body_and_head[-1]
-
     def __len__(self):
         return len(self.body_and_head)
 
