@@ -21,31 +21,31 @@ class Snake:
     If the snake is myself it's marked with is_me = True
     """
 
-    def __init__(self, body_and_head: list[Position], is_me=False):
-        self.body_and_head: list[Position] = body_and_head
+    def __init__(self, head_and_body: list[Position], is_me=False):
+        self.head_and_body: list[Position] = head_and_body
         self.is_me: bool = is_me
 
     @classmethod
     def from_dict(cls, **snake_data: dict) -> "Snake":
-        body_and_head: list[Position] = [
+        head_and_body: list[Position] = [
             Position(**position) for position in snake_data["body"]
         ]
-        return cls(body_and_head)
+        return cls(head_and_body)
 
     @property
     def head(self) -> Position:
-        return self.body_and_head[0]
+        return self.head_and_body[0]
 
     @property
     def body_without_head(self) -> list[Position]:
-        return self.body_and_head[1:]
+        return self.head_and_body[1:]
 
     @property
     def neck(self) -> Position:
-        return self.body_and_head[1]
+        return self.head_and_body[1]
 
     def __len__(self):
-        return len(self.body_and_head)
+        return len(self.head_and_body)
 
     def __str__(self):
         return SnakeVisualizer(self).snake_in_11x11_board
@@ -87,7 +87,7 @@ class FutureSnake(Snake):
 
     def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
         self.mother = mother
-        self.body_and_head = mother.body_and_head[:]
+        self.head_and_body = mother.head_and_body[:]
         self.step_made_to_get_here = next_step
         self.is_me = mother.is_me
         self.is_food_available = is_food_available
@@ -102,7 +102,7 @@ class FutureSnake(Snake):
 
     def _add_future_head_to_future_snake(self):
         future_head_position: Position = self._calc_future_head_position()
-        self.body_and_head.insert(0, future_head_position)
+        self.head_and_body.insert(0, future_head_position)
 
     def _calc_future_head_position(self) -> Position:
         if self.step_made_to_get_here == NextStep.UP:
@@ -120,7 +120,7 @@ class FutureSnake(Snake):
         return len(self.mother) < 3
 
     def _remove_tail(self):
-        self.body_and_head.pop()
+        self.head_and_body.pop()
 
     def get_my_first_step(self) -> NextStep:
         """Get the first step from the first FutureSnake in this line of relatives"""
@@ -146,7 +146,7 @@ class SnakeVisualizer:
         self.snake_in_11x11_board: str
 
     def _visualize(self):
-        for pos in self._snake.body_and_head:
+        for pos in self._snake.head_and_body:
             self._enter_snake_into_visual_board(pos)
         self._paint_field_walls()
         self._convert_board_array_to_str()
