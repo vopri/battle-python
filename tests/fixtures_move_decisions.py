@@ -14,7 +14,7 @@ def sample_move_decision_with_snake_in_block_without_food(
 ):
     md = MoveDecision(sample_request)
     md.board.all_snakes = {snake_in_block}
-    md.board._my_head = snake_in_block.head
+    md.board.my_snake.head = snake_in_block.head  # type: ignore
     return md
 
 
@@ -24,6 +24,6 @@ def sample_move_decision_with_snake_in_block_with_food(
 ):
     md = MoveDecision(sample_request)
     md.board.all_snakes = {snake_in_block}
-    md.board._my_head = snake_in_block.head
+    md.board.my_snake.head = snake_in_block.head  # type: ignore
     md.board.food.add(snake_in_block.head)
     return md

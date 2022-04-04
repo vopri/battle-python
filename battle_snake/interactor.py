@@ -18,13 +18,9 @@ def get_info() -> dict:
 class MoveDecision:
     """Decision maker for the next move of my snake."""
 
-    def __init__(self, data: dict):
-        self.board: Board = self._init_board(data)
+    def __init__(self, game_request: dict):
+        self.board: Board = Board.from_dict(game_request)
         self.risk_tolerance: float = 0
-
-    def _init_board(self, data: dict) -> Board:
-        my_head_pos = Position(**data["you"]["head"])
-        return Board(my_head_pos, **data["board"])
 
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""

@@ -35,13 +35,9 @@ def test_snake_init(sample_snake_data):
     assert len(snake) == 4
 
 
-def test_board_init(sample_board_data):
-    my_head = Position(0, 0)
-    board = Board(
-        my_head=my_head,
-        **sample_board_data,
-    )
-    assert board._bounderies == GameBoardBounderies(11, 11)
+def test_board_init(sample_request):
+    board = Board.from_dict(sample_request)
+    assert board.bounderies == GameBoardBounderies(11, 11)
     assert board.food == {
         Position(5, 5),
         Position(9, 0),

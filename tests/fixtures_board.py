@@ -13,10 +13,7 @@ def sample_request():
 
 @fixture
 def sample_board(sample_request):
-    return Board(
-        Position(**sample_request["you"]["head"]),
-        **sample_request["board"],
-    )
+    return Board.from_dict(sample_request)
 
 
 @fixture
@@ -38,10 +35,7 @@ def test_request_move_me_1():
 
 @fixture
 def sample_board_move_me_1(test_request_move_me_1) -> Board:
-    return Board(
-        Position(**test_request_move_me_1["you"]["head"]),
-        **test_request_move_me_1["board"],
-    )
+    return Board.from_dict(test_request_move_me_1)
 
 
 @fixture()
@@ -52,10 +46,7 @@ def test_request_move_me_2():
 
 @fixture
 def sample_board_move_me_2(test_request_move_me_2) -> Board:
-    return Board(
-        Position(**test_request_move_me_2["you"]["head"]),
-        **test_request_move_me_2["board"],
-    )
+    return Board.from_dict(test_request_move_me_2)
 
 
 @fixture()
@@ -66,15 +57,9 @@ def test_request_move_me_3():
 
 @fixture
 def sample_board_move_me_3(test_request_move_me_3) -> Board:
-    return Board(
-        Position(**test_request_move_me_3["you"]["head"]),
-        **test_request_move_me_3["board"],
-    )
+    return Board.from_dict(test_request_move_me_3)
 
 
 @fixture
 def test_board(test_request):
-    return Board(
-        Position(**test_request["you"]["head"]),
-        **test_request["board"],
-    )
+    return Board.from_dict(test_request)

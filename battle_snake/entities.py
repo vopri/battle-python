@@ -178,33 +178,30 @@ class SnakeVisualizer:
 class Board:
     """Represents the board including board size, all snakes, food and position of my own snake."""
 
-    def __init__(self, my_head: Position, **board_data: dict):
-        self._board_data: dict = board_data
-        self._bounderies: GameBoardBounderies = self._find_board_bounderies()
-        self.food: set[Position] = self._find_food()
-        self.all_snakes: set[Snake] = self._find_snakes()
-        self._my_head: Position = my_head
-        self._let_my_snake_know_who_it_is()
+    def __init__(
+        self,
+        bounderies: "GameBoardBounderies",
+        food: set[Position],
+        snakes: set[Snake],
+    ):
+        self.bounderies: "GameBoardBounderies" = bounderies
+        self.food: set[Position] = food
+        self.all_snakes: set[Snake] = snakes
 
-    def _find_board_bounderies(self):
-        return GameBoardBounderies(
-            self._board_data["height"], self._board_data["width"]
-        )
-
-    def _find_food(self):
-        return {Position(**position_data) for position_data in self._board_data["food"]}
-
-    def _find_snakes(self):
-        return {
-            Snake.from_dict(**snake_data) for snake_data in self._board_data["snakes"]
-        }
-
-    def _let_my_snake_know_who_it_is(self):
-        self.my_snake.is_me = True
+    @classmethod
+    def from_dict(cls, game_request: dict) -> "Board":
+        board_data: dict = game_request["board"]
+        my_head_pos = Position(**game_request["you"]["head"])
+        bounderies = GameBoardBounderies(board_data["height"], board_data["width"])
+        food = {Position(**position_data) for position_data in board_data["food"]}
+        snakes = {Snake.from_dict(**snake_data) for snake_data in board_data["snakes"]}
+        my_snake = [snake for snake in snakes if snake.head == my_head_pos].pop()
+        my_snake.is_me = True
+        return cls(bounderies, food, snakes)
 
     @property
     def my_snake(self) -> Snake:
-        return [snake for snake in self.all_snakes if snake.head == self._my_head].pop()
+        return [snake for snake in self.all_snakes if snake.is_me][0]
 
 
 class FutureBoard:
@@ -234,7 +231,7 @@ class FutureBoard:
 
     def __init__(self, board: Board, risk_tolerance: float = 0):
         self._orig_board = board
-        self._bounderies: GameBoardBounderies = board._bounderies
+        self._bounderies: GameBoardBounderies = board.bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[FutureSnake] = []
         self.risk_tolerance: float = risk_tolerance
