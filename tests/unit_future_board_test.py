@@ -83,3 +83,11 @@ def test_get_my_survived_snakes(
     future_board = FutureBoard(board, risk_tolerance=risk_tolerance)
     snakes = future_board.get_my_survived_snakes()
     assert len(snakes) == amount_of_my_survived_snakes
+
+
+def test_get_my_survived_snakes_combinations(almost_empty_board_request):
+    future_board = FutureBoard(
+        Board.from_dict(almost_empty_board_request),
+        risk_tolerance=0,
+    )
+    assert len(future_board.all_possible_snakes) == 2

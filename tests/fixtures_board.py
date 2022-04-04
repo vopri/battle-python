@@ -11,6 +11,12 @@ def sample_request():
     return json.loads(sample_request.read_text())
 
 
+@fixture(scope="session")
+def almost_empty_board_request():
+    sample_request = Path.cwd() / "tests" / "almost_empty_board_request.json"
+    return json.loads(sample_request.read_text())
+
+
 @fixture
 def sample_board(sample_request):
     return Board.from_dict(sample_request)
