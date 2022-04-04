@@ -49,5 +49,4 @@ class MoveDecision:
         for snake in future_board.get_my_survived_snakes():
             if future_board.is_food_available_for(snake):
                 return snake
-        else:
-            return future_board.get_my_survived_snakes().pop()
+        return future_board.get_my_survived_snakes().pop()

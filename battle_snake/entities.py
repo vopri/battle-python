@@ -147,7 +147,7 @@ class SnakeVisualizer:
         self._convert_board_array_to_str()
 
     def _init_11x11_board(self) -> list[list[str]]:
-        field: list[list[str]] = [["·" for i in range(11)] for j in range(11)]
+        field: list[list[str]] = [["·" for _ in range(11)] for _ in range(11)]
         return field
 
     def _enter_snake_into_visual_board(self, pos: Position):
@@ -157,8 +157,8 @@ class SnakeVisualizer:
         self._visual_board[10 - pos.y][pos.x] = char_for_body_limb
 
     def _paint_field_walls(self):
-        self._visual_board.insert(0, ["=" for i in range(11)])
-        self._visual_board.append(["=" for i in range(11)])
+        self._visual_board.insert(0, ["=" for _ in range(11)])
+        self._visual_board.append(["=" for _ in range(11)])
         for row in self._visual_board:
             row.insert(0, "|")
             row.append("|")
