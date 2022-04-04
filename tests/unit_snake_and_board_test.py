@@ -48,7 +48,10 @@ def test_board_init(sample_board_data):
         Position(2, 6),
     }
     assert len(board.all_snakes) == 2
-    snake: Snake = board.all_snakes.get(Position(5, 4))  # type: ignore
+    snake: Snake = [
+        snake for snake in board.all_snakes if snake.head == Position(5, 4)
+    ].pop()
+
     assert len(snake) == 4  # type: ignore
     assert snake.head_and_body[-1] == Position(6, 2)  # type: ignore
     assert board.my_snake.is_me

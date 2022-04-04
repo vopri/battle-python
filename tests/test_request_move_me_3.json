@@ -56,8 +56,8 @@
                 ],
                 "latency": "111",
                 "head": {
-                    "x": 3,
-                    "y": 6
+                    "x": 7,
+                    "y": 7
                 },
                 "length": 2,
                 "shout": "why are we shouting??",
@@ -206,8 +206,8 @@
         ],
         "latency": "111",
         "head": {
-            "x": 3,
-            "y": 6
+            "x": 7,
+            "y": 7
         },
         "length": 2,
         "shout": "why are we shouting??",

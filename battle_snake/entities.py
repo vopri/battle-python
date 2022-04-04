@@ -182,7 +182,7 @@ class Board:
         self._board_data: dict = board_data
         self._bounderies: GameBoardBounderies = self._find_board_bounderies()
         self.food: set[Position] = self._find_food()
-        self.all_snakes: dict[Position, Snake] = self._find_snakes()
+        self.all_snakes: set[Snake] = self._find_snakes()
         self._my_head: Position = my_head
         self._let_my_snake_know_who_it_is()
 
@@ -196,8 +196,7 @@ class Board:
 
     def _find_snakes(self):
         return {
-            Position(**snake_data["head"]): Snake.from_dict(**snake_data)
-            for snake_data in self._board_data["snakes"]
+            Snake.from_dict(**snake_data) for snake_data in self._board_data["snakes"]
         }
 
     def _let_my_snake_know_who_it_is(self):
@@ -205,7 +204,7 @@ class Board:
 
     @property
     def my_snake(self) -> Snake:
-        return self.all_snakes[self._my_head]
+        return [snake for snake in self.all_snakes if snake.head == self._my_head].pop()
 
 
 class FutureBoard:
@@ -252,7 +251,7 @@ class FutureBoard:
         - There are up to 3 snake-copies in the future board for every
         original snake, 1 for every direction (as long as it doesn't bite itself)
         """
-        snakes_of_mother_board = self._orig_board.all_snakes.values()
+        snakes_of_mother_board = self._orig_board.all_snakes
         for original_snake in snakes_of_mother_board:
             self._add_all_possible_variants_of_one_snake_to_future_board(original_snake)
 
@@ -322,7 +321,7 @@ class FutureBoard:
             self.all_possible_snakes.remove(my_risky_snake)
 
     def _remove_eaten_food(self):
-        for snake in self._orig_board.all_snakes.values():
+        for snake in self._orig_board.all_snakes:
             self._remove_food_eaten_by(snake)
 
     def _remove_food_eaten_by(self, snake: Snake):
