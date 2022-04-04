@@ -21,11 +21,16 @@ class Snake:
     If the snake is myself it's marked with is_me = True
     """
 
-    def __init__(self, **snake_data: dict):
-        self.body_and_head: list[Position] = [
+    def __init__(self, body_and_head: list[Position], is_me=False):
+        self.body_and_head: list[Position] = body_and_head
+        self.is_me: bool = is_me
+
+    @classmethod
+    def from_dict(cls, **snake_data: dict) -> "Snake":
+        body_and_head: list[Position] = [
             Position(**position) for position in snake_data["body"]
         ]
-        self.is_me: bool = False
+        return cls(body_and_head)
 
     @property
     def head(self) -> Position:
@@ -191,7 +196,7 @@ class Board:
 
     def _find_snakes(self):
         return {
-            Position(**snake_data["head"]): Snake(**snake_data)
+            Position(**snake_data["head"]): Snake.from_dict(**snake_data)
             for snake_data in self._board_data["snakes"]
         }
 

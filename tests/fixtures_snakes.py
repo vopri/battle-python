@@ -31,7 +31,7 @@ def sample_snake(sample_snake_data) -> Snake:
     |···········|
     |===========|
     """
-    return Snake(**sample_snake_data)
+    return Snake.from_dict(**sample_snake_data)
 
 
 @fixture
@@ -51,7 +51,7 @@ def snake_head_only():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 7, "y": 4},
@@ -77,7 +77,7 @@ def snake_in_block():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 7, "y": 4},
@@ -108,7 +108,7 @@ def snake_origin():
     |o··········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 0, "y": 0},
@@ -136,7 +136,7 @@ def snake_middle_short():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 5, "y": 5},
@@ -163,7 +163,7 @@ def snake_top_middle_short():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 5, "y": 10},
@@ -190,7 +190,7 @@ def snake_bottom_middle_short():
     |·····ox····|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 5, "y": 0},
@@ -217,7 +217,7 @@ def snake_left_middle_short():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 0, "y": 5},
@@ -244,7 +244,7 @@ def snake_right_middle_short():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 10, "y": 5},
@@ -271,7 +271,7 @@ def snake_top_right_short():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 10, "y": 10},
@@ -298,7 +298,7 @@ def snake_top_right_short_collision_same_size():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 10, "y": 10},
@@ -325,7 +325,7 @@ def snake_long():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 5, "y": 5},
@@ -358,7 +358,7 @@ def snake_long_2():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 4, "y": 5},
@@ -392,7 +392,7 @@ def snake_long_2_future_down_without_food():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 4, "y": 4},
@@ -426,7 +426,7 @@ def snake_long_future_up_without_food():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 5, "y": 6},
@@ -459,7 +459,7 @@ def snake_long_future_right_without_food():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 6, "y": 5},
@@ -492,7 +492,7 @@ def snake_long_future_left_without_food():
     |···········|
     |===========|
     """
-    return Snake(
+    return Snake.from_dict(
         **{
             "body": [
                 {"x": 4, "y": 5},

@@ -23,7 +23,7 @@ def test_postion_equal():
 
 
 def test_snake_init(sample_snake_data):
-    snake = Snake(**sample_snake_data)
+    snake = Snake.from_dict(**sample_snake_data)
     assert snake.head == Position(5, 4)
     assert snake.body_and_head == [
         Position(5, 4),
