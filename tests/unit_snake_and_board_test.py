@@ -43,9 +43,9 @@ def test_board_init(sample_request):
         Position(9, 0),
         Position(2, 6),
     }
-    assert len(board.all_snakes) == 2
+    assert len(board.snakes) == 2
     snake: Snake = [
-        snake for snake in board.all_snakes if snake.head == Position(5, 4)
+        snake for snake in board.snakes if snake.head == Position(5, 4)
     ].pop()
 
     assert len(snake) == 4  # type: ignore

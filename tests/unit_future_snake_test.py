@@ -19,7 +19,7 @@ def test_sample_board_future_snake_is_me_marker(sample_board: Board):
     )
     assert my_future_snake.is_me
     other_snake: Snake = [
-        snake for snake in sample_board.all_snakes if snake.head == Position(5, 4)
+        snake for snake in sample_board.snakes if snake.head == Position(5, 4)
     ].pop()
     other_future_snake = other_snake.calculate_future_snake(NextStep.DOWN)
     assert other_future_snake.is_me == False

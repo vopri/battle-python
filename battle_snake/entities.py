@@ -186,7 +186,7 @@ class Board:
     ):
         self.bounderies: "GameBoardBounderies" = bounderies
         self.food: set[Position] = food
-        self.all_snakes: set[Snake] = snakes
+        self.snakes: set[Snake] = snakes
 
     @classmethod
     def from_dict(cls, game_request: dict) -> "Board":
@@ -201,7 +201,7 @@ class Board:
 
     @property
     def my_snake(self) -> Snake:
-        return [snake for snake in self.all_snakes if snake.is_me][0]
+        return [snake for snake in self.snakes if snake.is_me][0]
 
 
 class FutureBoard:
@@ -231,7 +231,7 @@ class FutureBoard:
 
     def __init__(self, board: Board, risk_tolerance: float = 0):
         self._orig_board = board
-        self._bounderies: GameBoardBounderies = board.bounderies
+        self.bounderies: GameBoardBounderies = board.bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[FutureSnake] = []
         self.risk_tolerance: float = risk_tolerance
@@ -248,7 +248,7 @@ class FutureBoard:
         - There are up to 3 snake-copies in the future board for every
         original snake, 1 for every direction (as long as it doesn't bite itself)
         """
-        snakes_of_mother_board = self._orig_board.all_snakes
+        snakes_of_mother_board = self._orig_board.snakes
         for original_snake in snakes_of_mother_board:
             self._add_all_possible_variants_of_one_snake_to_future_board(original_snake)
 
@@ -318,7 +318,7 @@ class FutureBoard:
             self.all_possible_snakes.remove(my_risky_snake)
 
     def _remove_eaten_food(self):
-        for snake in self._orig_board.all_snakes:
+        for snake in self._orig_board.snakes:
             self._remove_food_eaten_by(snake)
 
     def _remove_food_eaten_by(self, snake: Snake):
@@ -392,7 +392,7 @@ class FutureBoard:
         Returns:
             bool: Is there a wall?
         """
-        return self._bounderies.is_wall(pos)
+        return self.bounderies.is_wall(pos)
 
     def get_my_survived_snakes(self) -> set[FutureSnake]:
         return {snake for snake in self.all_possible_snakes if snake.is_me}
