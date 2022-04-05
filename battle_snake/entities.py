@@ -93,6 +93,7 @@ class FutureSnake(Snake):
         self.is_me = mother.is_me
         self.is_food_available = is_food_available
         self._calculate_future_body()
+        # One ID is the same for all possible-future-snakes that is based on one "normal" Snake
         self.id = mother.id
 
     def _calculate_future_body(self):
@@ -398,6 +399,13 @@ class FutureBoard:
 
     def get_my_survived_snakes(self) -> set[FutureSnake]:
         return {snake for snake in self.all_possible_snakes if snake.is_me}
+
+    def get_variants_of(self, snake: FutureSnake) -> set[FutureSnake]:
+        return {
+            snake_variant
+            for snake_variant in self.all_possible_snakes
+            if snake.id == snake_variant.id
+        }
 
 
 class GameBoardBounderies:

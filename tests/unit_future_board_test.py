@@ -100,3 +100,12 @@ def test_snake_and_future_snake_id_handover(sample_request):
     survivor_ids = {snake.id for snake in future_board.get_my_survived_snakes()}
     assert len(survivor_ids) == 1
     assert my_id == survivor_ids.pop()
+
+
+def test_find_variants_of_snake(test_request_move_me_3):
+    board = Board.from_dict(test_request_move_me_3)
+    future_board = FutureBoard(board)
+    future_snakes = list(future_board.get_my_survived_snakes())
+    one_future_snake = future_snakes[0]
+    future_variants = future_board.get_variants_of(one_future_snake)
+    assert future_variants == set(future_snakes)
