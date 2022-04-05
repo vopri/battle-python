@@ -95,6 +95,7 @@ class FutureSnake(Snake):
         self._calculate_future_body()
         # One ID is the same for all possible-future-snakes that is based on one "normal" Snake
         self.id = mother.id
+        self.head_collision_risk: float = -1
 
     def _calculate_future_body(self):
         self._add_future_head_to_future_snake()
@@ -242,6 +243,7 @@ class FutureBoard:
         self._remove_snakes_running_into_walls()
         self._remove_snakes_disqualified_due_to_biting()
         self._remove_my_snakes_with_possible_head_collision()
+        self._calc_head_collision_risks_for_all_possible_snakes()
         self._remove_eaten_food()
 
     def _add_all_possible_snakes_of_future(self):
@@ -319,6 +321,10 @@ class FutureBoard:
         }
         for my_risky_snake in my_risky_snake_variants:
             self.all_possible_snakes.remove(my_risky_snake)
+
+    def _calc_head_collision_risks_for_all_possible_snakes(self):
+        for snake in self.all_possible_snakes:
+            snake.head_collision_risk = self._calc_head_collision_risk_for(snake)
 
     def _remove_eaten_food(self):
         for snake in self._orig_board.snakes:
@@ -407,7 +413,7 @@ class FutureBoard:
             if snake.id == snake_variant.id
         }
 
-    def calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
+    def _calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
         threading_future_snakes_with_head_collision = [
             snake
             for snake in self.all_possible_snakes

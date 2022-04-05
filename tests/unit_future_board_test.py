@@ -131,4 +131,19 @@ def test_calc_head_collision_risk(
     ]
     assert len(future_snakes) == 1
     f_snake = future_snakes[0]
-    assert future_board.calc_head_collision_risk_for(f_snake) == expected_risk_value
+    assert future_board._calc_head_collision_risk_for(f_snake) == expected_risk_value
+
+
+def test_future_snake_head_collision_risk(test_request_move_me_3):
+    board = Board.from_dict(test_request_move_me_3)
+    future_board = FutureBoard(board)
+    for snake in future_board.all_possible_snakes:
+        assert snake.head_collision_risk >= 0
+    future_snakes = [
+        snake
+        for snake in future_board.all_possible_snakes
+        if snake.id == Position(4, 5) and snake.head == Position(5, 5)
+    ]
+    assert len(future_snakes) == 1
+    f_snake = future_snakes[0]
+    assert f_snake.head_collision_risk == 1 / 3
