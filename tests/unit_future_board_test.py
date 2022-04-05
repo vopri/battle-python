@@ -147,3 +147,22 @@ def test_future_snake_head_collision_risk(test_request_move_me_3):
     assert len(future_snakes) == 1
     f_snake = future_snakes[0]
     assert f_snake.head_collision_risk == 1 / 3
+
+
+def test_remove_future_snake_head_collision_risk(test_request_move_me_4):
+    board = Board.from_dict(test_request_move_me_4)
+    future_board = FutureBoard(board)
+    future_snakes = [
+        snake
+        for snake in future_board.all_possible_snakes
+        if snake.id == Position(3, 2)
+    ]
+    assert len(future_snakes) == 0
+    future_snakes = [
+        snake
+        for snake in future_board.all_possible_snakes
+        if snake.id == Position(5, 2)
+    ]
+    assert len(future_snakes) == 1
+    f_snake = future_snakes[0]
+    assert f_snake.head_collision_risk == 0

@@ -244,6 +244,7 @@ class FutureBoard:
         self._remove_snakes_disqualified_due_to_biting()
         self._remove_my_snakes_with_possible_head_collision()
         self._calc_head_collision_risks_for_all_possible_snakes()
+        self._remove_snakes_which_will_die_by_head_collision()
         self._remove_eaten_food()
 
     def _add_all_possible_snakes_of_future(self):
@@ -431,6 +432,11 @@ class FutureBoard:
             ]
         )
         return len(threading_future_snakes_with_head_collision) / possible_snakes
+
+    def _remove_snakes_which_will_die_by_head_collision(self):
+        for snake in self.all_possible_snakes:
+            if snake.head_collision_risk == 1:
+                self.all_possible_snakes.remove(snake)
 
 
 class GameBoardBounderies:
