@@ -24,6 +24,7 @@ class Snake:
     def __init__(self, head_and_body: list[Position], is_me=False):
         self.head_and_body: list[Position] = head_and_body
         self.is_me: bool = is_me
+        self.id = self.head_and_body[0]
 
     @classmethod
     def from_dict(cls, **snake_data: dict) -> "Snake":
@@ -92,6 +93,7 @@ class FutureSnake(Snake):
         self.is_me = mother.is_me
         self.is_food_available = is_food_available
         self._calculate_future_body()
+        self.id = mother.id
 
     def _calculate_future_body(self):
         self._add_future_head_to_future_snake()

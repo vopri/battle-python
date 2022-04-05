@@ -33,6 +33,7 @@ def test_snake_init(sample_snake_data):
     ]
     assert snake.neck == Position(5, 3)
     assert len(snake) == 4
+    assert snake.id == Position(5, 4)
 
 
 def test_board_init(sample_request):

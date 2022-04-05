@@ -11,6 +11,7 @@ def test_future_snake_init(sample_snake: Snake):
     assert future_snake.mother == sample_snake
     assert future_snake.head == Position(5, 5)
     assert sample_snake.head == Position(5, 4)
+    assert sample_snake.id == future_snake.id
 
 
 def test_sample_board_future_snake_is_me_marker(sample_board: Board):
