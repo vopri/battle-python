@@ -91,3 +91,12 @@ def test_get_my_survived_snakes_combinations(almost_empty_board_request):
         risk_tolerance=0,
     )
     assert len(future_board.all_possible_snakes) == 2
+
+
+def test_snake_and_future_snake_id_handover(sample_request):
+    board = Board.from_dict(sample_request)
+    future_board = FutureBoard(board)
+    my_id = board.my_snake.id
+    survivor_ids = {snake.id for snake in future_board.get_my_survived_snakes()}
+    assert len(survivor_ids) == 1
+    assert my_id == survivor_ids.pop()
