@@ -6,8 +6,6 @@ def test_future_board_init(test_board: Board):
     future_board = FutureBoard(test_board)
     assert test_board.bounderies == future_board.bounderies
     assert future_board.food == {
-        # Position(2, 6), # eaten
-        # Position(5, 4), # eaten
         Position(5, 5),
         Position(9, 0),
     }
@@ -109,3 +107,28 @@ def test_find_variants_of_snake(test_request_move_me_3):
     one_future_snake = future_snakes[0]
     future_variants = future_board.get_variants_of(one_future_snake)
     assert future_variants == set(future_snakes)
+
+
+# param: id + head, risk
+@pytest.mark.parametrize(
+    "id, head, expected_risk_value",
+    [
+        (Position(4, 5), Position(5, 5), 1 / 3),
+        (Position(4, 5), Position(4, 6), 0),
+        (Position(5, 4), Position(5, 5), 0),  # I'm bigger!
+        (Position(4, 5), Position(4, 4), 1 / 3),
+    ],
+)
+def test_calc_head_collision_risk(
+    test_request_move_me_3, id, head, expected_risk_value
+):
+    board = Board.from_dict(test_request_move_me_3)
+    future_board = FutureBoard(board)
+    future_snakes = [
+        snake
+        for snake in future_board.all_possible_snakes
+        if snake.id == id and snake.head == head
+    ]
+    assert len(future_snakes) == 1
+    f_snake = future_snakes[0]
+    assert future_board.calc_head_collision_risk_for(f_snake) == expected_risk_value

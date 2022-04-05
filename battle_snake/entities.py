@@ -407,6 +407,25 @@ class FutureBoard:
             if snake.id == snake_variant.id
         }
 
+    def calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
+        threading_future_snakes_with_head_collision = [
+            snake
+            for snake in self.all_possible_snakes
+            if snake.head == future_snake.head
+            and len(snake) >= len(future_snake)
+            and snake != future_snake
+        ]
+        no_risk_at_all = len(threading_future_snakes_with_head_collision) == 0
+        if no_risk_at_all:
+            return 0
+        possible_snakes = sum(
+            [
+                len(self.get_variants_of(snake))
+                for snake in threading_future_snakes_with_head_collision
+            ]
+        )
+        return len(threading_future_snakes_with_head_collision) / possible_snakes
+
 
 class GameBoardBounderies:
     def __init__(self, height: int, width: int):
