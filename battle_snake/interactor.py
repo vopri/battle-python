@@ -20,29 +20,29 @@ class MoveDecision:
 
     def __init__(self, game_request: dict):
         self.board: Board = Board.from_dict(game_request)
-        self.risk_tolerance: float = 0
+        self.future_board: FutureBoard = FutureBoard(self.board)
 
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
 
-        future_board: FutureBoard = FutureBoard(self.board)
-        while self._are_there_no_survivors(future_board) and self.risk_tolerance < 1:
-            self._increase_risk_tolerance()
-            future_board = FutureBoard(self.board, risk_tolerance=self.risk_tolerance)
-        if self._are_there_no_survivors(future_board):
-            # die like a snake!
-            return NextStep.UP
-        best_choice_snake: FutureSnake = self._get_best_choice(future_board)
-        return best_choice_snake.get_my_first_step()
+        my_survivors = self.future_board.get_my_survived_snakes()
+        is_no_survivor = len(my_survivors) == 0
+        if is_no_survivor:
+            return self._die_like_a_snake()
+        my_survivors_sorted_by_risk_of_head_collision = sorted(
+            my_survivors,
+            key=self.sort_by_collision_risk_and_available_food,
+            reverse=True,
+        )
+        chosen_snake = my_survivors_sorted_by_risk_of_head_collision.pop()
+        return chosen_snake.get_my_first_step()
 
-    def _increase_risk_tolerance(self):
-        self.risk_tolerance += 10
+    def _die_like_a_snake(self):
+        return NextStep.UP
 
-    def _are_there_no_survivors(self, future_board) -> bool:
-        return len(future_board.get_my_survived_snakes()) < 1
-
-    def _get_best_choice(self, future_board) -> FutureSnake:
-        for snake in future_board.get_my_survived_snakes():
-            if future_board.is_food_available_for(snake):
-                return snake
-        return future_board.get_my_survived_snakes().pop()
+    def sort_by_collision_risk_and_available_food(self, snake: FutureSnake):
+        return (
+            snake.head_collision_risk,
+            # looks funny, but False (0) comes before True (1)
+            not self.future_board.is_food_available_for(snake),
+        )

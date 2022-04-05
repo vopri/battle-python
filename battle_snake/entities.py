@@ -91,7 +91,7 @@ class FutureSnake(Snake):
         self.head_and_body = mother.head_and_body[:]
         self.step_made_to_get_here = next_step
         self.is_me = mother.is_me
-        self.is_food_available = is_food_available
+        self._is_food_available_at_beginning = is_food_available
         self._calculate_future_body()
         # One ID is the same for all possible-future-snakes that is based on one "normal" Snake
         self.id = mother.id
@@ -100,8 +100,8 @@ class FutureSnake(Snake):
     def _calculate_future_body(self):
         self._add_future_head_to_future_snake()
         if self._is_still_baby_snake():
-            self.is_food_available = True
-        if not self.is_food_available:
+            self._is_food_available_at_beginning = True
+        if not self._is_food_available_at_beginning:
             self._remove_tail()
 
     def _add_future_head_to_future_snake(self):
@@ -220,9 +220,9 @@ class FutureBoard:
     Impossible means:
     - running into walls
     - disqualified by eating itself or others
-    - dependending from risk_tolerance:
-        - if 0: not risk tolerant at all -> avoid all possible head collisions with snakes in same size or bigger
-        - if 1: very risk tolerant -> don't care if you would collided with another snake's head
+    - dying snake due to *certain* head  collision with snake of same size or bigger.
+    Snakes with *possible* but not completely certain head collisions will stay on the board.
+    The head collision risk is "remembered" by each survoriving FutureSnake.
 
     All possible head positions are included (pessimistic approach).
     All "eaten" food from the current turn will be removed.
@@ -233,16 +233,14 @@ class FutureBoard:
 
     """
 
-    def __init__(self, board: Board, risk_tolerance: float = 0):
+    def __init__(self, board: Board):
         self._orig_board = board
         self.bounderies: GameBoardBounderies = board.bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[FutureSnake] = []
-        self.risk_tolerance: float = risk_tolerance
         self._add_all_possible_snakes_of_future()
         self._remove_snakes_running_into_walls()
         self._remove_snakes_disqualified_due_to_biting()
-        self._remove_my_snakes_with_possible_head_collision()
         self._calc_head_collision_risks_for_all_possible_snakes()
         self._remove_snakes_which_will_die_by_head_collision()
         self._remove_eaten_food()
@@ -310,19 +308,6 @@ class FutureBoard:
             pos for snake in self.all_possible_snakes for pos in snake.body_without_head
         }
 
-    def _remove_my_snakes_with_possible_head_collision(self):
-        i_dont_care_about_head_collisions = self.risk_tolerance == 1
-        if i_dont_care_about_head_collisions:
-            return
-        my_risky_snake_variants = {
-            snake
-            for snake in self.all_possible_snakes
-            if snake.is_me
-            and self.risk_tolerance < self.calc_snake_head_risk_value(snake.head)
-        }
-        for my_risky_snake in my_risky_snake_variants:
-            self.all_possible_snakes.remove(my_risky_snake)
-
     def _calc_head_collision_risks_for_all_possible_snakes(self):
         for snake in self.all_possible_snakes:
             snake.head_collision_risk = self._calc_head_collision_risk_for(snake)
@@ -334,64 +319,6 @@ class FutureBoard:
     def _remove_food_eaten_by(self, snake: Snake):
         if self.is_food_available_for(snake):
             self.food.remove(snake.head)
-
-    def calc_snake_head_risk_value(self, pos: Position) -> float:
-        """Calculate a risk between 0 and 1 that there's a dangerous snake head.
-
-        Dangerous means that the snake is at least of my lenght.
-        Args:
-            pos (Position): Position to check for
-
-        Returns:
-            float: Risk value as sum of probability of all snakes with their head on this position.
-        """
-        amount_of_variants_per_dangerous_snakes = [
-            (self._count_snakes_by_neck_position(neck_pos))
-            for neck_pos in self._get_danger_snake_neck_id_with_head_on_pos(pos)
-        ]
-        no_risk_at_all = len(amount_of_variants_per_dangerous_snakes) == 0
-        if no_risk_at_all:
-            return 0
-        amount_of_possible_collisions = len(amount_of_variants_per_dangerous_snakes)
-        amount_of_possible_movements_of_dangouers_snakes_in_total = sum(
-            amount_of_variants_per_dangerous_snakes
-        )
-
-        risk_value = (
-            amount_of_possible_collisions
-            / amount_of_possible_movements_of_dangouers_snakes_in_total
-        )
-        return risk_value
-
-    def _count_snakes_by_neck_position(self, pos: Position) -> int:
-        snake_variants = [
-            snake for snake in self.all_possible_snakes if snake.neck == pos
-        ]
-        return len(snake_variants)
-
-    def _get_danger_snake_neck_id_with_head_on_pos(
-        self, head_pos: Position
-    ) -> list[Position]:
-        """Return a list with neck positions of all snakes here, that can be dangerous for me.
-
-        Dangerous means, they are longer or equals long as me.
-        Args:
-            position (Position): Position to check for dangouers snakes.
-
-        Returns:
-            list[Position]: List of neck positions, because the neck is on the same position
-            for all possible variants of 1 snake in the future board of possiblities.
-            The neck of 1 snake in all possible variants can only be on one position.
-            And on one position there can only be one neck.
-        """
-        dangerous_size = len(self._orig_board.my_snake)
-        return [
-            snake.neck
-            for snake in self.all_possible_snakes
-            if snake.head == head_pos
-            and len(snake) >= dangerous_size
-            and not snake.is_me
-        ]
 
     def is_wall(self, pos: Position) -> bool:
         """Check for dangerous wall on given position.

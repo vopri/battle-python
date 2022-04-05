@@ -37,26 +37,7 @@ def test_future_board_all_possible_snakes(test_board: Board):
 
 
 @pytest.mark.parametrize(
-    "position,risk_value_as_str",
-    [
-        (Position(4, 4), "1/3"),  # 2 of 6
-        (Position(6, 4), "1/3"),
-        (Position(8, 6), "0"),
-        (Position(9, 10), "1"),
-        (Position(5, 9), "1/2"),
-        (Position(0, 1), "0"),  # my own head is no risk at all
-    ],
-)
-def test_calc_snake_head_risk_value(test_board: Board, position, risk_value_as_str):
-    future_board = FutureBoard(test_board)
-    risk_value = future_board.calc_snake_head_risk_value(position)
-    assert risk_value >= 0
-    assert risk_value <= 1
-    assert risk_value == eval(risk_value_as_str)
-
-
-@pytest.mark.parametrize(
-    "board_name, risk_tolerance, amount_of_my_survived_snakes",
+    "board_name, risk_tolerance, amount_of_my_survived_snakes_under_risk_tolerance",
     [
         ("test_board", 1, 1),
         ("test_board", 0.5, 1),
@@ -74,20 +55,21 @@ def test_calc_snake_head_risk_value(test_board: Board, position, risk_value_as_s
 def test_get_my_survived_snakes(
     board_name: str,
     risk_tolerance: float,
-    amount_of_my_survived_snakes: int,
+    amount_of_my_survived_snakes_under_risk_tolerance: int,
     request: pytest.FixtureRequest,
 ):
     board = request.getfixturevalue(board_name)
-    future_board = FutureBoard(board, risk_tolerance=risk_tolerance)
-    snakes = future_board.get_my_survived_snakes()
-    assert len(snakes) == amount_of_my_survived_snakes
+    future_board = FutureBoard(board)
+    snakes = [
+        snake
+        for snake in future_board.get_my_survived_snakes()
+        if snake.head_collision_risk <= risk_tolerance
+    ]
+    assert len(snakes) == amount_of_my_survived_snakes_under_risk_tolerance
 
 
 def test_get_my_survived_snakes_combinations(almost_empty_board_request):
-    future_board = FutureBoard(
-        Board.from_dict(almost_empty_board_request),
-        risk_tolerance=0,
-    )
+    future_board = FutureBoard(Board.from_dict(almost_empty_board_request))
     assert len(future_board.all_possible_snakes) == 2
 
 
