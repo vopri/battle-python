@@ -1,5 +1,12 @@
 import pytest
-from battle_snake.entities import Board, FutureSnake, NextStep, Position, Snake
+from battle_snake.entities import (
+    Board,
+    FutureSnake,
+    GameBoardBounderies,
+    NextStep,
+    Position,
+    Snake,
+)
 
 
 def test_future_snake_init(sample_snake: Snake):
@@ -116,3 +123,17 @@ def test_get_my_first_next_step(
     snake = request.getfixturevalue(snake_name)
     future_snake = snake.calculate_future_snake(next_step)
     assert future_snake.get_my_first_step() == next_step
+
+
+def test_future_snake_of_future_snake():
+    snake = Snake([Position(5, 5)], is_me=True)
+    future_snake = snake.calculate_future_snake(NextStep.DOWN)
+    future_snake = future_snake.calculate_future_snake(NextStep.DOWN)
+    future_snake = future_snake.calculate_future_snake(NextStep.RIGHT)
+    future_snake = future_snake.calculate_future_snake(NextStep.UP)
+    future_snake = future_snake.calculate_future_snake(
+        NextStep.LEFT, is_food_available=True
+    )
+    assert future_snake.head == Position(5, 4)
+    assert len(future_snake) == 4
+    assert future_snake.get_my_first_step() == NextStep.DOWN

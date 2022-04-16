@@ -15,6 +15,10 @@ class Position:
     y: int
 
 
+class BattleSnakeException(Exception):
+    ...
+
+
 class Snake:
     """Representation of one single snake.
 
@@ -87,7 +91,7 @@ class FutureSnake(Snake):
         FutureSnake: Brand new 'theoretical' snake how it would look like in the future after the next step."""
 
     def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
-        self.mother = mother
+        self.mother: Snake | FutureSnake = mother
         self.head_and_body = mother.head_and_body[:]
         self.step_made_to_get_here = next_step
         self.is_me = mother.is_me
@@ -137,6 +141,10 @@ class FutureSnake(Snake):
         while True:
             if type(snake.mother) == Snake:
                 break
+            elif type(snake.mother) == self.__class__:
+                snake = snake.mother  # type: ignore
+            else:
+                raise BattleSnakeException()
         return snake
 
 
