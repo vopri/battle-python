@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Iterable
 
 
 class NextStep(Enum):
@@ -242,26 +243,28 @@ class FutureBoard:
     """
 
     def __init__(self, board: Board):
-        self._orig_board = board
         self.bounderies: GameBoardBounderies = board.bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: list[FutureSnake] = []
-        self._add_all_possible_snakes_of_future()
+        self._prepare_future_board(board.snakes)
+
+    def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
+        self.all_possible_snakes.clear()
+        self._add_all_possible_snakes_of_future(orig_snakes)
         self._remove_snakes_running_into_walls()
         self._remove_snakes_disqualified_due_to_biting()
         self._calc_head_collision_risks_for_all_possible_snakes()
         self._remove_snakes_which_will_die_by_head_collision()
-        self._remove_eaten_food()
+        self._remove_eaten_food(orig_snakes)
 
-    def _add_all_possible_snakes_of_future(self):
+    def _add_all_possible_snakes_of_future(self, orig_snakes: Iterable[Snake]):
         """Add all possible snakes (including mine) to the board.
 
         - All snakes that do not bite itself.
         - There are up to 3 snake-copies in the future board for every
         original snake, 1 for every direction (as long as it doesn't bite itself)
         """
-        snakes_of_mother_board = self._orig_board.snakes
-        for original_snake in snakes_of_mother_board:
+        for original_snake in orig_snakes:
             self._add_all_possible_variants_of_one_snake_to_future_board(original_snake)
 
     def _add_all_possible_variants_of_one_snake_to_future_board(self, original_snake):
@@ -320,8 +323,27 @@ class FutureBoard:
         for snake in self.all_possible_snakes:
             snake.head_collision_risk = self._calc_head_collision_risk_for(snake)
 
-    def _remove_eaten_food(self):
-        for snake in self._orig_board.snakes:
+    def _calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
+        threading_future_snakes_with_head_collision = [
+            snake
+            for snake in self.all_possible_snakes
+            if snake.head == future_snake.head
+            and len(snake) >= len(future_snake)
+            and snake != future_snake
+        ]
+        no_risk_at_all = len(threading_future_snakes_with_head_collision) == 0
+        if no_risk_at_all:
+            return 0
+        possible_snakes = sum(
+            [
+                len(self._get_variants_of(snake))
+                for snake in threading_future_snakes_with_head_collision
+            ]
+        )
+        return len(threading_future_snakes_with_head_collision) / possible_snakes
+
+    def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
+        for snake in orig_snakes:
             self._remove_food_eaten_by(snake)
 
     def _remove_food_eaten_by(self, snake: Snake):
@@ -349,29 +371,14 @@ class FutureBoard:
             if snake.id == snake_variant.id
         }
 
-    def _calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
-        threading_future_snakes_with_head_collision = [
-            snake
-            for snake in self.all_possible_snakes
-            if snake.head == future_snake.head
-            and len(snake) >= len(future_snake)
-            and snake != future_snake
-        ]
-        no_risk_at_all = len(threading_future_snakes_with_head_collision) == 0
-        if no_risk_at_all:
-            return 0
-        possible_snakes = sum(
-            [
-                len(self._get_variants_of(snake))
-                for snake in threading_future_snakes_with_head_collision
-            ]
-        )
-        return len(threading_future_snakes_with_head_collision) / possible_snakes
-
     def _remove_snakes_which_will_die_by_head_collision(self):
         for snake in self.all_possible_snakes:
             if snake.head_collision_risk == 1:
                 self.all_possible_snakes.remove(snake)
+
+    def next_turn(self) -> None:
+        orig_snakes = self.all_possible_snakes[:]
+        self._prepare_future_board(orig_snakes)
 
 
 class GameBoardBounderies:

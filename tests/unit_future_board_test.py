@@ -1,5 +1,12 @@
 import pytest
-from battle_snake.entities import Board, FutureBoard, NextStep, Position
+from battle_snake.entities import (
+    Board,
+    FutureBoard,
+    GameBoardBounderies,
+    NextStep,
+    Position,
+    Snake,
+)
 
 
 def test_future_board_init(test_board: Board):
@@ -148,3 +155,16 @@ def test_remove_future_snake_head_collision_risk(test_request_move_me_4):
     assert len(future_snakes) == 1
     f_snake = future_snakes[0]
     assert f_snake.head_collision_risk == 0
+
+
+def test_future_board_several_turns():
+    snake = Snake([Position(5, 5)], is_me=True)
+    board = Board(GameBoardBounderies(11, 11), food={Position(4, 5)}, snakes={snake})
+    future_board = FutureBoard(board)
+    assert len(future_board.get_my_survived_snakes()) == 4
+    assert len(future_board.food) == 1
+    future_board.next_turn()
+    assert len(future_board.get_my_survived_snakes()) == 12
+    assert len(future_board.food) == 0
+    # for snake in future_board.get_my_survived_snakes():
+    #     assert snake.head_collision_risk == 0
