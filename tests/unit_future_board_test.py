@@ -87,7 +87,7 @@ def test_find_variants_of_snake(test_request_move_me_3):
     future_board = FutureBoard(board)
     future_snakes = list(future_board.get_my_survived_snakes())
     one_future_snake = future_snakes[0]
-    future_variants = future_board.get_variants_of(one_future_snake)
+    future_variants = future_board._get_variants_of(one_future_snake)
     assert future_variants == set(future_snakes)
 
 

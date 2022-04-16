@@ -334,7 +334,7 @@ class FutureBoard:
     def get_my_survived_snakes(self) -> set[FutureSnake]:
         return {snake for snake in self.all_possible_snakes if snake.is_me}
 
-    def get_variants_of(self, snake: FutureSnake) -> set[FutureSnake]:
+    def _get_variants_of(self, snake: FutureSnake) -> set[FutureSnake]:
         return {
             snake_variant
             for snake_variant in self.all_possible_snakes
@@ -354,7 +354,7 @@ class FutureBoard:
             return 0
         possible_snakes = sum(
             [
-                len(self.get_variants_of(snake))
+                len(self._get_variants_of(snake))
                 for snake in threading_future_snakes_with_head_collision
             ]
         )

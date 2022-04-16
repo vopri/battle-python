@@ -1,4 +1,4 @@
-from battle_snake.entities import Board, FutureBoard, FutureSnake, NextStep, Position
+from battle_snake.entities import Board, FutureBoard, FutureSnake, NextStep
 
 
 def get_info() -> dict:
