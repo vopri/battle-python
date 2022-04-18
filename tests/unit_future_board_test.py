@@ -166,5 +166,5 @@ def test_future_board_several_turns():
     future_board.next_turn()
     assert len(future_board.get_my_survived_snakes()) == 12
     assert len(future_board.food) == 0
-    # for snake in future_board.get_my_survived_snakes():
-    #     assert snake.head_collision_risk == 0
+    for snake in future_board.get_my_survived_snakes():
+        assert snake.head_collision_risk == 0

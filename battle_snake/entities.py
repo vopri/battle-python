@@ -324,23 +324,40 @@ class FutureBoard:
             snake.head_collision_risk = self._calc_head_collision_risk_for(snake)
 
     def _calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
-        threading_future_snakes_with_head_collision = [
-            snake
-            for snake in self.all_possible_snakes
-            if snake.head == future_snake.head
-            and len(snake) >= len(future_snake)
-            and snake != future_snake
-        ]
-        no_risk_at_all = len(threading_future_snakes_with_head_collision) == 0
+        dangerous_snakes = self._get_other_longer_snakes_with_possible_head_collision(
+            future_snake
+        )
+        no_risk_at_all = len(dangerous_snakes) == 0
         if no_risk_at_all:
             return 0
         possible_snakes = sum(
-            [
-                len(self._get_variants_of(snake))
-                for snake in threading_future_snakes_with_head_collision
-            ]
+            [len(self._get_variants_of(snake)) for snake in dangerous_snakes]
         )
-        return len(threading_future_snakes_with_head_collision) / possible_snakes
+        return len(dangerous_snakes) / possible_snakes
+
+    def _get_other_longer_snakes_with_possible_head_collision(
+        self, future_snake: FutureSnake
+    ) -> list[FutureSnake]:
+        return [
+            some_snake
+            for some_snake in self.all_possible_snakes
+            if self._will_heads_collide(some_snake, future_snake)
+            and self._is_snakes_lenght_dangerous(some_snake, future_snake)
+            and self._is_really_another_snake_and_not_just_a_variant(
+                some_snake, future_snake
+            )
+        ]
+
+    def _will_heads_collide(self, some_snake: FutureSnake, other_snake: FutureSnake):
+        return some_snake.head == other_snake.head
+
+    def _is_snakes_lenght_dangerous(self, some_snake, other_snake: FutureSnake):
+        return len(some_snake) >= len(other_snake)
+
+    def _is_really_another_snake_and_not_just_a_variant(
+        self, some_snake: FutureSnake, other_snake: FutureSnake
+    ):
+        return some_snake.id != other_snake.id
 
     def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
         for snake in orig_snakes:
