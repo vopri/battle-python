@@ -324,16 +324,23 @@ class FutureBoard:
             snake.head_collision_risk = self._calc_head_collision_risk_for(snake)
 
     def _calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
-        dangerous_snakes = self._get_other_longer_snakes_with_possible_head_collision(
-            future_snake
+        """Calculate probability of dangerous head collision for one future snake
+
+        Probability = amount of results leading to event / possible results
+        'amount of results leading to event' is here: amount of all variants of dangerous snakes
+        'possible results' is here: amount of all possible snakes
+        """
+        dangerous_snake_variants = (
+            self._get_other_longer_snakes_with_possible_head_collision(future_snake)
         )
-        no_risk_at_all = len(dangerous_snakes) == 0
+        no_risk_at_all = len(dangerous_snake_variants) == 0
         if no_risk_at_all:
             return 0
-        possible_snakes = sum(
-            [len(self._get_variants_of(snake)) for snake in dangerous_snakes]
+        amount_of_possible_snakes = sum(
+            self._get_possible_results_per_snake(dangerous_snake_variants)
         )
-        return len(dangerous_snakes) / possible_snakes
+        amount_of_dangerous_snake_variants = len(dangerous_snake_variants)
+        return amount_of_dangerous_snake_variants / amount_of_possible_snakes
 
     def _get_other_longer_snakes_with_possible_head_collision(
         self, future_snake: FutureSnake
@@ -358,6 +365,9 @@ class FutureBoard:
         self, some_snake: FutureSnake, other_snake: FutureSnake
     ):
         return some_snake.id != other_snake.id
+
+    def _get_possible_results_per_snake(self, dangerous_snakes):
+        return [len(self._get_variants_of(snake)) for snake in dangerous_snakes]
 
     def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
         for snake in orig_snakes:
