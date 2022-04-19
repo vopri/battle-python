@@ -349,7 +349,9 @@ class FutureBoard:
             some_snake
             for some_snake in self.all_possible_snakes
             if self._will_heads_collide(some_snake, future_snake)
-            and self._is_snakes_lenght_dangerous(some_snake, future_snake)
+            and self._is_lenght_of_some_snake_dangerous_for_future_snake(
+                some_snake, future_snake
+            )
             and self._is_really_another_snake_and_not_just_a_variant(
                 some_snake, future_snake
             )
@@ -358,13 +360,15 @@ class FutureBoard:
     def _will_heads_collide(self, some_snake: FutureSnake, other_snake: FutureSnake):
         return some_snake.head == other_snake.head
 
-    def _is_snakes_lenght_dangerous(self, some_snake, other_snake: FutureSnake):
-        return len(some_snake) >= len(other_snake)
+    def _is_lenght_of_some_snake_dangerous_for_future_snake(
+        self, some_snake, future_snake: FutureSnake
+    ):
+        return len(some_snake) >= len(future_snake)
 
     def _is_really_another_snake_and_not_just_a_variant(
-        self, some_snake: FutureSnake, other_snake: FutureSnake
+        self, some_snake: FutureSnake, future_snake: FutureSnake
     ):
-        return some_snake.id != other_snake.id
+        return some_snake.id != future_snake.id
 
     def _get_possible_results_per_snake(self, dangerous_snakes):
         return [len(self._get_variants_of(snake)) for snake in dangerous_snakes]
