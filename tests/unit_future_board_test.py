@@ -157,7 +157,7 @@ def test_remove_future_snake_head_collision_risk(test_request_move_me_4):
     assert f_snake.head_collision_risk == 0
 
 
-def test_future_board_several_turns():
+def test_simple_future_board_several_turns():
     snake = Snake([Position(5, 5)], is_me=True)
     board = Board(GameBoardBounderies(11, 11), food={Position(4, 5)}, snakes={snake})
     future_board = FutureBoard(board)
@@ -168,3 +168,39 @@ def test_future_board_several_turns():
     assert len(future_board.food) == 0
     for snake in future_board.get_my_survived_snakes():
         assert snake.head_collision_risk == 0
+
+
+def test_complex_future_board_several_turns(test_request_move_me_3):
+    board = Board.from_dict(test_request_move_me_3)
+    future_board = FutureBoard(board)
+    future_board.next_turn()
+    assert len(future_board.get_my_survived_snakes()) == 9
+
+
+def test_simple_future_board_several_turns_walls():
+    snake = Snake([Position(0, 0)], is_me=True)
+    board = Board(GameBoardBounderies(11, 11), food=set(), snakes={snake})
+    future_board = FutureBoard(board)
+    future_board.next_turn()
+    assert len(future_board.get_my_survived_snakes()) == 4
+    future_board.next_turn()
+    assert len(future_board.get_my_survived_snakes()) == 8
+    future_board.next_turn()
+    assert len(future_board.get_my_survived_snakes()) == 16
+    future_board.next_turn()
+    assert len(future_board.get_my_survived_snakes()) == 32
+
+
+def test_simple_future_board_several_turns_biting():
+    snake = Snake([Position(0, 0)], is_me=True)
+    other_snake = Snake([Position(2, 0)], is_me=False)
+    board = Board(GameBoardBounderies(11, 11), food=set(), snakes={snake, other_snake})
+    future_board = FutureBoard(board)
+    interesting_snake = [
+        snake
+        for snake in future_board.get_my_survived_snakes()
+        if snake.head == Position(1, 0)
+    ][0]
+    assert interesting_snake.head_collision_risk == 1 / 3
+    future_board.next_turn()
+    assert len(future_board.get_my_survived_snakes()) == 3
