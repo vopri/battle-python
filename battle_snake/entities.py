@@ -326,9 +326,23 @@ class FutureBoard:
     def _calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
         """Calculate probability of dangerous head collision for one future snake
 
-        Probability = amount of results leading to event / possible results
-        'amount of results leading to event' is here: amount of all variants of dangerous snakes
-        'possible results' is here: amount of all possible snakes
+        We are coping with probability for non-mutually exclusive events!
+        Calculation of the probability of snakehead collisions is done using the addition rule.
+        The probability of several non-mutually exclusive events (like in this case) can be calculated using the rules of De Morgan.
+
+        P(S1 ∪ S2 ∪ S3) = 1 - (1-P(S1) * 1-P(S2) * 1-P(S3)).
+
+        P(S1) is calculated as 1/(amount of variants, i.e. possible moves, of snake S1)
+
+        Example 1: There are 2 snakes (A & B) that could collide with the investigated snake here
+        * Snake A: collides with P(1/2)=50% (1 out of 2 possible moves)
+        * Snake B: collides with P(1/3)=33% (1 out of 3 possible moves)
+        * Calculation: 1 - (1/2 * 2/3) = 2/3 = 66%
+
+        * Example 2:
+        * Snake A: collides with probability of 100% (1 / 1 possible moves)
+        * Snake B: collides with probability of 1/3 = 33% (1 / 3 possible moves)
+        * Calculatoin: 1 - (0 * 2/3) = 1 = 100%
         """
         dangerous_snake_variants = (
             self._get_other_longer_snakes_with_possible_head_collision(future_snake)
