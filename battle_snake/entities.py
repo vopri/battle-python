@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from enum import Enum
 from typing import Iterable
@@ -93,7 +94,7 @@ class FutureSnake(Snake):
 
     def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
         self.mother: Snake | FutureSnake = mother
-        self.head_and_body = mother.head_and_body[:]
+        self.head_and_body = mother.head_and_body.copy()
         self.step_made_to_get_here = next_step
         self.is_me = mother.is_me
         self._is_food_available_at_beginning = is_food_available
@@ -147,6 +148,9 @@ class FutureSnake(Snake):
             else:
                 raise BattleSnakeException()
         return snake
+
+    def __repr__(self) -> str:
+        return f"FutureSnake: ID={self.id}, HEAD={self.head}, MOTHER={self.mother.head}"
 
 
 class SnakeVisualizer:
@@ -327,8 +331,9 @@ class FutureBoard:
         """Calculate probability of dangerous head collision for one future snake
 
         We are coping with probability for non-mutually exclusive events!
-        Calculation of the probability of snakehead collisions is done using the addition rule.
-        The probability of several non-mutually exclusive events (like in this case) can be calculated using the rules of De Morgan.
+        Calculation of the probability of snake head collisions is done using the addition rule.
+        The probability of several non-mutually exclusive events (like in this case) can be calculated
+        using the rules of De Morgan.
 
         P(S1 ∪ S2 ∪ S3) = 1 - (1-P(S1) * 1-P(S2) * 1-P(S3)).
 
@@ -344,32 +349,38 @@ class FutureBoard:
         * Snake B: collides with probability of 1/3 = 33% (1 / 3 possible moves)
         * Calculatoin: 1 - (0 * 2/3) = 1 = 100%
         """
-        dangerous_snake_variants = (
-            self._get_other_longer_snakes_with_possible_head_collision(future_snake)
-        )
-        no_risk_at_all = len(dangerous_snake_variants) == 0
-        if no_risk_at_all:
+        dangerous_snakes = self._get_future_dangerous_snakes(future_snake)
+        if not dangerous_snakes:
             return 0
-        amount_of_possible_snakes = sum(
-            self._get_possible_results_per_snake(dangerous_snake_variants)
+        amount_of_moves_of_dangerour_snakes = (
+            self._get_possible_moves_of_dangerous_snakes(dangerous_snakes)
         )
-        amount_of_dangerous_snake_variants = len(dangerous_snake_variants)
-        return amount_of_dangerous_snake_variants / amount_of_possible_snakes
+        inverse_risks_of_dangrous_snake_head_collisions = [
+            1 - (1 / amount_of_moves)
+            for amount_of_moves in amount_of_moves_of_dangerour_snakes
+        ]
+        total_risk = 1 - math.prod(inverse_risks_of_dangrous_snake_head_collisions)
+        return total_risk
 
-    def _get_other_longer_snakes_with_possible_head_collision(
+    def _get_future_dangerous_snakes(
         self, future_snake: FutureSnake
-    ) -> list[FutureSnake]:
-        return [
+    ) -> Iterable[FutureSnake]:
+        """Get future snakes that are dangerous in sense of head collision.
+
+        Args:
+            future_snake (FutureSnake): FutureSnake that head collision risk is calculated for
+        """
+        return {
             some_snake
             for some_snake in self.all_possible_snakes
             if self._will_heads_collide(some_snake, future_snake)
             and self._is_lenght_of_some_snake_dangerous_for_future_snake(
                 some_snake, future_snake
             )
-            and self._is_really_another_snake_and_not_just_a_variant(
+            and self._is_really_another_snake_and_not_just_a_variant_of_myself(
                 some_snake, future_snake
             )
-        ]
+        }
 
     def _will_heads_collide(self, some_snake: FutureSnake, other_snake: FutureSnake):
         return some_snake.head == other_snake.head
@@ -379,13 +390,27 @@ class FutureBoard:
     ):
         return len(some_snake) >= len(future_snake)
 
-    def _is_really_another_snake_and_not_just_a_variant(
+    def _is_really_another_snake_and_not_just_a_variant_of_myself(
         self, some_snake: FutureSnake, future_snake: FutureSnake
     ):
         return some_snake.id != future_snake.id
 
-    def _get_possible_results_per_snake(self, dangerous_snakes):
-        return [len(self._get_variants_of(snake)) for snake in dangerous_snakes]
+    def _get_possible_moves_of_dangerous_snakes(
+        self, dangerous_snakes
+    ) -> Iterable[int]:
+        return {
+            self._count_dangerous_snake_and_siblings(dangrous_snake)
+            for dangrous_snake in dangerous_snakes
+        }
+
+    def _count_dangerous_snake_and_siblings(self, dangrous_snake) -> int:
+        snakes = {
+            snake
+            for snake in self.all_possible_snakes
+            if snake.id == dangrous_snake.id
+            and snake.mother.head == dangrous_snake.mother.head
+        }
+        return len(snakes)
 
     def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
         for snake in orig_snakes:
@@ -409,20 +434,13 @@ class FutureBoard:
     def get_my_survived_snakes(self) -> set[FutureSnake]:
         return {snake for snake in self.all_possible_snakes if snake.is_me}
 
-    def _get_variants_of(self, snake: FutureSnake) -> set[FutureSnake]:
-        return {
-            snake_variant
-            for snake_variant in self.all_possible_snakes
-            if snake.id == snake_variant.id
-        }
-
     def _remove_snakes_which_will_die_by_head_collision(self):
-        for snake in self.all_possible_snakes:
+        for snake in self.all_possible_snakes.copy():
             if snake.head_collision_risk == 1:
                 self.all_possible_snakes.remove(snake)
 
     def next_turn(self) -> None:
-        orig_snakes = self.all_possible_snakes[:]
+        orig_snakes = self.all_possible_snakes.copy()
         self._prepare_future_board(orig_snakes)
 
 
