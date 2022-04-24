@@ -325,9 +325,9 @@ class FutureBoard:
 
     def _calc_head_collision_risks_for_all_possible_snakes(self):
         for snake in self.all_possible_snakes:
-            snake.head_collision_risk = self._calc_head_collision_risk_for(snake)
+            snake.head_collision_risk = self.calc_head_collision_risk_for(snake)
 
-    def _calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
+    def calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
         """Calculate probability of dangerous head collision for one future snake
 
         We are coping with probability for non-mutually exclusive events!
