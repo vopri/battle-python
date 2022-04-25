@@ -50,7 +50,7 @@ def test_future_board_all_possible_snakes(test_board: Board):
         ("test_board", 1, 1),
         ("test_board", 0.5, 1),
         ("sample_board_move_me_1", 1, 1),
-        ("sample_board_move_me_1", 0, 1),
+        ("sample_board_move_me_1", 0, 0),
         ("sample_board_move_me_1", 0.5, 1),
         ("sample_board_move_me_1", 0.4, 1),
         ("sample_board_move_me_2", 1, 3),
@@ -142,7 +142,8 @@ def test_remove_future_snake_head_collision_risk(test_request_move_me_4):
         for snake in future_board.all_possible_snakes
         if snake.id == Position(3, 2)
     ]
-    assert len(future_snakes) == 0
+    assert len(future_snakes) == 1
+    assert future_board.calc_head_collision_risk_for(future_snakes[0]) == 1
     future_snakes = [
         snake
         for snake in future_board.all_possible_snakes
@@ -201,4 +202,4 @@ def test_simple_future_board_several_turns_biting():
         interesting_snake
     ) == pytest.approx(1 / 3, rel=1e-3)
     future_board.next_turn()
-    assert len(future_board.get_my_survived_snakes()) == 1
+    assert len(future_board.get_my_survived_snakes()) == 3

@@ -42,7 +42,7 @@ class MoveDecision:
 
     def sort_by_collision_risk_and_available_food(self, snake: FutureSnake):
         return (
-            snake.head_collision_risk,
+            self.future_board.calc_head_collision_risk_for(snake),
             # looks funny, but False (0) comes before True (1)
             not self.future_board.is_food_available_for(snake),
         )

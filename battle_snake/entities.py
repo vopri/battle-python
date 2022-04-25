@@ -101,7 +101,6 @@ class FutureSnake(Snake):
         self._calculate_future_body()
         # One ID is the same for all possible-future-snakes that is based on one "normal" Snake
         self.id = mother.id
-        self.head_collision_risk: float = -1
 
     def _calculate_future_body(self):
         self._add_future_head_to_future_snake()
@@ -227,15 +226,15 @@ class FutureBoard:
     Deterministic is the body of all snakes.
     Unclear is the position of their heads.
 
-    This method will include all possible snakes, including mine.
+    This method will include all possible snakes, including "mine".
     "Impossible snakes" will be removed.
 
     Impossible means:
     - running into walls
     - disqualified by eating itself or others
-    - dying snake due to *certain* head  collision with snake of same size or bigger.
+    - only after using next_turn: dying snake due to *certain* head  collision with snake of same size or bigger.
     Snakes with *possible* but not completely certain head collisions will stay on the board.
-    The head collision risk is "remembered" by each survoriving FutureSnake.
+    The head collision risk can be calculated per FutureSnake dynamically.
 
     All possible head positions are included (pessimistic approach).
     All "eaten" food from the current turn will be removed.
@@ -257,8 +256,6 @@ class FutureBoard:
         self._add_all_possible_snakes_of_future(orig_snakes)
         self._remove_snakes_running_into_walls()
         self._remove_snakes_disqualified_due_to_biting()
-        self._calc_head_collision_risks_for_all_possible_snakes()
-        self._remove_snakes_which_will_die_by_head_collision()
         self._remove_eaten_food(orig_snakes)
 
     def _add_all_possible_snakes_of_future(self, orig_snakes: Iterable[Snake]):
@@ -322,10 +319,6 @@ class FutureBoard:
         return {
             pos for snake in self.all_possible_snakes for pos in snake.body_without_head
         }
-
-    def _calc_head_collision_risks_for_all_possible_snakes(self):
-        for snake in self.all_possible_snakes:
-            snake.head_collision_risk = self.calc_head_collision_risk_for(snake)
 
     def calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
         """Calculate probability of dangerous head collision for one future snake
@@ -436,10 +429,15 @@ class FutureBoard:
 
     def _remove_snakes_which_will_die_by_head_collision(self):
         for snake in self.all_possible_snakes.copy():
-            if snake.head_collision_risk == 1:
+            if self.calc_head_collision_risk_for(snake) == 1:
                 self.all_possible_snakes.remove(snake)
 
     def next_turn(self) -> None:
+        # Removal of head-collision snakes during next_turn only
+        # (instead of during init of Board),
+        # because otherwise the removal would have unwanted side effects
+        # on calculation of head collision risk
+        self._remove_snakes_which_will_die_by_head_collision()
         orig_snakes = self.all_possible_snakes.copy()
         self._prepare_future_board(orig_snakes)
 
