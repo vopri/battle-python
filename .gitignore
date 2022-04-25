@@ -5,5 +5,5 @@ __pycache__/
 .idea
 .vscode
 docs/ideen.md
-docs/overview.puml
+tests/*herumtesten.xlsx
 .coverage
