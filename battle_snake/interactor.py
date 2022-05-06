@@ -1,3 +1,5 @@
+import time
+from copy import deepcopy
 from typing import Optional
 
 from battle_snake.entities import Board, FutureBoard, FutureSnake, NextStep
@@ -21,15 +23,20 @@ class MoveDecision:
     """Decision maker for the next move of my snake."""
 
     def __init__(self, game_request: dict):
+        self._start_time: int = time.perf_counter_ns()
         self.board: Board = Board.from_dict(game_request)
         self.future_board: FutureBoard = FutureBoard(self.board)
 
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
 
-        max_turns_to_check_ahead = 5
+        max_turns_to_check_ahead = 10
+        stop_latest_after_ns = 1_000_000 * 300
+        backup_of_first_future_board = deepcopy(self.future_board)
         my_survivors: Optional[set[FutureSnake]] = None
         for _ in range(max_turns_to_check_ahead):
+            if time.perf_counter_ns() - self._start_time > stop_latest_after_ns:
+                break
             my_survivors_of_this_turn = self.future_board.get_my_survived_snakes()
             if len(my_survivors_of_this_turn) == 0:
                 break
@@ -47,7 +54,7 @@ class MoveDecision:
                 snake.find_first_future_snake_of_my_ancestors()
                 for snake in my_survivors
             }
-            self.future_board = FutureBoard(self.board)
+        self.future_board = backup_of_first_future_board
         my_survivors_sorted_by_risk_of_head_collision = sorted(
             mothers_of_survivors,
             key=self.sort_by_collision_risk_and_available_food,
