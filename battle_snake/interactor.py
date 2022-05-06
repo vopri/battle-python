@@ -1,3 +1,5 @@
+from typing import Optional
+
 from battle_snake.entities import Board, FutureBoard, FutureSnake, NextStep
 
 
@@ -25,12 +27,29 @@ class MoveDecision:
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
 
-        my_survivors = self.future_board.get_my_survived_snakes()
-        is_no_survivor = len(my_survivors) == 0
-        if is_no_survivor:
+        max_turns_to_check_ahead = 5
+        my_survivors: Optional[set[FutureSnake]] = None
+        for _ in range(max_turns_to_check_ahead):
+            my_survivors_of_this_turn = self.future_board.get_my_survived_snakes()
+            if len(my_survivors_of_this_turn) == 0:
+                break
+            my_survivors = my_survivors_of_this_turn
+            if len(my_survivors_of_this_turn) == 1:
+                break
+            else:
+                self.future_board.next_turn()
+        if my_survivors is None:
             return self._die_like_a_snake()
+        elif len(my_survivors) == 1:
+            return my_survivors.pop().get_my_first_step()
+        else:
+            mothers_of_survivors = {
+                snake.find_first_future_snake_of_my_ancestors()
+                for snake in my_survivors
+            }
+            self.future_board = FutureBoard(self.board)
         my_survivors_sorted_by_risk_of_head_collision = sorted(
-            my_survivors,
+            mothers_of_survivors,
             key=self.sort_by_collision_risk_and_available_food,
             reverse=True,
         )

@@ -3,7 +3,6 @@ from battle_snake.entities import (
     Board,
     FutureBoard,
     GameBoardBounderies,
-    NextStep,
     Position,
     Snake,
 )
@@ -48,9 +47,8 @@ def test_board_init(sample_request):
     snake: Snake = [
         snake for snake in board.snakes if snake.head == Position(5, 4)
     ].pop()
-
-    assert len(snake) == 4  # type: ignore
-    assert snake.head_and_body[-1] == Position(6, 2)  # type: ignore
+    assert len(snake) == 4
+    assert snake.head_and_body[-1] == Position(6, 2)
     assert board.my_snake.is_me
     assert snake.is_me == False
 

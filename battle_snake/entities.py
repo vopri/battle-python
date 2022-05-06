@@ -134,10 +134,10 @@ class FutureSnake(Snake):
     def get_my_first_step(self) -> NextStep:
         """Get the first step from the first FutureSnake in this line of relatives"""
 
-        first_future_snake = self._find_first_future_snake_of_my_ancestors()
+        first_future_snake = self.find_first_future_snake_of_my_ancestors()
         return first_future_snake.step_made_to_get_here
 
-    def _find_first_future_snake_of_my_ancestors(self):
+    def find_first_future_snake_of_my_ancestors(self):
         snake: FutureSnake = self
         while True:
             if type(snake.mother) == Snake:
