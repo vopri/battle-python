@@ -248,7 +248,7 @@ class FutureBoard:
     def __init__(self, board: Board):
         self.bounderies: GameBoardBounderies = board.bounderies
         self.food: set[Position] = {food for food in board.food}
-        self.all_possible_snakes: list[FutureSnake] = []
+        self.all_possible_snakes: set[FutureSnake] = set()
         self._prepare_future_board(board.snakes)
 
     def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
@@ -271,7 +271,7 @@ class FutureBoard:
     def _add_all_possible_variants_of_one_snake_to_future_board(self, original_snake):
         for next_possible_step in self._get_all_possible_steps():
             future_snake = self._make_future_snake(original_snake, next_possible_step)
-            self.all_possible_snakes.append(future_snake)
+            self.all_possible_snakes.add(future_snake)
 
     def _get_all_possible_steps(self):
         return (
@@ -291,9 +291,9 @@ class FutureBoard:
         return snake.head in self.food
 
     def _remove_snakes_running_into_walls(self):
-        self.all_possible_snakes = [
+        self.all_possible_snakes = {
             snake for snake in self.all_possible_snakes if not self.is_wall(snake.head)
-        ]
+        }
 
     def _remove_snakes_disqualified_due_to_biting(self):
         """All snakes that are *defenitely* diqualified, because biting another snake or itself are removed.
@@ -306,11 +306,11 @@ class FutureBoard:
         into another body (excl. head).
         """
 
-        self.all_possible_snakes = [
+        self.all_possible_snakes = {
             snake
             for snake in self.all_possible_snakes
             if not self._is_disqualified_due_to_biting(snake)
-        ]
+        }
 
     def _is_disqualified_due_to_biting(self, snake) -> bool:
         return snake.head in self._get_all_body_fields()
