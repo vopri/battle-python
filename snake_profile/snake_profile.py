@@ -1,5 +1,6 @@
 import json
 import sys
+import time
 from pathlib import Path
 
 from battle_snake.interactor import MoveDecision
@@ -14,6 +15,8 @@ if not sample_request.exists():
     )
     sys.exit(1)
 request = json.loads(sample_request.read_text())
+start = time.perf_counter()
 md = MoveDecision(request)
 decision = md.decide()
+print(time.perf_counter() - start)
 print(decision)

@@ -7,4 +7,4 @@ __pycache__/
 docs/ideen.md
 tests/*herumtesten.xlsx
 .coverage
-snake_profile/snake.prof
+snake_profile/*.prof

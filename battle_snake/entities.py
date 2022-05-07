@@ -249,12 +249,14 @@ class FutureBoard:
         self.bounderies: GameBoardBounderies = board.bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: set[FutureSnake] = set()
+        self._positions_of_all_snakes_bodies: set[Position] = set()
         self._prepare_future_board(board.snakes)
         self._simulated_turns: int = 1
 
     def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
         self.all_possible_snakes.clear()
         self._add_all_possible_snakes_of_future(orig_snakes)
+        self._positions_of_all_snakes_bodies = self._calc_all_body_fields()
         self._remove_snakes_running_into_walls()
         self._remove_snakes_disqualified_due_to_biting()
         self._remove_eaten_food(orig_snakes)
@@ -316,10 +318,13 @@ class FutureBoard:
     def _is_disqualified_due_to_biting(self, snake) -> bool:
         return snake.head in self._get_all_body_fields()
 
-    def _get_all_body_fields(self) -> set[Position]:
+    def _calc_all_body_fields(self) -> set[Position]:
         return {
             pos for snake in self.all_possible_snakes for pos in snake.body_without_head
         }
+
+    def _get_all_body_fields(self) -> set[Position]:
+        return self._positions_of_all_snakes_bodies
 
     def calc_head_collision_risk_for(self, future_snake: FutureSnake) -> float:
         """Calculate probability of dangerous head collision for one future snake
