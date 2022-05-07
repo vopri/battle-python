@@ -40,7 +40,7 @@ class MoveDecision:
         return chosen_snake.get_my_first_step()
 
     def _simulate_survivors(self) -> None | set[FutureSnake]:
-        max_turns_to_check_ahead = 15
+        max_turns_to_check_ahead = 10
         my_survivors: Optional[set[FutureSnake]] = None
         for _ in range(max_turns_to_check_ahead):
             if self._time_is_over():
