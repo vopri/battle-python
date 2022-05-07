@@ -250,6 +250,7 @@ class FutureBoard:
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: set[FutureSnake] = set()
         self._prepare_future_board(board.snakes)
+        self._simulated_turns: int = 1
 
     def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
         self.all_possible_snakes.clear()
@@ -440,6 +441,7 @@ class FutureBoard:
         self._remove_snakes_which_will_die_by_head_collision()
         orig_snakes = self.all_possible_snakes.copy()
         self._prepare_future_board(orig_snakes)
+        self._simulated_turns += 1
 
 
 class GameBoardBounderies:
