@@ -40,11 +40,8 @@ class MoveDecision:
         return chosen_snake.get_my_first_step()
 
     def _simulate_survivors(self) -> None | set[FutureSnake]:
-        max_turns_to_check_ahead = 20
         my_survivors: Optional[set[FutureSnake]] = None
-        for _ in range(max_turns_to_check_ahead):
-            if self._time_is_over():
-                break
+        while not self._time_is_over():
             my_survivors_of_this_turn = self.future_board.get_my_survived_snakes()
             if self._no_survivors_left(my_survivors_of_this_turn):
                 break
@@ -57,7 +54,7 @@ class MoveDecision:
         return my_survivors
 
     def _time_is_over(self) -> bool:
-        stop_latest_after_ns = 1_000_000 * 120
+        stop_latest_after_ns = 1_000_000 * 100
         return time.perf_counter_ns() - self._start_time > stop_latest_after_ns
 
     def _no_survivors_left(self, my_survivors_of_this_turn):

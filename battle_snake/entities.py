@@ -11,7 +11,7 @@ class NextStep(Enum):
     RIGHT = "right"
 
 
-@dataclass(frozen=True, order=True)
+@dataclass(frozen=True, slots=True)
 class Position:
     x: int
     y: int
@@ -241,7 +241,6 @@ class FutureBoard:
 
     The FutureBoard doesn't derive from Board because of Liskov Substitution Principle:
     not fitting: all_snakes vs. all_possible_snakes etc.
-    To avoid DRY GameBoardBounderies is extracted.
 
     """
 
@@ -443,7 +442,7 @@ class FutureBoard:
         # (instead of during init of Board),
         # because otherwise the removal would have unwanted side effects
         # on calculation of head collision risk
-        self._remove_snakes_which_will_die_by_head_collision()
+        # self._remove_snakes_which_will_die_by_head_collision()
         orig_snakes = self.all_possible_snakes.copy()
         self._prepare_future_board(orig_snakes)
         self._simulated_turns += 1
