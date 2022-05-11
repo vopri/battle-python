@@ -35,6 +35,34 @@ def test_snake_init(sample_snake_data):
     assert snake.id == Position(5, 4)
 
 
+def test_snake_bites_itself():
+    snake = Snake(
+        [
+            Position(4, 4),
+            Position(4, 5),
+            Position(3, 5),
+            Position(3, 4),
+            Position(4, 4),
+            Position(4, 3),
+        ]
+    )
+    assert snake.bites_itself()
+
+
+def test_snake_bites_not_itself():
+    snake = Snake(
+        [
+            Position(5, 5),
+            Position(4, 5),
+            Position(3, 5),
+            Position(3, 4),
+            Position(4, 4),
+            Position(4, 3),
+        ]
+    )
+    assert not snake.bites_itself()
+
+
 def test_board_init(sample_request):
     board = Board.from_dict(sample_request)
     assert board.bounderies == GameBoardBounderies(11, 11)

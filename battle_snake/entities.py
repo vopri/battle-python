@@ -1,7 +1,8 @@
 import math
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable
+from typing import Iterable, Optional
+from xmlrpc.client import Boolean
 
 
 class NextStep(Enum):
@@ -66,6 +67,9 @@ class Snake:
 
         return FutureSnake(self, next_step, is_food_available)
 
+    def bites_itself(self) -> Boolean:
+        return self.head in self.body_without_head
+
 
 class FutureSnake(Snake):
     """Create a theoretical new snake based on the next step and available food.
@@ -94,16 +98,16 @@ class FutureSnake(Snake):
 
     def __init__(
         self,
-        mother: Snake | "FutureSnake",
+        mother,
         next_step: NextStep,
         is_food_available: bool,
     ):
         self.mother: Snake | FutureSnake = mother
         self.head_and_body = mother.head_and_body.copy()
         self.step_made_to_get_here = next_step
-        if type(mother) == "Snake":
+        if type(mother) == Snake:
             self.my_first_step = next_step
-        elif type(mother) == "FutureSnake":
+        elif type(mother) == FutureSnake:
             self.my_first_step = mother.my_first_step  # type: ignore
         self.is_me = mother.is_me
         self._is_food_available_at_beginning = is_food_available
