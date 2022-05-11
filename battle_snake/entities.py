@@ -92,10 +92,19 @@ class FutureSnake(Snake):
     Returns:
         FutureSnake: Brand new 'theoretical' snake how it would look like in the future after the next step."""
 
-    def __init__(self, mother: Snake, next_step: NextStep, is_food_available: bool):
+    def __init__(
+        self,
+        mother: Snake | "FutureSnake",
+        next_step: NextStep,
+        is_food_available: bool,
+    ):
         self.mother: Snake | FutureSnake = mother
         self.head_and_body = mother.head_and_body.copy()
         self.step_made_to_get_here = next_step
+        if type(mother) == "Snake":
+            self.my_first_step = next_step
+        elif type(mother) == "FutureSnake":
+            self.my_first_step = mother.my_first_step  # type: ignore
         self.is_me = mother.is_me
         self._is_food_available_at_beginning = is_food_available
         self._calculate_future_body()
@@ -133,9 +142,7 @@ class FutureSnake(Snake):
 
     def get_my_first_step(self) -> NextStep:
         """Get the first step from the first FutureSnake in this line of relatives"""
-
-        first_future_snake = self.find_first_future_snake_of_my_ancestors()
-        return first_future_snake.step_made_to_get_here
+        return self.my_first_step
 
     def find_first_future_snake_of_my_ancestors(self):
         snake: FutureSnake = self
