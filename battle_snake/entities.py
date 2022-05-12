@@ -483,3 +483,82 @@ class GameBoardBounderies:
 
     def __eq__(self, other: "GameBoardBounderies") -> bool:
         return self.height == other.height and self.width == other.width
+
+
+class PossibleFutureBoard:
+    def __init__(self, board: Board):
+        self.bounderies: GameBoardBounderies = board.bounderies
+        self.food: set[Position] = {food for food in board.food}
+        self.all_possible_snakes: set[FutureSnake] = set()
+        self._prepare_future_board(board.snakes)
+        self.simulated_turns: int = 1
+
+    def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
+        self.all_possible_snakes.clear()
+        self._add_all_possible_snakes_of_future(orig_snakes)
+        self._remove_snakes_running_into_walls()
+        self._remove_snakes_biting_itself()
+
+    def _add_all_possible_snakes_of_future(self, orig_snakes: Iterable[Snake]):
+        for original_snake in orig_snakes:
+            self._add_all_possible_variants_of_one_snake_to_future_board(original_snake)
+
+    def _add_all_possible_variants_of_one_snake_to_future_board(self, original_snake):
+        for next_possible_step in self._get_all_possible_steps():
+            future_snake = self._make_future_snake(original_snake, next_possible_step)
+            self.all_possible_snakes.add(future_snake)
+
+    def _get_all_possible_steps(self):
+        return (
+            NextStep.UP,
+            NextStep.DOWN,
+            NextStep.RIGHT,
+            NextStep.LEFT,
+        )
+
+    def _make_future_snake(self, snake, next_possible_step):
+        future_snake = snake.calculate_future_snake(
+            next_possible_step, self.is_food_available_for(snake)
+        )
+        return future_snake
+
+    def is_food_available_for(self, snake: Snake):
+        return snake.head in self.food
+
+    def _remove_snakes_running_into_walls(self):
+        self.all_possible_snakes = {
+            snake for snake in self.all_possible_snakes if not self.is_wall(snake.head)
+        }
+
+    def _remove_snakes_biting_itself(self):
+        self.all_possible_snakes = {
+            snake for snake in self.all_possible_snakes if not snake.bites_itself()
+        }
+
+    def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
+        for snake in orig_snakes:
+            self._remove_food_eaten_by(snake)
+
+    def _remove_food_eaten_by(self, snake: Snake):
+        if self.is_food_available_for(snake):
+            self.food.remove(snake.head)
+
+    def is_wall(self, pos: Position) -> bool:
+        """Check for dangerous wall on given position.
+
+        Args:
+            pos (Position): Coordinates on the board.
+
+        Returns:
+            bool: Is there a wall?
+        """
+        return self.bounderies.is_wall(pos)
+
+    def get_my_survived_snakes(self) -> set[FutureSnake]:
+        return {snake for snake in self.all_possible_snakes if snake.is_me}
+
+    def next_turn(self) -> None:
+        orig_snakes = self.all_possible_snakes.copy()
+        self._remove_eaten_food(orig_snakes)
+        self._prepare_future_board(orig_snakes)
+        self.simulated_turns += 1
