@@ -1,9 +1,16 @@
 import time
+from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Optional
 
-from battle_snake.entities import Board, FutureBoard, FutureSnake, NextStep
+from battle_snake.entities import (
+    Board,
+    FutureBoard,
+    FutureSnake,
+    NextStep,
+    PossibleFutureBoard,
+)
 
 
 def get_info() -> dict:
@@ -122,3 +129,29 @@ class MySnakeHistory:
             for next_step in self.head_collision_risk_first_step.keys()
             if self.head_collision_risk_first_step[next_step] == min_risk
         }
+
+
+class MyFutureHistory:
+    def __init__(self):
+        self._food_after_steps: dict[NextStep, Optional[int]] = {
+            NextStep.UP: None,
+            NextStep.DOWN: None,
+            NextStep.LEFT: None,
+            NextStep.RIGHT: None,
+        }
+
+    def save(self, future_board: PossibleFutureBoard) -> None:
+        for snake in future_board.get_my_survived_snakes():
+            first_step = snake.get_my_first_step()
+            self._check_for_food(future_board, snake, first_step)
+
+    def _check_for_food(self, future_board, snake, first_step):
+        food_available = future_board.is_food_available_for(snake)
+        if self._was_no_food_in_this_direction_until_now(first_step) and food_available:
+            self._food_after_steps[first_step] = future_board.simulated_turns
+
+    def _was_no_food_in_this_direction_until_now(self, first_step):
+        return self._food_after_steps[first_step] is None
+
+    def get_food_after_how_many_steps(self, first_step: NextStep) -> Optional[int]:
+        return self._food_after_steps[first_step]
