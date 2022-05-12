@@ -39,11 +39,6 @@ def test_request_move_me_1():
     return json.loads(sample_request.read_text())
 
 
-@fixture
-def sample_board_move_me_1(test_request_move_me_1) -> Board:
-    return Board.from_dict(test_request_move_me_1)
-
-
 @fixture()
 def test_request_move_me_2():
     sample_request = Path.cwd() / "tests" / "test_request_move_me_2.json"
@@ -75,3 +70,36 @@ def test_request_move_me_4():
 @fixture
 def test_board(test_request):
     return Board.from_dict(test_request)
+
+
+@fixture()
+def solo_board_request_1():
+    sample_request = Path.cwd() / "tests" / "solo_board_1.json"
+    return json.loads(sample_request.read_text())
+
+
+@fixture
+def solo_board_1(solo_board_request_1) -> Board:
+    return Board.from_dict(solo_board_request_1)
+
+
+@fixture()
+def solo_board_request_2():
+    sample_request = Path.cwd() / "tests" / "solo_board_2.json"
+    return json.loads(sample_request.read_text())
+
+
+@fixture
+def solo_board_2(solo_board_request_2) -> Board:
+    return Board.from_dict(solo_board_request_2)
+
+
+@fixture()
+def solo_board_request_3():
+    sample_request = Path.cwd() / "tests" / "solo_board_3.json"
+    return json.loads(sample_request.read_text())
+
+
+@fixture
+def solo_board_3(solo_board_request_3) -> Board:
+    return Board.from_dict(solo_board_request_3)
