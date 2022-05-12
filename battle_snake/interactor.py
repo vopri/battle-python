@@ -2,7 +2,7 @@ import time
 from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Optional
+from typing import NewType, Optional
 
 from battle_snake.entities import (
     Board,
@@ -133,25 +133,60 @@ class MySnakeHistory:
 
 class MyFutureHistory:
     def __init__(self):
-        self._food_after_steps: dict[NextStep, Optional[int]] = {
+        self._food_after_steps: dict[  # type: ignore
+            NextStep, Optional[int]
+        ] = self._init_food_dict()
+        self._count_alive_after_steps: dict[  # type: ignore
+            NextStep, dict[int, int]
+        ] = self._init_count_alive_dict()
+        self._current_future_board: PossibleFutureBoard = None  # type: ignore
+
+    def _init_food_dict(self) -> dict[NextStep, None]:
+        return {
             NextStep.UP: None,
             NextStep.DOWN: None,
             NextStep.LEFT: None,
             NextStep.RIGHT: None,
         }
 
+    def _init_count_alive_dict(self) -> dict[NextStep, dict]:
+        return {
+            NextStep.UP: dict(),
+            NextStep.DOWN: dict(),
+            NextStep.LEFT: dict(),
+            NextStep.RIGHT: dict(),
+        }
+
     def save(self, future_board: PossibleFutureBoard) -> None:
+        self._current_future_board = future_board
         for snake in future_board.get_my_survived_snakes():
             first_step = snake.get_my_first_step()
-            self._check_for_food(future_board, snake, first_step)
+            self._check_for_food(snake)
+            self._increment_snake_alive_counter(first_step)
 
-    def _check_for_food(self, future_board, snake, first_step):
-        food_available = future_board.is_food_available_for(snake)
+    def _increment_snake_alive_counter(self, first_step):
+        turn_no = self._current_future_board.simulated_turns
+        amount = self._count_alive_after_steps[first_step].get(turn_no, 0)
+        self._count_alive_after_steps[first_step][turn_no] = amount + 1
+
+    def _check_for_food(self, snake):
+        first_step = snake.get_my_first_step()
+        food_available = self._current_future_board.is_food_available_for(snake)
         if self._was_no_food_in_this_direction_until_now(first_step) and food_available:
-            self._food_after_steps[first_step] = future_board.simulated_turns
+            self._food_after_steps[
+                first_step
+            ] = self._current_future_board.simulated_turns
 
     def _was_no_food_in_this_direction_until_now(self, first_step):
         return self._food_after_steps[first_step] is None
 
-    def get_food_after_how_many_steps(self, first_step: NextStep) -> Optional[int]:
+    def found_food_after_how_many_steps(self, first_step: NextStep) -> Optional[int]:
         return self._food_after_steps[first_step]
+
+    def all_snakes_definitely_dead_after_how_many_steps(
+        self, first_step: NextStep
+    ) -> Optional[int]:
+        counter_first_step = self._count_alive_after_steps[first_step]
+        if len(counter_first_step.keys()) == 0:
+            return 1
+        return max(counter_first_step.keys()) + 1

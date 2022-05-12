@@ -1,0 +1,165 @@
+{
+    "game": {
+        "id": "game-00fe20da-94ad-11ea-bb37",
+        "ruleset": {
+            "name": "standard",
+            "version": "v.1.2.3"
+        },
+        "timeout": 500
+    },
+    "turn": 14,
+    "board": {
+        "height": 11,
+        "width": 11,
+        "food": [
+            {
+                "x": 5,
+                "y": 5
+            },
+            {
+                "x": 9,
+                "y": 0
+            },
+            {
+                "x": 2,
+                "y": 6
+            }
+        ],
+        "hazards": [
+            {
+                "x": 3,
+                "y": 2
+            }
+        ],
+        "snakes": [
+            {
+                "id": "snake-508e96ac-94ad-11ea-bb37",
+                "name": "My Snake",
+                "health": 54,
+                "body": [
+                    {
+                        "x": 10,
+                        "y": 2
+                    },
+                    {
+                        "x": 9,
+                        "y": 2
+                    },
+                    {
+                        "x": 9,
+                        "y": 3
+                    },
+                    {
+                        "x": 9,
+                        "y": 4
+                    },
+                    {
+                        "x": 9,
+                        "y": 5
+                    },
+                    {
+                        "x": 10,
+                        "y": 5
+                    },
+                    {
+                        "x": 10,
+                        "y": 6
+                    },
+                    {
+                        "x": 10,
+                        "y": 7
+                    },
+                    {
+                        "x": 10,
+                        "y": 8
+                    },
+                    {
+                        "x": 10,
+                        "y": 9
+                    },
+                    {
+                        "x": 10,
+                        "y": 10
+                    }
+                ],
+                "latency": "111",
+                "head": {
+                    "x": 10,
+                    "y": 2
+                },
+                "length": 3,
+                "shout": "why are we shouting??",
+                "squad": "",
+                "customizations": {
+                    "color": "#FF0000",
+                    "head": "pixel",
+                    "tail": "pixel"
+                }
+            }
+        ]
+    },
+    "you": {
+        "id": "snake-508e96ac-94ad-11ea-bb37",
+        "name": "My Snake",
+        "health": 54,
+        "body": [
+            {
+                "x": 10,
+                "y": 2
+            },
+            {
+                "x": 9,
+                "y": 2
+            },
+            {
+                "x": 9,
+                "y": 3
+            },
+            {
+                "x": 9,
+                "y": 4
+            },
+            {
+                "x": 9,
+                "y": 5
+            },
+            {
+                "x": 10,
+                "y": 5
+            },
+            {
+                "x": 10,
+                "y": 6
+            },
+            {
+                "x": 10,
+                "y": 7
+            },
+            {
+                "x": 10,
+                "y": 8
+            },
+            {
+                "x": 10,
+                "y": 9
+            },
+            {
+                "x": 10,
+                "y": 10
+            }
+        ],
+        "latency": "111",
+        "head": {
+            "x": 10,
+            "y": 2
+        },
+        "length": 3,
+        "shout": "why are we shouting??",
+        "squad": "",
+        "customizations": {
+            "color": "#FF0000",
+            "head": "pixel",
+            "tail": "pixel"
+        }
+    }
+}

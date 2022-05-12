@@ -43,39 +43,6 @@ def test_future_board_all_possible_snakes(test_board: Board):
     assert {snake.head for snake in future_board.all_possible_snakes} == expected_heads
 
 
-# TODO: Replace whole test with more useful logic!
-@pytest.mark.parametrize(
-    "board_name, risk_tolerance, amount_of_my_survived_snakes_under_risk_tolerance",
-    [
-        ("test_board", 1, 1),
-        ("test_board", 0.5, 1),
-        ("sample_board_move_me_1", 1, 1),
-        ("sample_board_move_me_1", 0, 0),
-        ("sample_board_move_me_1", 0.5, 1),
-        ("sample_board_move_me_1", 0.4, 1),
-        ("sample_board_move_me_2", 1, 3),
-        ("sample_board_move_me_2", 0, 1),
-        ("sample_board_move_me_2", 0.30, 1),
-        ("sample_board_move_me_2", 0.40, 3),
-        ("sample_board_move_me_2", 0.7, 3),
-    ],
-)
-def test_get_my_survived_snakes(
-    board_name: str,
-    risk_tolerance: float,
-    amount_of_my_survived_snakes_under_risk_tolerance: int,
-    request: pytest.FixtureRequest,
-):
-    board = request.getfixturevalue(board_name)
-    future_board = FutureBoard(board)
-    snakes = [
-        snake
-        for snake in future_board.get_my_survived_snakes()
-        if future_board.calc_head_collision_risk_for(snake) <= risk_tolerance
-    ]
-    assert len(snakes) == amount_of_my_survived_snakes_under_risk_tolerance
-
-
 def test_get_my_survived_snakes_combinations(almost_empty_board_request):
     future_board = FutureBoard(Board.from_dict(almost_empty_board_request))
     assert len(future_board.all_possible_snakes) == 2

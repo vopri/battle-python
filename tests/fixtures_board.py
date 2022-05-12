@@ -103,3 +103,14 @@ def solo_board_request_3():
 @fixture
 def solo_board_3(solo_board_request_3) -> Board:
     return Board.from_dict(solo_board_request_3)
+
+
+@fixture()
+def solo_board_request_4():
+    sample_request = Path.cwd() / "tests" / "solo_board_4.json"
+    return json.loads(sample_request.read_text())
+
+
+@fixture
+def solo_board_4(solo_board_request_4) -> Board:
+    return Board.from_dict(solo_board_request_4)
