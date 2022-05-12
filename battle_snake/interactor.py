@@ -185,8 +185,35 @@ class MyFutureHistory:
 
     def all_snakes_definitely_dead_after_how_many_steps(
         self, first_step: NextStep
-    ) -> Optional[int]:
+    ) -> int:
         counter_first_step = self._count_alive_after_steps[first_step]
         if len(counter_first_step.keys()) == 0:
             return 1
         return max(counter_first_step.keys()) + 1
+
+
+class Tactics:
+    def __init__(self, history: MyFutureHistory):
+        self._history = history
+
+    def decide(self) -> NextStep:
+        surviors_first_steps = set()
+        for max_steps in range(7, 0, -1):
+            surviors_first_steps = self._find_survivors(max_steps)
+            if surviors_first_steps:
+                break
+        food_after: dict[int, NextStep] = dict()
+        for step in surviors_first_steps:
+            amount_of_steps = self._history.found_food_after_how_many_steps(step)
+            if amount_of_steps is not None:
+                food_after[amount_of_steps] = step
+        shortest_way_to_food = min(food_after.keys())
+        return food_after[shortest_way_to_food]
+
+    def _find_survivors(self, max_steps: int):
+        return {
+            step
+            for step in NextStep
+            if self._history.all_snakes_definitely_dead_after_how_many_steps(step)
+            > max_steps
+        }
