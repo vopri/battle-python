@@ -33,6 +33,24 @@ class MoveDecision:
 
     def __init__(self, game_request: dict):
         self._start_time: int = time.perf_counter_ns()
+        self.board: Board = Board.from_dict(game_request)
+        self.future_board: PossibleFutureBoard = PossibleFutureBoard(self.board)
+        self._history = MyFutureHistory()
+        self.future_board.register_recorder(self._history)
+        self.tactics = Tactics(self._history)
+
+    def decide(self) -> NextStep:
+        """Find decision for next step for my snake"""
+        for _ in range(8):
+            self.future_board.next_turn()
+        return self.tactics.decide()
+
+
+class MoveDecisionOld:
+    """Decision maker for the next move of my snake."""
+
+    def __init__(self, game_request: dict):
+        self._start_time: int = time.perf_counter_ns()
         self._history = MySnakeHistory()
         self.board: Board = Board.from_dict(game_request)
         self.future_board: FutureBoard = FutureBoard(self.board)
