@@ -32,6 +32,9 @@ def get_info() -> dict:
     }
 
 
+FORECAST_DEPTH = 8
+
+
 class MoveDecision:
     """Decision maker for the next move of my snake."""
 
@@ -45,7 +48,7 @@ class MoveDecision:
 
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
-        for _ in range(10):
+        for _ in range(FORECAST_DEPTH - 1):
             self.future_board.next_turn()
         logging.info(f"Posisition of my snake: {self.board.my_snake}")
         decision = self.tactics.decide()
@@ -224,7 +227,7 @@ class Tactics:
 
     def decide(self) -> NextStep:
         surviors_first_steps = set()
-        for max_steps in range(9, 0, -1):
+        for max_steps in range(FORECAST_DEPTH, 0, -1):
             surviors_first_steps = self._find_survivors(max_steps)
             if surviors_first_steps:
                 break
