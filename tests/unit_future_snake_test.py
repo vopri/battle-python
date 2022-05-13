@@ -14,7 +14,7 @@ def test_future_snake_init(sample_snake: Snake):
     is_food_available = True
     future_snake = FutureSnake(sample_snake, next_step, is_food_available)
     assert future_snake.step_made_to_get_here == next_step
-    assert future_snake._is_food_available_at_beginning == is_food_available
+    assert future_snake._is_food_available_at_creation_time == is_food_available
     assert future_snake.mother == sample_snake
     assert future_snake.head == Position(5, 5)
     assert future_snake.get_my_first_step() == NextStep.UP

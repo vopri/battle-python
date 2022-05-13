@@ -1,8 +1,6 @@
-import math
 from dataclasses import dataclass
 from enum import Enum
 from typing import Iterable, Optional, Protocol
-from xmlrpc.client import Boolean
 
 
 class NextStep(Enum):
@@ -18,14 +16,10 @@ class Position:
     y: int
 
 
-class BattleSnakeException(Exception):
-    ...
-
-
 class Snake:
     """Representation of one single snake.
 
-    If the snake is myself it's marked with is_me = True
+    If the snake is myself it's marked with is_me flag.
     """
 
     def __init__(self, head_and_body: list[Position], is_me=False):
@@ -48,10 +42,6 @@ class Snake:
     def body_without_head(self) -> list[Position]:
         return self.head_and_body[1:]
 
-    @property
-    def neck(self) -> Position:
-        return self.head_and_body[1]
-
     def __len__(self):
         return len(self.head_and_body)
 
@@ -67,7 +57,7 @@ class Snake:
 
         return FutureSnake(self, next_step, is_food_available)
 
-    def bites_itself(self) -> Boolean:
+    def bites_itself(self) -> bool:
         return self.head in self.body_without_head
 
 
@@ -83,8 +73,8 @@ class FutureSnake(Snake):
     Until the snake is smaller than 3 (inc. head) it will grow, even if there's no
     food available.
 
-    The future snake remembers its 'mother' as well as the mother's next_step
-    that created this snake in the first place.
+    The future snake remembers its 'mother' as well as the first "next_step"
+    that created this snake and further successors in the first place.
     A FutureSnake can calculate another FutureSnake. Every FutureSnake can
     go back to the very first next_step of the earliest ancestor.
 
@@ -110,7 +100,7 @@ class FutureSnake(Snake):
         elif type(mother) == FutureSnake:
             self.my_first_step = mother.my_first_step  # type: ignore
         self.is_me = mother.is_me
-        self._is_food_available_at_beginning = is_food_available
+        self._is_food_available_at_creation_time = is_food_available
         self._calculate_future_body()
         # One ID is the same for all possible-future-snakes that is based on one "normal" Snake
         self.id = mother.id
@@ -118,8 +108,8 @@ class FutureSnake(Snake):
     def _calculate_future_body(self):
         self._add_future_head_to_future_snake()
         if self._is_still_baby_snake():
-            self._is_food_available_at_beginning = True
-        if not self._is_food_available_at_beginning:
+            self._is_food_available_at_creation_time = True
+        if not self._is_food_available_at_creation_time:
             self._remove_tail()
 
     def _add_future_head_to_future_snake(self):
@@ -150,13 +140,8 @@ class FutureSnake(Snake):
 
     def find_first_future_snake_of_my_ancestors(self):
         snake: FutureSnake = self
-        while True:
-            if type(snake.mother) == Snake:
-                break
-            elif type(snake.mother) == self.__class__:
-                snake = snake.mother  # type: ignore
-            else:
-                raise BattleSnakeException()
+        while type(snake.mother) != Snake:
+            snake = snake.mother  # type: ignore
         return snake
 
     def __repr__(self) -> str:
@@ -214,6 +199,7 @@ class Board:
         self.bounderies: "GameBoardBounderies" = bounderies
         self.food: set[Position] = food
         self.snakes: set[Snake] = snakes
+        self._my_snake: Snake = [snake for snake in self.snakes if snake.is_me][0]
 
     @classmethod
     def from_dict(cls, game_request: dict) -> "Board":
@@ -228,7 +214,7 @@ class Board:
 
     @property
     def my_snake(self) -> Snake:
-        return [snake for snake in self.snakes if snake.is_me][0]
+        return self._my_snake
 
 
 class GameBoardBounderies:
@@ -258,6 +244,8 @@ class GameBoardBounderies:
 
 
 class Recorder(Protocol):
+    """Record history of all information of interest of the PossibleFutureBoard"""
+
     def save(self, board: "PossibleFutureBoard"):
         ...
 
@@ -265,52 +253,42 @@ class Recorder(Protocol):
 class PossibleFutureBoard:
     def __init__(self, board: Board):
         self.bounderies: GameBoardBounderies = board.bounderies
-        self.food: set[Position] = {food for food in board.food}
-        self.all_possible_snakes: set[FutureSnake] = set()
+        self.food: set[Position] = board.food.copy()
+        self.possible_snakes: set[FutureSnake] = set()
         self.recorder: Optional[Recorder] = None
         self._prepare_future_board(board.snakes)
         self.simulated_turns: int = 1
 
     def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
-        self.all_possible_snakes.clear()
-        self._add_all_possible_snakes_of_future(orig_snakes)
+        self.possible_snakes = set()
+        self._add_possible_snakes_of_future(orig_snakes)
         self._remove_snakes_running_into_walls()
         self._remove_snakes_biting_itself()
 
-    def _add_all_possible_snakes_of_future(self, orig_snakes: Iterable[Snake]):
+    def _add_possible_snakes_of_future(self, orig_snakes: Iterable[Snake]):
         for original_snake in orig_snakes:
-            self._add_all_possible_variants_of_one_snake_to_future_board(original_snake)
+            self._add_possible_variants_of_one_snake_to_future_board(original_snake)
 
-    def _add_all_possible_variants_of_one_snake_to_future_board(self, original_snake):
-        for next_possible_step in self._get_all_possible_steps():
-            future_snake = self._make_future_snake(original_snake, next_possible_step)
-            self.all_possible_snakes.add(future_snake)
+    def _add_possible_variants_of_one_snake_to_future_board(self, original_snake):
+        for step in NextStep:
+            future_snake = self._make_future_snake(original_snake, step)
+            self.possible_snakes.add(future_snake)
 
-    def _get_all_possible_steps(self):
-        return (
-            NextStep.UP,
-            NextStep.DOWN,
-            NextStep.RIGHT,
-            NextStep.LEFT,
-        )
-
-    def _make_future_snake(self, snake, next_possible_step):
-        future_snake = snake.calculate_future_snake(
-            next_possible_step, self.is_food_available_for(snake)
-        )
-        return future_snake
+    def _make_future_snake(self, snake, step):
+        has_food = self.is_food_available_for(snake)
+        return snake.calculate_future_snake(step, has_food)
 
     def is_food_available_for(self, snake: Snake):
         return snake.head in self.food
 
     def _remove_snakes_running_into_walls(self):
-        self.all_possible_snakes = {
-            snake for snake in self.all_possible_snakes if not self.is_wall(snake.head)
+        self.possible_snakes = {
+            snake for snake in self.possible_snakes if not self.is_wall(snake.head)
         }
 
     def _remove_snakes_biting_itself(self):
-        self.all_possible_snakes = {
-            snake for snake in self.all_possible_snakes if not snake.bites_itself()
+        self.possible_snakes = {
+            snake for snake in self.possible_snakes if not snake.bites_itself()
         }
 
     def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
@@ -322,21 +300,13 @@ class PossibleFutureBoard:
             self.food.remove(snake.head)
 
     def is_wall(self, pos: Position) -> bool:
-        """Check for dangerous wall on given position.
-
-        Args:
-            pos (Position): Coordinates on the board.
-
-        Returns:
-            bool: Is there a wall?
-        """
         return self.bounderies.is_wall(pos)
 
     def get_my_survived_snakes(self) -> set[FutureSnake]:
-        return {snake for snake in self.all_possible_snakes if snake.is_me}
+        return {snake for snake in self.possible_snakes if snake.is_me}
 
     def next_turn(self) -> None:
-        orig_snakes = self.all_possible_snakes.copy()
+        orig_snakes = self.possible_snakes.copy()
         self._remove_eaten_food(orig_snakes)
         self._prepare_future_board(orig_snakes)
         self.simulated_turns += 1

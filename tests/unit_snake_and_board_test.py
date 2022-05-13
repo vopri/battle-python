@@ -24,7 +24,6 @@ def test_snake_init(sample_snake_data):
         Position(6, 3),
         Position(6, 2),
     ]
-    assert snake.neck == Position(5, 3)
     assert len(snake) == 4
     assert snake.id == Position(5, 4)
 
@@ -78,7 +77,6 @@ def test_board_init(sample_request):
 def test_get_my_snake(sample_board):
     me = sample_board.my_snake
     assert len(me) == 3
-    assert me.neck == Position(1, 0)
 
 
 # def test_is_wall(sample_board):
