@@ -239,8 +239,11 @@ class Tactics:
         if food_after:
             shortest_way_to_food = min(food_after.keys())
             return food_after[shortest_way_to_food]
-        else:
+        elif surviors_first_steps:
             return random.choice(list(surviors_first_steps))
+        else:
+            # die like a snake!
+            return NextStep.UP
 
     def _find_survivors(self, max_steps: int):
         return {
