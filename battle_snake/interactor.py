@@ -45,7 +45,7 @@ class MoveDecision:
 
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
-        for _ in range(6):
+        for _ in range(10):
             self.future_board.next_turn()
         logging.info(f"Posisition of my snake: {self.board.my_snake}")
         decision = self.tactics.decide()
@@ -224,7 +224,7 @@ class Tactics:
 
     def decide(self) -> NextStep:
         surviors_first_steps = set()
-        for max_steps in range(7, 0, -1):
+        for max_steps in range(9, 0, -1):
             surviors_first_steps = self._find_survivors(max_steps)
             if surviors_first_steps:
                 break
