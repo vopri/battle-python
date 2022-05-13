@@ -41,7 +41,7 @@ class MoveDecision:
 
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
-        for _ in range(8):
+        for _ in range(6):
             self.future_board.next_turn()
         return self.tactics.decide()
 
