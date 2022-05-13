@@ -1,3 +1,5 @@
+import logging
+import random
 import time
 from collections import defaultdict
 from copy import deepcopy
@@ -12,6 +14,8 @@ from battle_snake.entities import (
     PossibleFutureBoard,
     Recorder,
 )
+
+logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
 
 def get_info() -> dict:
@@ -43,7 +47,10 @@ class MoveDecision:
         """Find decision for next step for my snake"""
         for _ in range(6):
             self.future_board.next_turn()
-        return self.tactics.decide()
+        logging.info(f"Posisition of my snake: {self.board.my_snake}")
+        decision = self.tactics.decide()
+        logging.info(f"Decision for next step: {decision}")
+        return decision
 
 
 class MoveDecisionOld:
@@ -226,8 +233,11 @@ class Tactics:
             amount_of_steps = self._history.found_food_after_how_many_steps(step)
             if amount_of_steps is not None:
                 food_after[amount_of_steps] = step
-        shortest_way_to_food = min(food_after.keys())
-        return food_after[shortest_way_to_food]
+        if food_after:
+            shortest_way_to_food = min(food_after.keys())
+            return food_after[shortest_way_to_food]
+        else:
+            return random.choice(list(surviors_first_steps))
 
     def _find_survivors(self, max_steps: int):
         return {

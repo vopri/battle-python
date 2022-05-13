@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from battle_snake.entities import NextStep
 from battle_snake.interactor import MoveDecision
@@ -6,6 +8,11 @@ from battle_snake.interactor import MoveDecision
 @pytest.mark.skip
 def test_decide_sample_request(sample_move_decision: MoveDecision):
     assert sample_move_decision.decide() == NextStep.UP
+
+
+def test_decide_solo_1(solo_board_request_1, caplog):
+    caplog.set_level(logging.INFO)
+    assert MoveDecision(solo_board_request_1).decide() == NextStep.UP
 
 
 @pytest.mark.skip

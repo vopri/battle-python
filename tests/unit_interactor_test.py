@@ -61,3 +61,13 @@ def test_tactis_3(solo_board_2):
         fb.next_turn()
     tactics = Tactics(hist)
     assert tactics.decide() == NextStep.DOWN
+
+
+def test_tactis_4(solo_board_1):
+    hist = MyFutureHistory()
+    fb = PossibleFutureBoard(solo_board_1)
+    fb.register_recorder(hist)
+    for _ in range(8):
+        fb.next_turn()
+    tactics = Tactics(hist)
+    assert tactics.decide() == NextStep.UP
