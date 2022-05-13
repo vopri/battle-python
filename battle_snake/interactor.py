@@ -10,6 +10,7 @@ from battle_snake.entities import (
     FutureSnake,
     NextStep,
     PossibleFutureBoard,
+    Recorder,
 )
 
 
@@ -131,7 +132,7 @@ class MySnakeHistory:
         }
 
 
-class MyFutureHistory:
+class MyFutureHistory(Recorder):
     def __init__(self):
         self._food_after_steps: dict[  # type: ignore
             NextStep, Optional[int]

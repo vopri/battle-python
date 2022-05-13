@@ -1,7 +1,7 @@
 import math
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Protocol
 from xmlrpc.client import Boolean
 
 
@@ -485,11 +485,17 @@ class GameBoardBounderies:
         return self.height == other.height and self.width == other.width
 
 
+class Recorder(Protocol):
+    def save(self, board: "PossibleFutureBoard"):
+        ...
+
+
 class PossibleFutureBoard:
     def __init__(self, board: Board):
         self.bounderies: GameBoardBounderies = board.bounderies
         self.food: set[Position] = {food for food in board.food}
         self.all_possible_snakes: set[FutureSnake] = set()
+        self.recorder: Optional[Recorder] = None
         self._prepare_future_board(board.snakes)
         self.simulated_turns: int = 1
 
@@ -562,3 +568,9 @@ class PossibleFutureBoard:
         self._remove_eaten_food(orig_snakes)
         self._prepare_future_board(orig_snakes)
         self.simulated_turns += 1
+        if self.recorder:
+            self.recorder.save(self)
+
+    def register_recorder(self, recorder: Recorder):
+        self.recorder = recorder
+        self.recorder.save(self)

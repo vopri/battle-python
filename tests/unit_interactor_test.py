@@ -18,30 +18,27 @@ def test_my_future_history_food(solo_board_2):
 def test_my_future_history_dead_step_1(solo_board_2):
     hist = MyFutureHistory()
     fb = PossibleFutureBoard(solo_board_2)
-    hist.save(fb)
+    fb.register_recorder(hist)
     for _ in range(8):
         fb.next_turn()
-        hist.save(fb)
     assert hist.all_snakes_definitely_dead_after_how_many_steps(NextStep.RIGHT) == 1
 
 
 def test_my_future_history_dead_lock(solo_board_4):
     hist = MyFutureHistory()
     fb = PossibleFutureBoard(solo_board_4)
-    hist.save(fb)
+    fb.register_recorder(hist)
     for _ in range(8):
         fb.next_turn()
-        hist.save(fb)
     assert hist.all_snakes_definitely_dead_after_how_many_steps(NextStep.UP) == 3
 
 
 def test_tactis(solo_board_4):
     hist = MyFutureHistory()
     fb = PossibleFutureBoard(solo_board_4)
-    hist.save(fb)
+    fb.register_recorder(hist)
     for _ in range(8):
         fb.next_turn()
-        hist.save(fb)
     tactics = Tactics(hist)
     assert tactics.decide() == NextStep.DOWN
 
@@ -49,10 +46,9 @@ def test_tactis(solo_board_4):
 def test_tactis_2(solo_board_3):
     hist = MyFutureHistory()
     fb = PossibleFutureBoard(solo_board_3)
-    hist.save(fb)
+    fb.register_recorder(hist)
     for _ in range(8):
         fb.next_turn()
-        hist.save(fb)
     tactics = Tactics(hist)
     assert tactics.decide() in (NextStep.DOWN, NextStep.LEFT)
 
@@ -60,9 +56,8 @@ def test_tactis_2(solo_board_3):
 def test_tactis_3(solo_board_2):
     hist = MyFutureHistory()
     fb = PossibleFutureBoard(solo_board_2)
-    hist.save(fb)
+    fb.register_recorder(hist)
     for _ in range(8):
         fb.next_turn()
-        hist.save(fb)
     tactics = Tactics(hist)
     assert tactics.decide() == NextStep.DOWN
