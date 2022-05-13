@@ -223,14 +223,6 @@ class GameBoardBounderies:
         self.width = width
 
     def is_wall(self, pos: Position) -> bool:
-        """Check for dangerous wall on given position.
-
-        Args:
-            pos (Position): Coordinates on the board.
-
-        Returns:
-            bool: Is there a wall?
-        """
         if pos.x < 0 or pos.y < 0:
             return True
         if pos.x >= self.width:
@@ -251,6 +243,13 @@ class Recorder(Protocol):
 
 
 class PossibleFutureBoard:
+    """Simulate Board as it could look like in the future.
+
+    Several turns can be simulated using next_turn.
+    For performance reasons it's possible to register a recorder
+    to evaluate interesting information later on.
+    """
+
     def __init__(self, board: Board):
         self.bounderies: GameBoardBounderies = board.bounderies
         self.food: set[Position] = board.food.copy()
