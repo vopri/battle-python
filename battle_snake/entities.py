@@ -267,34 +267,28 @@ class PossibleFutureBoard:
     def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
         self.possible_snakes = set()
         self._add_possible_snakes_of_future(orig_snakes)
-        self._remove_snakes_running_into_walls()
-        self._remove_snakes_biting_itself()
 
     def _add_possible_snakes_of_future(self, orig_snakes: Iterable[Snake]):
         for original_snake in orig_snakes:
             self._add_possible_variants_of_one_snake_to_future_board(original_snake)
 
-    def _add_possible_variants_of_one_snake_to_future_board(self, original_snake):
+    def _add_possible_variants_of_one_snake_to_future_board(
+        self, original_snake: Snake | FutureSnake
+    ):
         for step in NextStep:
             future_snake = self._make_future_snake(original_snake, step)
+            if future_snake.bites_itself() or self.is_wall(future_snake.head):
+                continue
             self.possible_snakes.add(future_snake)
 
-    def _make_future_snake(self, snake, step):
+    def _make_future_snake(
+        self, snake: Snake | FutureSnake, step: NextStep
+    ) -> FutureSnake:
         has_food = self.is_food_available_for(snake)
         return snake.calculate_future_snake(step, has_food)
 
     def is_food_available_for(self, snake: Snake):
         return snake.head in self.food
-
-    def _remove_snakes_running_into_walls(self):
-        self.possible_snakes = {
-            snake for snake in self.possible_snakes if not self.is_wall(snake.head)
-        }
-
-    def _remove_snakes_biting_itself(self):
-        self.possible_snakes = {
-            snake for snake in self.possible_snakes if not snake.bites_itself()
-        }
 
     def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
         for snake in orig_snakes:
