@@ -140,16 +140,8 @@ class Tactics:
         self._history = history
 
     def decide(self) -> NextStep:
-        surviors_first_steps = set()
-        for max_steps in range(FORECAST_DEPTH, 0, -1):
-            surviors_first_steps = self._find_survivors(max_steps)
-            if surviors_first_steps:
-                break
-        food_after: dict[int, NextStep] = dict()
-        for step in surviors_first_steps:
-            amount_of_steps = self._history.found_food_after_how_many_steps(step)
-            if amount_of_steps is not None:
-                food_after[amount_of_steps] = step
+        surviors_first_steps = self._get_first_steps_of_latest_survivor()
+        food_after = self._get_first_food_for(surviors_first_steps)
         if food_after:
             shortest_way_to_food = min(food_after.keys())
             return food_after[shortest_way_to_food]
@@ -158,6 +150,24 @@ class Tactics:
         else:
             # die like a snake!
             return NextStep.UP
+
+    def _get_first_food_for(
+        self, surviors_first_steps
+    ) -> dict[AmountOfSteps, NextStep]:
+        food_after: dict[AmountOfSteps, NextStep] = dict()
+        for step in surviors_first_steps:
+            amount_of_steps = self._history.found_food_after_how_many_steps(step)
+            if amount_of_steps is not None:
+                food_after[AmountOfSteps(amount_of_steps)] = step
+        return food_after
+
+    def _get_first_steps_of_latest_survivor(self) -> set:
+        surviors_first_steps = set()
+        for max_steps in range(FORECAST_DEPTH, 0, -1):
+            surviors_first_steps = self._find_survivors(max_steps)
+            if surviors_first_steps:
+                break
+        return surviors_first_steps
 
     def _find_survivors(self, max_steps: int):
         return {
