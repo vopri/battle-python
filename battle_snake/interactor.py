@@ -28,7 +28,7 @@ def get_info() -> dict:
     }
 
 
-FORECAST_DEPTH = 8
+FORECAST_DEPTH = 10
 
 
 class MoveDecision:
