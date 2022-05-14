@@ -45,11 +45,18 @@ class MoveDecision:
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
         for _ in range(FORECAST_DEPTH - 1):
+            if self._is_ready_for_decision():
+                break
             self.future_board.next_turn()
         logging.info(f"Posisition of my snake: {self.board.my_snake}")
         decision = self.tactics.decide()
         logging.info(f"Decision for next step: {decision}")
         return decision
+
+    def _is_ready_for_decision(self) -> bool:
+        survivors = self.future_board.get_my_survived_snakes()
+        first_steps = {snake.get_my_first_step() for snake in survivors}
+        return len(first_steps) < 2
 
 
 AmountOfSteps = NewType("AmountOfSteps", int)
