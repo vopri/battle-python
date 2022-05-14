@@ -1,5 +1,7 @@
+from collections import deque
 from dataclasses import dataclass
 from enum import Enum
+from itertools import islice
 from typing import Iterable, Optional, Protocol
 
 
@@ -23,9 +25,9 @@ class Snake:
     """
 
     def __init__(self, head_and_body: list[Position], is_me=False):
-        self.head_and_body: list[Position] = head_and_body
+        self._head_and_body: deque[Position] = deque(head_and_body)
         self.is_me: bool = is_me
-        self.id = self.head_and_body[0]
+        self.id = self._head_and_body[0]
 
     @classmethod
     def from_dict(cls, **snake_data: dict) -> "Snake":
@@ -35,15 +37,19 @@ class Snake:
         return cls(head_and_body)
 
     @property
+    def head_and_body(self) -> list[Position]:
+        return list(self._head_and_body)
+
+    @property
     def head(self) -> Position:
-        return self.head_and_body[0]
+        return self._head_and_body[0]
 
     @property
     def body_without_head(self) -> list[Position]:
-        return self.head_and_body[1:]
+        return list(islice(self._head_and_body, 1, None))
 
     def __len__(self):
-        return len(self.head_and_body)
+        return len(self._head_and_body)
 
     def __str__(self):
         return SnakeVisualizer(self).snake_in_11x11_board
@@ -93,7 +99,7 @@ class FutureSnake(Snake):
         is_food_available: bool,
     ):
         self.mother: Snake | FutureSnake = mother
-        self.head_and_body = mother.head_and_body.copy()
+        self._head_and_body = mother._head_and_body.copy()
         self.step_made_to_get_here = next_step
         if type(mother) == Snake:
             self.my_first_step = next_step
@@ -114,7 +120,7 @@ class FutureSnake(Snake):
 
     def _add_future_head_to_future_snake(self):
         future_head_position: Position = self._calc_future_head_position()
-        self.head_and_body.insert(0, future_head_position)
+        self._head_and_body.appendleft(future_head_position)
 
     def _calc_future_head_position(self) -> Position:
         if self.step_made_to_get_here == NextStep.UP:
@@ -132,7 +138,7 @@ class FutureSnake(Snake):
         return len(self.mother) < 3
 
     def _remove_tail(self):
-        self.head_and_body.pop()
+        self._head_and_body.pop()
 
     def get_my_first_step(self) -> NextStep:
         """Get the first step from the first FutureSnake in this line of relatives"""
