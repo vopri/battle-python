@@ -315,3 +315,21 @@ class PossibleFutureBoard:
     def register_recorder(self, recorder: Recorder):
         self.recorder = recorder
         self.recorder.save(self)
+
+    def does_my_snake_bite_or_collide_with_another_snake(
+        self, my_snake: FutureSnake
+    ) -> bool:
+        assert my_snake.is_me
+        for other_snake in self.possible_snakes:
+            if other_snake.is_me:
+                continue
+            if my_snake.head in other_snake.body_without_head:
+                return True
+            if self._possible_dangerous_head_collision(my_snake, other_snake):
+                return True
+        return False
+
+    def _possible_dangerous_head_collision(
+        self, my_snake: FutureSnake, other_snake: FutureSnake
+    ) -> bool:
+        return my_snake.head == other_snake.head and len(my_snake) <= len(other_snake)

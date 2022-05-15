@@ -9,10 +9,10 @@ def test_my_future_history_food(solo_board_2):
     for _ in range(8):
         fb.next_turn()
         hist.save(fb)
-    assert hist.found_food_after_how_many_steps(NextStep.DOWN) == 3
-    assert hist.found_food_after_how_many_steps(NextStep.LEFT) == 5
-    assert hist.found_food_after_how_many_steps(NextStep.UP) is None
-    assert hist.found_food_after_how_many_steps(NextStep.RIGHT) is None
+    assert hist.my_snake_found_food_after_how_many_steps(NextStep.DOWN) == 3
+    assert hist.my_snake_found_food_after_how_many_steps(NextStep.LEFT) == 5
+    assert hist.my_snake_found_food_after_how_many_steps(NextStep.UP) is None
+    assert hist.my_snake_found_food_after_how_many_steps(NextStep.RIGHT) is None
 
 
 def test_my_future_history_dead_step_1(solo_board_2):
@@ -21,7 +21,7 @@ def test_my_future_history_dead_step_1(solo_board_2):
     fb.register_recorder(hist)
     for _ in range(8):
         fb.next_turn()
-    assert hist.all_snakes_definitely_dead_after_how_many_steps(NextStep.RIGHT) == 1
+    assert hist.all_my_snakes_definitely_dead_after_how_many_steps(NextStep.RIGHT) == 1
 
 
 def test_my_future_history_dead_lock(solo_board_4):
@@ -30,7 +30,7 @@ def test_my_future_history_dead_lock(solo_board_4):
     fb.register_recorder(hist)
     for _ in range(8):
         fb.next_turn()
-    assert hist.all_snakes_definitely_dead_after_how_many_steps(NextStep.UP) == 3
+    assert hist.all_my_snakes_definitely_dead_after_how_many_steps(NextStep.UP) == 3
 
 
 def test_tactis(solo_board_4):
