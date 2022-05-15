@@ -126,7 +126,7 @@ class MyFutureHistory(Recorder):
         ] = AmountOfSnakesAlive(amount_of_snakes_alive + 1)
 
     def _check_for_dangerous_snake_in_first_step(self, my_snake: FutureSnake):
-        if self._current_future_board.simulated_turns > 1:
+        if self._current_future_board.simulated_turns > 2:
             return
         is_danger_ahead = (
             self._current_future_board.does_my_snake_bite_or_collide_with_another_snake(
@@ -134,6 +134,8 @@ class MyFutureHistory(Recorder):
             )
         )
         first_step = my_snake.get_my_first_step()
+        if self._current_future_board.simulated_turns == 2 and not is_danger_ahead:
+            return
         self._dangerous_snake_first_step[first_step] = is_danger_ahead
 
     def my_snake_found_food_after_how_many_steps(
@@ -160,11 +162,12 @@ class Tactics:
     def decide(self) -> NextStep:
         surviors_first_steps = self._get_first_steps_of_latest_survivor()
         # Remove dangerous steps
-        surviors_first_steps = {
-            step
-            for step in surviors_first_steps
-            if not self._history.is_dangerous_snake_in_first_step(step)
-        }
+        if len(surviors_first_steps) > 1:
+            surviors_first_steps = {
+                step
+                for step in surviors_first_steps
+                if not self._history.is_dangerous_snake_in_first_step(step)
+            }
         #
         food_after = self._get_first_food_for(surviors_first_steps)
         if food_after:
