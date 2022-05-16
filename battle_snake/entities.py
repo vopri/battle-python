@@ -262,6 +262,8 @@ class PossibleFutureBoard:
         self.possible_snakes: set[FutureSnake] = set()
         self.recorder: Optional[Recorder] = None
         self._prepare_future_board(board.snakes)
+        # only deterministic in first step
+        self._remove_my_snakes_biting_other_snakes()
         self.simulated_turns: int = 1
 
     def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
@@ -289,6 +291,15 @@ class PossibleFutureBoard:
 
     def is_food_available_for(self, snake: Snake):
         return snake.head in self.food
+
+    def _remove_my_snakes_biting_other_snakes(self):
+        other_snakes: set[FutureSnake] = (
+            self.possible_snakes - self.get_my_survived_snakes()
+        )
+        other_snakes_bodies = {snake.body_without_head for snake in other_snakes}
+        for my_snake in self.get_my_survived_snakes():
+            if my_snake.head in other_snakes_bodies:
+                self.possible_snakes.remove(my_snake)
 
     def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
         for snake in orig_snakes:
