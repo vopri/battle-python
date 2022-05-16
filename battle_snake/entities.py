@@ -296,7 +296,7 @@ class PossibleFutureBoard:
         other_snakes: set[FutureSnake] = (
             self.possible_snakes - self.get_my_survived_snakes()
         )
-        other_snakes_bodies = {snake.body_without_head for snake in other_snakes}
+        other_snakes_bodies = [snake.body_without_head for snake in other_snakes]
         for my_snake in self.get_my_survived_snakes():
             if my_snake.head in other_snakes_bodies:
                 self.possible_snakes.remove(my_snake)
