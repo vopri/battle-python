@@ -24,7 +24,7 @@ def test_future_board_init(test_board: Board):
     }
     assert len(test_board.food) == 4
     assert len(test_board.snakes) == 7
-    assert len(future_board.possible_snakes) == 16
+    assert len(future_board.possible_snakes) == 14
 
 
 # def test_future_board_all_possible_snakes(test_board: Board):
