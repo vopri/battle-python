@@ -144,12 +144,6 @@ class FutureSnake(Snake):
         """Get the first step from the first FutureSnake in this line of relatives"""
         return self.my_first_step
 
-    def find_first_future_snake_of_my_ancestors(self):
-        snake: FutureSnake = self
-        while type(snake.mother) != Snake:
-            snake = snake.mother  # type: ignore
-        return snake
-
     def __repr__(self) -> str:
         return f"FutureSnake: ID={self.id}, HEAD={self.head}, MOTHER={self.mother.head}"
 
