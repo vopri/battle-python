@@ -1,5 +1,11 @@
 import pytest
-from battle_snake.entities import Board, GameBoardBounderies, Position, Snake
+from battle_snake.entities import (
+    Board,
+    GameBoardBounderies,
+    Position,
+    PossibleFutureBoard,
+    Snake,
+)
 
 
 def test_postion_init():
@@ -79,20 +85,20 @@ def test_get_my_snake(sample_board):
     assert len(me) == 3
 
 
-# def test_is_wall(sample_board):
-#     future_board = FutureBoard(sample_board)
-#     assert not future_board.is_wall(Position(0, 0))
-#     assert not future_board.is_wall(Position(3, 3))
-#     assert not future_board.is_wall(Position(10, 10))
-#     assert not future_board.is_wall(Position(0, 10))
-#     assert not future_board.is_wall(Position(10, 0))
-#     assert future_board.is_wall(Position(-1, 3))
-#     assert future_board.is_wall(Position(2, -3))
-#     assert future_board.is_wall(Position(11, 3))
-#     assert future_board.is_wall(Position(5, 11))
-#     assert future_board.is_wall(Position(15, 15))
-#     assert future_board.is_wall(Position(-3, 15))
-#     assert future_board.is_wall(Position(-3, -8))
+def test_is_wall(sample_board: Board):
+    future_board = PossibleFutureBoard(sample_board)
+    assert not future_board.is_wall(Position(0, 0))
+    assert not future_board.is_wall(Position(3, 3))
+    assert not future_board.is_wall(Position(10, 10))
+    assert not future_board.is_wall(Position(0, 10))
+    assert not future_board.is_wall(Position(10, 0))
+    assert future_board.is_wall(Position(-1, 3))
+    assert future_board.is_wall(Position(2, -3))
+    assert future_board.is_wall(Position(11, 3))
+    assert future_board.is_wall(Position(5, 11))
+    assert future_board.is_wall(Position(15, 15))
+    assert future_board.is_wall(Position(-3, 15))
+    assert future_board.is_wall(Position(-3, -8))
 
 
 @pytest.mark.parametrize(

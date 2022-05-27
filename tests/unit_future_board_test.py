@@ -1,21 +1,30 @@
 import pytest
-from battle_snake.entities import Board, GameBoardBounderies, NextStep, Position, Snake
+from battle_snake.entities import (
+    Board,
+    GameBoardBounderies,
+    NextStep,
+    Position,
+    PossibleFutureBoard,
+    Snake,
+)
 
 
 def test_placeholder():
     assert True
 
 
-# def test_future_board_init(test_board: Board):
-#     future_board = FutureBoard(test_board)
-#     assert test_board.bounderies == future_board.bounderies
-#     assert future_board.food == {
-#         Position(5, 5),
-#         Position(9, 0),
-#     }
-#     assert len(test_board.food) == 4
-#     assert len(future_board.food) == 2
-#     assert len(test_board.snakes) == 7
+def test_future_board_init(test_board: Board):
+    future_board = PossibleFutureBoard(test_board)
+    assert test_board.bounderies == future_board.bounderies
+    assert future_board.food == {
+        Position(2, 6),
+        Position(5, 5),
+        Position(5, 4),
+        Position(9, 0),
+    }
+    assert len(test_board.food) == 4
+    assert len(test_board.snakes) == 7
+    assert len(future_board.possible_snakes) == 16
 
 
 # def test_future_board_all_possible_snakes(test_board: Board):

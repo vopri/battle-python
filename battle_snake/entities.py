@@ -251,6 +251,14 @@ class Recorder(Protocol):
 class PossibleFutureBoard:
     """Simulate Board as it could look like in the future.
 
+    Add all possible future snakes for every new step.
+    Remove only snakes biting itself or running into walls.
+    For the first step only (deterministic regarding the body):
+    Remove only my snakes, biting other snakes for sure
+    (during initializing the PossibleFutureBoard).
+
+    Remove eaten food after calculating the next_turn.
+
     Several turns can be simulated using next_turn.
     For performance reasons it's possible to register a recorder
     to evaluate interesting information later on.
