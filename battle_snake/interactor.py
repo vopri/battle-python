@@ -140,7 +140,7 @@ class MyFutureHistory(Recorder):
         return self._found_first_food_after_n_steps[FirstStep(first_step)]
 
     def all_my_snakes_definitely_dead_after_how_many_steps(
-        self, first_step: NextStep
+        self, first_step: FirstStep
     ) -> int:
         counter_first_step = self._counter_of_snakes_alive_after_n_steps[
             FirstStep(first_step)
@@ -149,7 +149,7 @@ class MyFutureHistory(Recorder):
             return 1
         return max(counter_first_step.keys()) + 1
 
-    def is_dangerous_snake_in_first_step(self, first_step: NextStep):
+    def is_dangerous_snake_in_first_step(self, first_step: FirstStep):
         return self._dangerous_snake_first_step[FirstStep(first_step)]
 
 
@@ -158,38 +158,32 @@ class Tactics:
         self._history = history
 
     def decide(self) -> NextStep:
-        surviors_first_steps = self._get_first_steps_of_latest_survivor()
-        # Remove dangerous steps
-        if len(surviors_first_steps) > 1:
-            surviors_first_steps = {
-                step
-                for step in surviors_first_steps
-                if not self._history.is_dangerous_snake_in_first_step(step)
-            }
-        #
-        food_after = self._get_first_food_for(surviors_first_steps)
-        if food_after:
-            shortest_way_to_food = min(food_after.keys())
-            return food_after[shortest_way_to_food]
-        elif surviors_first_steps:
-            return random.choice(list(surviors_first_steps))
-        else:
-            # die like a snake!
-            return NextStep.UP
-
-    def _get_first_food_for(
-        self, surviors_first_steps
-    ) -> dict[AmountOfSteps, NextStep]:
-        food_after: dict[AmountOfSteps, NextStep] = dict()
-        for step in surviors_first_steps:
-            amount_of_steps = self._history.my_snake_found_food_after_how_many_steps(
-                step
+        latest_surviors_first_steps: set[
+            FirstStep
+        ] = self._get_first_steps_of_latest_survivor()
+        latest_surviors_first_steps = (
+            self._remove_possible_snake_collision_in_first_step(
+                latest_surviors_first_steps
             )
-            if amount_of_steps is not None:
-                food_after[AmountOfSteps(amount_of_steps)] = step
-        return food_after
+        )
 
-    def _get_first_steps_of_latest_survivor(self) -> set[NextStep]:
+        # Nothing to chose in these cases:
+        if len(latest_surviors_first_steps) == 0:
+            return NextStep.UP
+        if len(latest_surviors_first_steps) == 1:
+            return latest_surviors_first_steps.pop()
+
+        # Find next way to food
+        smelt_food = self._smelt_first_food_on_future_path_for(
+            latest_surviors_first_steps
+        )
+        if smelt_food:
+            shortest_way_to_food: AmountOfSteps = min(smelt_food.keys())
+            return smelt_food[shortest_way_to_food]
+        else:
+            return random.choice(list(latest_surviors_first_steps))
+
+    def _get_first_steps_of_latest_survivor(self) -> set[FirstStep]:
         surviors_first_steps = set()
         for max_steps in range(FORECAST_DEPTH, 0, -1):
             surviors_first_steps = self._find_survivors(max_steps)
@@ -199,8 +193,35 @@ class Tactics:
 
     def _find_survivors(self, max_steps: int):
         return {
-            step
-            for step in NextStep
-            if self._history.all_my_snakes_definitely_dead_after_how_many_steps(step)
+            direction
+            for direction in NextStep
+            if self._history.all_my_snakes_definitely_dead_after_how_many_steps(
+                FirstStep(direction)
+            )
             > max_steps
         }
+
+    def _remove_possible_snake_collision_in_first_step(
+        self, latest_surviors_first_steps: set[FirstStep]
+    ) -> set[FirstStep]:
+        if len(latest_surviors_first_steps) > 1:
+            latest_surviors_first_steps = {
+                first_step
+                for first_step in latest_surviors_first_steps
+                if not self._history.is_dangerous_snake_in_first_step(
+                    FirstStep(first_step)
+                )
+            }
+        return latest_surviors_first_steps
+
+    def _smelt_first_food_on_future_path_for(
+        self, surviors_first_steps: set[FirstStep]
+    ) -> dict[AmountOfSteps, FirstStep]:
+        food_after: dict[AmountOfSteps, FirstStep] = dict()
+        for step in surviors_first_steps:
+            amount_of_steps = self._history.my_snake_found_food_after_how_many_steps(
+                step
+            )
+            if amount_of_steps is not None:
+                food_after[AmountOfSteps(amount_of_steps)] = FirstStep(step)
+        return food_after
