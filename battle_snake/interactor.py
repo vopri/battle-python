@@ -158,7 +158,7 @@ class Tactics:
         self._history = history
 
     def decide(self) -> NextStep:
-        logging.info("\n" + "*" * 10)
+        logging.info("\n" + "*" * 30)
         logging.info(
             f"Survivors simulation: {self._history._counter_of_snakes_alive_after_n_steps}"
         )
@@ -166,11 +166,19 @@ class Tactics:
             FirstStep
         ] = self._get_first_steps_of_latest_survivor()
         logging.info(f"Latest survivors: {latest_surviors_first_steps}")
+        # If next calc removes to many steps, I want to be able to switch back
+        latest_surviors_first_steps_backup = latest_surviors_first_steps.copy()
         latest_surviors_first_steps = (
             self._remove_possible_snake_collision_in_first_step(
                 latest_surviors_first_steps
             )
         )
+        if len(latest_surviors_first_steps) == 0:
+            logging.info(
+                "Avoiding collision in first step will be revised..."
+                "I will have to take my chances",
+            )
+            latest_surviors_first_steps = latest_surviors_first_steps_backup
         logging.info(f"Avoiding collision in first step: {latest_surviors_first_steps}")
 
         # Nothing to chose in these cases:
