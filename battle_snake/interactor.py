@@ -175,8 +175,8 @@ class Tactics:
 
         # Nothing to chose in these cases:
         if len(latest_surviors_first_steps) == 0:
-            logging.info(f"Die like a snake!")
-            return NextStep.UP
+            logging.info(f"Try your chances or die like a snake!")
+            return latest_surviors_first_steps.pop()
         if len(latest_surviors_first_steps) == 1:
             logging.info(f"There's one step left only: {latest_surviors_first_steps}")
             return latest_surviors_first_steps.pop()
