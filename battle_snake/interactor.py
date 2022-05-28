@@ -1,10 +1,13 @@
 import logging
 import random
 import time
-from typing import NewType, Optional
+from typing import Optional
 
 from battle_snake.entities import (
+    AmountOfSnakesAlive,
+    AmountOfSteps,
     Board,
+    FirstStep,
     FutureSnake,
     NextStep,
     PossibleFutureBoard,
@@ -60,11 +63,6 @@ class MoveDecision:
         survivors = self.future_board.get_my_survived_snakes()
         first_steps = {snake.get_my_first_step() for snake in survivors}
         return len(first_steps) < 2
-
-
-AmountOfSteps = NewType("AmountOfSteps", int)
-AmountOfSnakesAlive = NewType("AmountOfSnakesAlive", int)
-FirstStep = NewType("FirstStep", NextStep)
 
 
 class MyFutureHistory(Recorder):
@@ -177,7 +175,7 @@ class Tactics:
         self._try_to_smell_food_on_path()
         if self._i_can_smell_food():
             return self._get_first_step_to_nearest_food()
-
+        # else: which_first_steps_leads_to_food-further-away?
         logging.info(
             f"I'll guess one by luck from... {self._latest_surviors_first_steps}"
         )

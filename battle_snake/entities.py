@@ -2,7 +2,7 @@ from collections import deque
 from dataclasses import dataclass
 from enum import Enum
 from itertools import islice
-from typing import Iterable, Optional, Protocol
+from typing import Iterable, NewType, Optional, Protocol
 
 
 class NextStep(Enum):
@@ -10,6 +10,11 @@ class NextStep(Enum):
     DOWN = "down"
     LEFT = "left"
     RIGHT = "right"
+
+
+AmountOfSteps = NewType("AmountOfSteps", int)
+AmountOfSnakesAlive = NewType("AmountOfSnakesAlive", int)
+FirstStep = NewType("FirstStep", NextStep)
 
 
 @dataclass(frozen=True, slots=True)
