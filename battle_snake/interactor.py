@@ -48,7 +48,6 @@ class MoveDecision:
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
         self._calculate_simulation()
-        logging.info(f"Posisition of my snake: {self.board.my_snake}")
         decision = self.tactics.decide()
         logging.info(f"Decision for next step: {decision}")
         return decision
