@@ -44,14 +44,17 @@ class MoveDecision:
 
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
-        for _ in range(FORECAST_DEPTH - 1):
-            if self._is_ready_for_decision():
-                break
-            self.future_board.next_turn()
+        self._calculate_simulation()
         logging.info(f"Posisition of my snake: {self.board.my_snake}")
         decision = self.tactics.decide()
         logging.info(f"Decision for next step: {decision}")
         return decision
+
+    def _calculate_simulation(self):
+        for _ in range(FORECAST_DEPTH - 1):
+            if self._is_ready_for_decision():
+                break
+            self.future_board.next_turn()
 
     def _is_ready_for_decision(self) -> bool:
         survivors = self.future_board.get_my_survived_snakes()
@@ -160,9 +163,10 @@ class Tactics:
         self._smelt_food: dict[AmountOfSteps, FirstStep] = dict()  # type: ignore
 
     def decide(self) -> NextStep:
+        """Here's the decision made based on collected data of the simulation"""
         self._init_with_first_steps_of_last_survivors()
         self._try_to_avoid_collision_in_first_step()
-        if self.there_is_just_one_possibility():
+        if self._there_is_just_one_possibility():
             logging.info(
                 f"There's one step left only: {self._latest_surviors_first_steps}"
             )
@@ -171,7 +175,7 @@ class Tactics:
             logging.info(f"I'm dying ... arghhhh ...")
             return NextStep.UP
         self._try_to_smell_food_on_path()
-        if self.i_can_smell_food():
+        if self._i_can_smell_food():
             return self._get_first_step_to_nearest_food()
 
         logging.info(
@@ -229,7 +233,7 @@ class Tactics:
                 )
             }
 
-    def there_is_just_one_possibility(self) -> bool:
+    def _there_is_just_one_possibility(self) -> bool:
         return len(self._latest_surviors_first_steps) == 1
 
     def _there_is_no_way_out(self) -> bool:
@@ -243,7 +247,7 @@ class Tactics:
         first_step_into_food_direction = self._smelt_food[shortest_way_to_food]
         return first_step_into_food_direction
 
-    def i_can_smell_food(self) -> bool:
+    def _i_can_smell_food(self) -> bool:
         return len(self._smelt_food) > 0
 
     def _try_to_smell_food_on_path(self):
