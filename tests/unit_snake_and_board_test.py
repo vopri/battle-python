@@ -1,7 +1,10 @@
+from turtle import down
+
 import pytest
 from battle_snake.entities import (
     Board,
     GameBoardBounderies,
+    NextStep,
     Position,
     PossibleFutureBoard,
     Snake,
@@ -123,3 +126,22 @@ def test_print_snake(
 
 def test_snake_body_withoud_head(snake_origin):
     assert snake_origin.body_without_head == [Position(0, 1), Position(0, 2)]
+
+
+def test_find_nearest_food(sample_board: Board):
+    nearest_food = sample_board.get_food_ordered_by_distance(Position(5, 7))
+    assert len(nearest_food) == 3
+    nf0 = nearest_food[0]
+    assert nf0[0] == {NextStep.DOWN}
+    assert nf0[1] == 2
+    assert nf0[2] == Position(5, 5)
+
+    nf1 = nearest_food[1]
+    assert nf1[0] == {NextStep.DOWN, NextStep.LEFT}
+    assert nf1[1] == 4
+    assert nf1[2] == Position(2, 6)
+
+    nf2 = nearest_food[2]
+    assert nf2[0] == {NextStep.DOWN, NextStep.RIGHT}
+    assert nf2[1] == 11
+    assert nf2[2] == Position(9, 0)

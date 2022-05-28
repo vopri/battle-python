@@ -221,6 +221,49 @@ class Board:
     def my_snake(self) -> Snake:
         return self._my_snake
 
+    def get_food_ordered_by_distance(
+        self, position: Position
+    ) -> list[tuple[set[FirstStep], AmountOfSteps, Position]]:
+        """Get list with food ordered by distance from requested position."""
+        nearest_food: list[tuple[set[FirstStep], AmountOfSteps, Position]] = []
+        for food_item in self.food:
+            if self._is_food_on_same_position(position, food_item):
+                continue
+            steps: AmountOfSteps = self._calc_distance(position, food_item)
+            first_steps: set[FirstStep] = self._calc_first_steps(position, food_item)
+            near_food = (first_steps, steps, food_item)
+            nearest_food.append(near_food)
+        self._sort_food_list_by_distance(nearest_food)
+        return nearest_food
+
+    def _calc_first_steps(
+        self, position: Position, food_item: Position
+    ) -> set[FirstStep]:
+        first_steps: set[FirstStep] = set()
+        if position.x < food_item.x:
+            first_steps.add(FirstStep(NextStep.RIGHT))
+        elif position.x > food_item.x:
+            first_steps.add(FirstStep(NextStep.LEFT))
+        if position.y < food_item.y:
+            first_steps.add(FirstStep(NextStep.UP))
+        elif position.y > food_item.y:
+            first_steps.add(FirstStep(NextStep.DOWN))
+        return first_steps
+
+    def _is_food_on_same_position(
+        self, position: Position, food_item: Position
+    ) -> bool:
+        return position == food_item
+
+    def _calc_distance(self, position: Position, food_item: Position):
+        x_dist = abs(food_item.x - position.x)
+        y_dist = abs(food_item.y - position.y)
+        steps = AmountOfSteps(x_dist + y_dist)
+        return steps
+
+    def _sort_food_list_by_distance(self, nearest_food):
+        nearest_food.sort(key=lambda entry: entry[1])
+
 
 class GameBoardBounderies:
     def __init__(self, height: int, width: int):
