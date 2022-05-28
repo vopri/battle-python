@@ -43,7 +43,7 @@ class MoveDecision:
         self.future_board: PossibleFutureBoard = PossibleFutureBoard(self.board)
         self._history = MyFutureHistory()
         self.future_board.register_recorder(self._history)
-        self.tactics = Tactics(self._history)
+        self.tactics = Tactics(self._history, self.board)
 
     def decide(self) -> NextStep:
         """Find decision for next step for my snake"""
@@ -155,10 +155,11 @@ class MyFutureHistory(Recorder):
 
 
 class Tactics:
-    def __init__(self, history: MyFutureHistory):
+    def __init__(self, history: MyFutureHistory, board: Board):
         self._history = history
         self._latest_surviors_first_steps: set[FirstStep] = None  # type: ignore
         self._smelt_food: dict[AmountOfSteps, FirstStep] = dict()  # type: ignore
+        self._board = board
 
     def decide(self) -> NextStep:
         """Here's the decision made based on collected data of the simulation"""
@@ -175,9 +176,26 @@ class Tactics:
         self._try_to_smell_food_on_path()
         if self._i_can_smell_food():
             return self._get_first_step_to_nearest_food()
-        # else: which_first_steps_leads_to_food-further-away?
+        # Find food that I can't smell yet
+        else:
+            for food_pos in self._board.get_food_ordered_by_distance(
+                self._board.my_snake.head
+            ):
+                first_steps_leading_to_food: set[FirstStep] = food_pos[0]
+                first_steps_leading_to_food = (
+                    self._latest_surviors_first_steps.intersection(
+                        first_steps_leading_to_food
+                    )
+                )
+                if len(first_steps_leading_to_food) > 0:
+                    first_step = first_steps_leading_to_food.pop()
+                    logging.info(
+                        f"First secure step leading to food that I couldn't smell: {first_step}"
+                    )
+                    return first_step
+
         logging.info(
-            f"I'll guess one by luck from... {self._latest_surviors_first_steps}"
+            f"I'll guess one by luck from, because there's no food securely reachable... {self._latest_surviors_first_steps}"
         )
         return random.choice(list(self._latest_surviors_first_steps))
 
