@@ -156,54 +156,36 @@ class MyFutureHistory(Recorder):
 class Tactics:
     def __init__(self, history: MyFutureHistory):
         self._history = history
+        self._latest_surviors_first_steps: set[FirstStep] = None  # type: ignore
+        self._smelt_food: dict[AmountOfSteps, FirstStep] = dict()  # type: ignore
 
     def decide(self) -> NextStep:
-        logging.info("\n" + "*" * 30)
+        self._init_with_first_steps_of_last_survivors()
+        self._try_to_avoid_collision_in_first_step()
+        if self.there_is_just_one_possibility():
+            logging.info(
+                f"There's one step left only: {self._latest_surviors_first_steps}"
+            )
+            return self._latest_surviors_first_steps.pop()
+        if self._there_is_no_way_out():
+            logging.info(f"I'm dying ... arghhhh ...")
+            return NextStep.UP
+        self._try_to_smell_food_on_path()
+        if self.i_can_smell_food():
+            return self._get_first_step_to_nearest_food()
+
+        logging.info(
+            f"I'll guess one by luck from... {self._latest_surviors_first_steps}"
+        )
+        return random.choice(list(self._latest_surviors_first_steps))
+
+    def _init_with_first_steps_of_last_survivors(self):
+        logging.info("\n" + "New Decision   " + "*" * 30)
         logging.info(
             f"Survivors simulation: {self._history._counter_of_snakes_alive_after_n_steps}"
         )
-        latest_surviors_first_steps: set[
-            FirstStep
-        ] = self._get_first_steps_of_latest_survivor()
-        logging.info(f"Latest survivors: {latest_surviors_first_steps}")
-        # If next calc removes to many steps, I want to be able to switch back
-        latest_surviors_first_steps_backup = latest_surviors_first_steps.copy()
-        latest_surviors_first_steps = (
-            self._remove_possible_snake_collision_in_first_step(
-                latest_surviors_first_steps
-            )
-        )
-        if len(latest_surviors_first_steps) == 0:
-            logging.info(
-                "Avoiding collision in first step will be revised..."
-                "I will have to take my chances",
-            )
-            latest_surviors_first_steps = latest_surviors_first_steps_backup
-        logging.info(f"Avoiding collision in first step: {latest_surviors_first_steps}")
-
-        # Nothing to chose in these cases:
-        if len(latest_surviors_first_steps) == 0:
-            logging.info(f"Try your chances or die like a snake!")
-            return latest_surviors_first_steps.pop()
-        if len(latest_surviors_first_steps) == 1:
-            logging.info(f"There's one step left only: {latest_surviors_first_steps}")
-            return latest_surviors_first_steps.pop()
-
-        # Find next way to food
-        smelt_food = self._smelt_first_food_on_future_path_for(
-            latest_surviors_first_steps
-        )
-        if smelt_food:
-            shortest_way_to_food: AmountOfSteps = min(smelt_food.keys())
-            logging.info(
-                f"Smelling food nearby: {smelt_food[shortest_way_to_food]} in {shortest_way_to_food} steps"
-            )
-            return smelt_food[shortest_way_to_food]
-        else:
-            logging.info(
-                f"I'll guess one by luck from... {latest_surviors_first_steps}"
-            )
-            return random.choice(list(latest_surviors_first_steps))
+        self._latest_surviors_first_steps = self._get_first_steps_of_latest_survivor()
+        logging.info(f"Latest survivors: {self._latest_surviors_first_steps}")
 
     def _get_first_steps_of_latest_survivor(self) -> set[FirstStep]:
         surviors_first_steps = set()
@@ -223,27 +205,51 @@ class Tactics:
             > max_steps
         }
 
-    def _remove_possible_snake_collision_in_first_step(
-        self, latest_surviors_first_steps: set[FirstStep]
-    ) -> set[FirstStep]:
-        if len(latest_surviors_first_steps) > 1:
-            latest_surviors_first_steps = {
+    def _try_to_avoid_collision_in_first_step(self):
+        # If next calc removes to many steps, I want to be able to switch back
+        latest_surviors_first_steps_backup = self._latest_surviors_first_steps.copy()
+        self._remove_possible_snake_collision_in_first_step()
+        if len(self._latest_surviors_first_steps) == 0:
+            logging.info(
+                "Avoiding collision in first step will be revised..."
+                "I will have to take my chances",
+            )
+            self._latest_surviors_first_steps = latest_surviors_first_steps_backup
+        logging.info(
+            f"Avoiding collision in first step: {self._latest_surviors_first_steps}"
+        )
+
+    def _remove_possible_snake_collision_in_first_step(self):
+        if len(self._latest_surviors_first_steps) > 1:
+            self._latest_surviors_first_steps = {
                 first_step
-                for first_step in latest_surviors_first_steps
+                for first_step in self._latest_surviors_first_steps
                 if not self._history.is_dangerous_snake_in_first_step(
                     FirstStep(first_step)
                 )
             }
-        return latest_surviors_first_steps
 
-    def _smelt_first_food_on_future_path_for(
-        self, surviors_first_steps: set[FirstStep]
-    ) -> dict[AmountOfSteps, FirstStep]:
-        food_after: dict[AmountOfSteps, FirstStep] = dict()
-        for step in surviors_first_steps:
+    def there_is_just_one_possibility(self) -> bool:
+        return len(self._latest_surviors_first_steps) == 1
+
+    def _there_is_no_way_out(self) -> bool:
+        return len(self._latest_surviors_first_steps) == 0
+
+    def _get_first_step_to_nearest_food(self) -> FirstStep:
+        shortest_way_to_food: AmountOfSteps = min(self._smelt_food.keys())
+        logging.info(
+            f"Smelling food nearby: {self._smelt_food[shortest_way_to_food]} in {shortest_way_to_food} steps"
+        )
+        first_step_into_food_direction = self._smelt_food[shortest_way_to_food]
+        return first_step_into_food_direction
+
+    def i_can_smell_food(self) -> bool:
+        return len(self._smelt_food) > 0
+
+    def _try_to_smell_food_on_path(self):
+        for step in self._latest_surviors_first_steps:
             amount_of_steps = self._history.my_snake_found_food_after_how_many_steps(
                 step
             )
             if amount_of_steps is not None:
-                food_after[AmountOfSteps(amount_of_steps)] = FirstStep(step)
-        return food_after
+                self._smelt_food[AmountOfSteps(amount_of_steps)] = FirstStep(step)
