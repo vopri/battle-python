@@ -158,19 +158,27 @@ class Tactics:
         self._history = history
 
     def decide(self) -> NextStep:
+        logging.info("\n" + "*" * 10)
+        logging.info(
+            f"Survivors simulation: {self._history._counter_of_snakes_alive_after_n_steps}"
+        )
         latest_surviors_first_steps: set[
             FirstStep
         ] = self._get_first_steps_of_latest_survivor()
+        logging.info(f"Latest survivors: {latest_surviors_first_steps}")
         latest_surviors_first_steps = (
             self._remove_possible_snake_collision_in_first_step(
                 latest_surviors_first_steps
             )
         )
+        logging.info(f"Avoiding collision in first step: {latest_surviors_first_steps}")
 
         # Nothing to chose in these cases:
         if len(latest_surviors_first_steps) == 0:
+            logging.info(f"Die like a snake!")
             return NextStep.UP
         if len(latest_surviors_first_steps) == 1:
+            logging.info(f"There's one step left only: {latest_surviors_first_steps}")
             return latest_surviors_first_steps.pop()
 
         # Find next way to food
@@ -179,8 +187,14 @@ class Tactics:
         )
         if smelt_food:
             shortest_way_to_food: AmountOfSteps = min(smelt_food.keys())
+            logging.info(
+                f"Smelling food nearby: {smelt_food[shortest_way_to_food]} in {shortest_way_to_food} steps"
+            )
             return smelt_food[shortest_way_to_food]
         else:
+            logging.info(
+                f"I'll guess one by luck from... {latest_surviors_first_steps}"
+            )
             return random.choice(list(latest_surviors_first_steps))
 
     def _get_first_steps_of_latest_survivor(self) -> set[FirstStep]:
