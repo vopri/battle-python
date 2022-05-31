@@ -175,24 +175,10 @@ class Tactics:
         self._try_to_smell_food_on_path()
         if self._i_can_smell_food():
             return self._get_first_step_to_nearest_food()
-        # Find food that I can't smell yet
         else:
-            for food_pos in self._board.get_food_ordered_by_distance(
-                self._board.my_snake.head
-            ):
-                first_steps_leading_to_food: set[FirstStep] = food_pos[0]
-                first_steps_leading_to_food = (
-                    self._latest_surviors_first_steps.intersection(
-                        first_steps_leading_to_food
-                    )
-                )
-                if len(first_steps_leading_to_food) > 0:
-                    first_step = first_steps_leading_to_food.pop()
-                    logging.info(
-                        f"First secure step leading to food that I couldn't smell: {first_step}"
-                    )
-                    return first_step
-
+            first_step_to_food_far_away = self._find_food_i_cant_smell()
+            if first_step_to_food_far_away is not None:
+                return first_step_to_food_far_away
         logging.info(
             f"I'll guess one by luck from, because there's no food securely reachable... {self._latest_surviors_first_steps}"
         )
@@ -272,3 +258,22 @@ class Tactics:
             )
             if amount_of_steps is not None:
                 self._smelt_food[AmountOfSteps(amount_of_steps)] = FirstStep(step)
+
+    def _find_food_i_cant_smell(self) -> Optional[FirstStep]:
+        for food_pos in self._board.get_food_ordered_by_distance(
+            self._board.my_snake.head
+        ):
+            first_steps_leading_to_food: set[FirstStep] = food_pos[0]
+            first_steps_leading_to_food = (
+                self._latest_surviors_first_steps.intersection(
+                    first_steps_leading_to_food
+                )
+            )
+            if len(first_steps_leading_to_food) > 0:
+                first_step = first_steps_leading_to_food.pop()
+                logging.info(
+                    f"First secure step leading to food that I couldn't smell: {first_step}"
+                )
+                return first_step
+        logging.info(f"Strange ... there's no food availabe.")
+        return None
