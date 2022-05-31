@@ -1,4 +1,4 @@
-from collections import deque
+from collections import defaultdict, deque
 from dataclasses import dataclass
 from enum import Enum
 from itertools import islice
@@ -312,14 +312,13 @@ class PossibleFutureBoard:
         self.food: set[Position] = board.food.copy()
         self.possible_snakes: set[FutureSnake] = set()
         self.recorder: Optional[Recorder] = None
-        self._prepare_future_board(board.snakes)
-        # only deterministic in first step
-        self._remove_snakes_biting_other_snakes()
         self.simulated_turns: int = 1
+        self._prepare_future_board(board.snakes)
 
     def _prepare_future_board(self, orig_snakes: Iterable[Snake]):
         self.possible_snakes = set()
         self._add_possible_snakes_of_future(orig_snakes)
+        self._remove_snakes_biting_other_snakes()
 
     def _add_possible_snakes_of_future(self, orig_snakes: Iterable[Snake]):
         for original_snake in orig_snakes:
@@ -344,15 +343,27 @@ class PossibleFutureBoard:
         return snake.head in self.food
 
     def _remove_snakes_biting_other_snakes(self):
-        snake_bodies = [
-            position
-            for snake in self.possible_snakes
-            for position in snake.body_without_head
-        ]
-
+        deterministik_snake_bodies = defaultdict(set)
+        for snake in self.possible_snakes:
+            for position in self._deterministic_part_of_snake(snake):
+                deterministik_snake_bodies[position].add(snake.id)
         for snake in self.possible_snakes.copy():
-            if snake.head in snake_bodies:
+            if (
+                snake.head in deterministik_snake_bodies.keys()
+                and self._is_not_just_another_variant_of_myself(
+                    deterministik_snake_bodies, snake
+                )
+            ):
                 self.possible_snakes.remove(snake)
+
+    def _deterministic_part_of_snake(self, snake: FutureSnake) -> list[Position]:
+        start_index = self.simulated_turns
+        return snake.head_and_body[start_index:]
+
+    def _is_not_just_another_variant_of_myself(
+        self, deterministik_snake_bodies: dict, snake: FutureSnake
+    ) -> bool:
+        return len(deterministik_snake_bodies[snake.head] - {snake.id}) > 0
 
     def _remove_eaten_food(self, orig_snakes: Iterable[Snake]):
         for snake in orig_snakes:
