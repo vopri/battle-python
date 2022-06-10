@@ -145,3 +145,16 @@ def test_find_nearest_food(sample_board: Board):
     assert nf2[0] == {NextStep.DOWN, NextStep.RIGHT}
     assert nf2[1] == 11
     assert nf2[2] == Position(9, 0)
+
+
+def test_board_move_snake(solo_board_2: Board):
+    assert solo_board_2.move_snake(solo_board_2.my_snake, NextStep.UP) == Position(5, 9)
+    assert solo_board_2.move_snake(solo_board_2.my_snake, NextStep.DOWN) == Position(
+        5, 7
+    )
+    assert solo_board_2.move_snake(solo_board_2.my_snake, NextStep.LEFT) == Position(
+        4, 8
+    )
+    assert solo_board_2.move_snake(solo_board_2.my_snake, NextStep.RIGHT) == Position(
+        6, 8
+    )

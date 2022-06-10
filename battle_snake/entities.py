@@ -264,6 +264,19 @@ class Board:
     def _sort_food_list_by_distance(self, nearest_food):
         nearest_food.sort(key=lambda entry: entry[1])
 
+    def move_snake(self, snake: Snake, next_step: NextStep) -> Position:
+        """Get new head position of snake afer moving into given direction."""
+        x, y = snake.head.x, snake.head.y
+        match next_step:
+            case NextStep.UP:
+                return Position(x, y + 1)
+            case NextStep.DOWN:
+                return Position(x, y - 1)
+            case NextStep.LEFT:
+                return Position(x - 1, y)
+            case NextStep.RIGHT:
+                return Position(x + 1, y)
+
 
 class GameBoardBounderies:
     def __init__(self, height: int, width: int):
