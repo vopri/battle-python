@@ -214,12 +214,16 @@ class Tactics:
         # If next calc removes to many steps, I want to be able to switch back
         latest_surviors_first_steps_backup = self._latest_surviors_first_steps.copy()
         self._remove_possible_snake_collision_in_first_step()
-        if len(self._latest_surviors_first_steps) == 0:
+        is_collision_not_avoidable = len(self._latest_surviors_first_steps) == 0
+        if is_collision_not_avoidable:
             logging.info(
                 "Avoiding collision in first step will be revised..."
                 "I will have to take my chances",
             )
-            self._latest_surviors_first_steps = latest_surviors_first_steps_backup
+            self._revise_avoiding_collision_in_first_step(
+                latest_surviors_first_steps_backup
+            )
+            self._avoid_field_with_food()
         logging.info(
             f"Avoiding collision in first step: {self._latest_surviors_first_steps}"
         )
@@ -233,6 +237,23 @@ class Tactics:
                     FirstStep(first_step)
                 )
             }
+
+    def _revise_avoiding_collision_in_first_step(
+        self, latest_surviors_first_steps_backup
+    ):
+        self._latest_surviors_first_steps = latest_surviors_first_steps_backup
+
+    def _avoid_field_with_food(self):
+        for next_step in self._latest_surviors_first_steps.copy():
+            new_head_pos = self._board.move_snake(self._board.my_snake, next_step)
+            is_food_on_new_head_position = new_head_pos in self._board.food
+            if is_food_on_new_head_position:
+                self._latest_surviors_first_steps.remove(next_step)
+                logging.info(
+                    "Avoiding field with food to avoid dangerous head collision"
+                )
+            if len(self._latest_surviors_first_steps) < 2:
+                break
 
     def _there_is_just_one_possibility(self) -> bool:
         return len(self._latest_surviors_first_steps) == 1
