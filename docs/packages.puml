@@ -1,0 +1,24 @@
+@startuml packages
+set namespaceSeparator none
+package "battle_snake.__main__" as battle_snake.__main__ {
+    class HandleMove
+}
+package "battle_snake.interactor" as battle_snake.interactor {
+    class MoveDecision
+    class MyFutureHistory
+    class Tactics
+}
+package "battle_snake.entities" as battle_snake.entities {
+    class Point
+    class NextStep
+    class Snake
+    class FutureSnake
+    class Board
+    class FutureBoard
+    NextStep --|> Enum
+    FutureSnake --|> Snake
+    FutureBoard *-- Board
+}
+battle_snake.__main__ --> battle_snake.interactor
+battle_snake.interactor --> battle_snake.entities
+@enduml

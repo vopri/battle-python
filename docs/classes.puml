@@ -1,0 +1,73 @@
+@startuml classes
+set namespaceSeparator none
+class "Board" as battle_snake.entities.Board {
+  food : set[Position]
+  my_snake
+  snakes : set[Snake]
+  get_food_ordered_by_distance(position: Position) -> list[tuple[set[FirstStep], AmountOfSteps, Position]]
+  move_snake(snake: Snake, next_step: NextStep) -> Position
+}
+class "FutureSnake" as battle_snake.entities.FutureSnake {
+  get_my_first_step() -> NextStep
+}
+class "GameBoardBounderies" as battle_snake.entities.GameBoardBounderies {
+  height : int
+  width : int
+  is_wall(pos: Position) -> bool
+}
+class "MoveDecision" as battle_snake.interactor.MoveDecision {
+  board
+  future_board
+  tactics
+  decide() -> NextStep
+}
+class "MyFutureHistory" as battle_snake.interactor.MyFutureHistory {
+  all_my_snakes_definitely_dead_after_how_many_steps(first_step: FirstStep) -> int
+  is_dangerous_snake_in_first_step(first_step: FirstStep)
+  my_snake_found_food_after_how_many_steps(first_step: NextStep) -> Optional[int]
+  save(future_board: PossibleFutureBoard) -> None
+}
+class "NextStep" as battle_snake.entities.NextStep {
+}
+class "Position" as battle_snake.entities.Position {
+  x : int
+  y : int
+}
+class "PossibleFutureBoard" as battle_snake.entities.PossibleFutureBoard {
+  bounderies
+  food : set[Position]
+  possible_snakes : set, set[FutureSnake]
+  recorder : Optional[Recorder]
+  simulated_turns : int
+  does_my_snake_bite_or_collide_with_another_snake(my_snake: FutureSnake) -> bool
+  get_my_survived_snakes() -> set[FutureSnake]
+  is_food_available_for(snake: Snake)
+  is_wall(pos: Position) -> bool
+  next_turn() -> None
+  register_recorder(recorder: Recorder)
+}
+class "Recorder" as battle_snake.entities.Recorder {
+  save(board: 'PossibleFutureBoard')
+}
+class "Snake" as battle_snake.entities.Snake {
+  bites_itself() -> bool
+  calculate_future_snake(next_step: NextStep, is_food_available: bool) -> 'FutureSnake'
+}
+
+class "Tactics" as battle_snake.interactor.Tactics {
+  decide() -> NextStep
+}
+battle_snake.entities.FutureSnake --|> battle_snake.entities.Snake
+battle_snake.interactor.MyFutureHistory --|> battle_snake.entities.Recorder
+battle_snake.entities.Board --* battle_snake.interactor.MoveDecision : board
+battle_snake.entities.Board --* battle_snake.interactor.Tactics : _board
+battle_snake.entities.GameBoardBounderies --* battle_snake.entities.PossibleFutureBoard : bounderies
+battle_snake.entities.GameBoardBounderies --* battle_snake.entities.Board : bounderies
+battle_snake.entities.PossibleFutureBoard --* battle_snake.interactor.MoveDecision : future_board
+battle_snake.entities.Recorder --* battle_snake.entities.PossibleFutureBoard : recorder
+battle_snake.entities.Snake --* battle_snake.entities.Board 
+battle_snake.entities.FutureSnake --* battle_snake.entities.PossibleFutureBoard 
+battle_snake.interactor.MyFutureHistory --* battle_snake.interactor.MoveDecision : _history
+battle_snake.interactor.MyFutureHistory --* battle_snake.interactor.Tactics : _history
+battle_snake.interactor.Tactics --* battle_snake.interactor.MoveDecision : tactics
+@enduml

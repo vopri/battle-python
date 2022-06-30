@@ -1,0 +1,29 @@
+@startuml Sequence
+group Init Phase
+    MoveDecision -> Board: create
+    MoveDecision -> MyFutureHistory: create
+    MoveDecision -> Tactics: create
+end
+group Simulation Phase
+    MoveDecision -> PossibleFutureBoard: create 
+    PossibleFutureBoard -> FutureSnake: create if survivable
+    PossibleFutureBoard -> MyFutureHistory: save(future_board)
+    loop 6 times
+        MoveDecision -> PossibleFutureBoard: next_turn
+        PossibleFutureBoard -> FutureSnake: create if survivable
+        PossibleFutureBoard -> MyFutureHistory: save(future_board)
+    end
+end
+group Decision Phase
+    MoveDecision -> Tactics: decide
+    Tactics -> MyFutureHistory: find my latest survived snakes
+    alt
+    Tactics -> MyFutureHistory: from selection find snakes \nwith food on their path
+    else
+    Tactics -> MyFutureHistory: from selection find snakes \ndirecting to food more far away
+    end
+    Tactics -> Tactics: chose randomly one \nfrom selection
+    Tactics -> FutureSnake: get your very \nfirst step in simulation
+    Tactics --> MoveDecision: next_step
+end
+@enduml
