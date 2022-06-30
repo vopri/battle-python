@@ -21,4 +21,4 @@ Local installation can be done using [poetry](https://python-poetry.org/). All f
 
 * [Logical Flow](https://github.com/vopri/battle-python/blob/main/docs/Sequence.png)
 * [Package Overview](https://github.com/vopri/battle-python/blob/main/docs/packages.png)
-* [More Detailed Class Diagram](https://github.com/vopri/battle-python/blob/main/docs/classes.puml)
+* [More Detailed Class Diagram](https://github.com/vopri/battle-python/blob/main/docs/classes.png)
